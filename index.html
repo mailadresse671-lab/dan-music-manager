@@ -441,6 +441,8 @@
       <div class="api-dot" id="apiDot"></div>
       <span id="apiStatusText">Kein API Key</span>
     </div>
+    <button class="btn-api" onclick="exportSongs()" title="Songs als JSON exportieren">⬇ Export</button>
+    <label class="btn-api" style="cursor:pointer;" title="Songs aus JSON importieren">⬆ Import<input type="file" accept=".json" onchange="importSongs(event)" style="display:none"></label>
     <button class="btn-api" onclick="openApiModal()">API Key</button>
   </div>
 </div>
@@ -544,6 +546,13 @@
             <button class="btn-copy" onclick="copyResult('p1_result_content')">📋 Kopieren</button>
           </div>
           <div class="result-content" id="p1_result_content"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Notizen</div>
+        <div class="form-group">
+          <label>Allgemeine Notizen zum Song</label>
+          <textarea id="song_notes" rows="4" placeholder="Ideen, Inspirationen, Referenzen, To-Dos..." oninput="autoSave()"></textarea>
         </div>
       </div>
     </div>
@@ -845,9 +854,13 @@
   <div class="modal">
     <div class="modal-title">🔑 API Key eingeben</div>
     <div class="modal-desc">
-      Gib deinen Anthropic API Key ein, um die KI-Funktionen zu nutzen. Der Key wird nur in dieser Browser-Session gespeichert (sessionStorage).
+      Gib deinen Anthropic API Key ein, um die KI-Funktionen zu nutzen.
     </div>
     <input type="password" class="modal-input" id="apiKeyInput" placeholder="sk-ant-..." onkeydown="if(event.key==='Enter')saveApiKey()">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <input type="checkbox" id="apiKeyPersist" style="width:16px;height:16px;accent-color:var(--purple);flex-shrink:0;">
+      <label for="apiKeyPersist" style="font-size:12px;color:var(--text-muted);margin:0;cursor:pointer;">Key dauerhaft speichern (localStorage) – nur auf eigenem Gerät empfohlen</label>
+    </div>
     <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">
       💡 Du kannst deinen Key unter <a href="https://console.anthropic.com/" target="_blank" style="color:var(--blue);">console.anthropic.com</a> finden.
     </div>
@@ -867,6 +880,19 @@
     <div class="modal-btns">
       <button class="btn-primary" onclick="confirmNewSong()">Erstellen</button>
       <button class="btn-cancel" onclick="closeNewSongModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- RENAME SONG MODAL -->
+<div class="modal-overlay hidden" id="renameSongModal">
+  <div class="modal">
+    <div class="modal-title">✏️ Song umbenennen</div>
+    <div class="modal-desc">Gib den neuen Namen für deinen Song ein.</div>
+    <input type="text" class="modal-input" id="renameSongInput" placeholder="Neuer Song-Titel..." onkeydown="if(event.key==='Enter')confirmRenameSong()">
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="confirmRenameSong()">Umbenennen</button>
+      <button class="btn-cancel" onclick="closeRenameSongModal()">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -893,12 +919,12 @@ document.addEventListener('DOMContentLoaded', () => {
   updateApiStatus();
   renderSongList();
 
-  const apiKey = sessionStorage.getItem('dan_api_key');
-  if (!apiKey) {
-    document.getElementById('apiModal').classList.remove('hidden');
-    // Make sure modal doesn't have hidden class from start... it already doesn't
-  } else {
+  const apiKey = sessionStorage.getItem('dan_api_key') || localStorage.getItem('dan_api_key');
+  if (apiKey) {
+    sessionStorage.setItem('dan_api_key', apiKey);
     document.getElementById('apiModal').classList.add('hidden');
+  } else {
+    document.getElementById('apiModal').classList.remove('hidden');
   }
 
   // Load first song if exists
@@ -924,8 +950,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // =============================
 function openApiModal() {
   document.getElementById('apiModal').classList.remove('hidden');
-  const existing = sessionStorage.getItem('dan_api_key');
+  const existing = sessionStorage.getItem('dan_api_key') || localStorage.getItem('dan_api_key');
   if (existing) document.getElementById('apiKeyInput').value = existing;
+  document.getElementById('apiKeyPersist').checked = !!localStorage.getItem('dan_api_key');
   document.getElementById('apiKeyInput').focus();
 }
 
@@ -940,10 +967,17 @@ function saveApiKey() {
     showToast('API Key Format ungültig (sollte mit sk-ant- beginnen)', 'error');
     return;
   }
+  const persist = document.getElementById('apiKeyPersist').checked;
   sessionStorage.setItem('dan_api_key', key);
+  if (persist) {
+    localStorage.setItem('dan_api_key', key);
+    showToast('API Key dauerhaft gespeichert!', 'success');
+  } else {
+    localStorage.removeItem('dan_api_key');
+    showToast('API Key gespeichert (nur diese Session)!', 'success');
+  }
   updateApiStatus();
   closeApiModal();
-  showToast('API Key gespeichert!', 'success');
 }
 
 function updateApiStatus() {
@@ -1270,7 +1304,8 @@ function confirmNewSong() {
     p4_ai_result: '',
     p5_stimmung: '', p5_stil: '', p5_farben: '', p5_motiv: '', p5_ai_result: '',
     p6_konzept: '', p6_ai_result: '',
-    p7_zusatz: '', p7_ai_result: ''
+    p7_zusatz: '', p7_ai_result: '',
+    song_notes: ''
   };
 
   saveToStorage();
@@ -1334,7 +1369,7 @@ function renderSongList() {
     div.dataset.id = id;
     div.onclick = () => selectSong(id);
     div.innerHTML = `
-      <span class="song-item-name">${escHtml(song.name)}</span>
+      <span class="song-item-name" ondblclick="openRenameSong('${id}', event)" title="Doppelklick zum Umbenennen">${escHtml(song.name)}</span>
       <button class="song-item-del" onclick="deleteSong('${id}', event)" title="Song löschen">×</button>
     `;
     list.appendChild(div);
@@ -1430,6 +1465,9 @@ function loadSongData(id) {
   setVal('p7_zusatz', s.p7_zusatz);
   if (s.p7_ai_result) { showResult('p7_result', 'p7_result_content', s.p7_ai_result); }
   else { hideResult('p7_result'); }
+
+  // Notes
+  setVal('song_notes', s.song_notes);
 }
 
 function hideResult(id) {
@@ -1470,6 +1508,7 @@ function autoSave() {
 
   s.p6_konzept = getVal('p6_konzept');
   s.p7_zusatz = getVal('p7_zusatz');
+  s.song_notes = getVal('song_notes');
 
   saveToStorage();
 }
@@ -1564,6 +1603,84 @@ function toggleSidebar() {
 function closeSidebar() {
   sidebarOpen = false;
   document.getElementById('sidebar').classList.remove('open');
+}
+
+// =============================
+// EXPORT / IMPORT
+// =============================
+function exportSongs() {
+  if (Object.keys(songs).length === 0) {
+    showToast('Keine Songs zum Exportieren!', 'error');
+    return;
+  }
+  autoSave();
+  const data = JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), songs }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dan-music-songs-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Songs exportiert!', 'success');
+}
+
+function importSongs(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const imported = data.songs || data;
+      if (typeof imported !== 'object' || Array.isArray(imported)) throw new Error('Ungültiges Format');
+      const count = Object.keys(imported).length;
+      if (count === 0) throw new Error('Keine Songs gefunden');
+      // Merge: imported songs are added, existing songs with same ID are overwritten
+      Object.assign(songs, imported);
+      saveToStorage();
+      renderSongList();
+      showToast(`${count} Song(s) importiert!`, 'success');
+    } catch(err) {
+      showToast('Import-Fehler: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// =============================
+// SONG RENAME
+// =============================
+let renamingSongId = null;
+
+function openRenameSong(id, event) {
+  event.stopPropagation();
+  renamingSongId = id;
+  const song = songs[id];
+  if (!song) return;
+  document.getElementById('renameSongInput').value = song.name;
+  document.getElementById('renameSongModal').classList.remove('hidden');
+  document.getElementById('renameSongInput').focus();
+  document.getElementById('renameSongInput').select();
+}
+
+function closeRenameSongModal() {
+  document.getElementById('renameSongModal').classList.add('hidden');
+  renamingSongId = null;
+}
+
+function confirmRenameSong() {
+  const newName = document.getElementById('renameSongInput').value.trim();
+  if (!newName) { showToast('Bitte Namen eingeben!', 'error'); return; }
+  if (!renamingSongId || !songs[renamingSongId]) { closeRenameSongModal(); return; }
+  songs[renamingSongId].name = newName;
+  saveToStorage();
+  renderSongList();
+  closeRenameSongModal();
+  showToast(`Song umbenannt zu "${newName}"`, 'success');
 }
 </script>
 </body>
