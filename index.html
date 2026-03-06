@@ -1823,7 +1823,8 @@ function closeCloudModal() {
 }
 
 async function saveCloudConfig() {
-  const url = document.getElementById('sbUrl').value.trim().replace(/\/$/, '');
+  let url = document.getElementById('sbUrl').value.trim().replace(/\/$/, '');
+  if (url && !url.startsWith('http')) url = 'https://' + url;
   const key = document.getElementById('sbKey').value.trim();
   if (!url || !key) { showToast('Bitte URL und Key eingeben!', 'error'); return; }
 
