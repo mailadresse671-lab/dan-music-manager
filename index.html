@@ -1766,7 +1766,8 @@ function confirmRenameSong() {
 // =============================
 // SUPABASE CLOUD SYNC
 // =============================
-let sbUrl = '', sbKey = '';
+let sbUrl = 'https://aytvvbasvxbuwsfsbypj.supabase.co';
+let sbKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5dHZ2YmFzdnhidXdzZnNieXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNjA3MDQsImV4cCI6MjA4MzYzNjcwNH0.YsmU-M8Gc-qA8kjWfXoIa3DOAhLwHhiacKRK2ly10iI';
 let cloudConnected = false;
 let syncDebounceTimer = null;
 
@@ -1780,8 +1781,8 @@ function getSbHeaders() {
 }
 
 function loadCloudConfig() {
-  sbUrl = localStorage.getItem('dan_sb_url') || '';
-  sbKey = localStorage.getItem('dan_sb_key') || '';
+  sbUrl = localStorage.getItem('dan_sb_url') || sbUrl;
+  sbKey = localStorage.getItem('dan_sb_key') || sbKey;
   if (sbUrl && sbKey) {
     cloudConnected = true;
     updateCloudStatus('connected');
