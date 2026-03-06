@@ -1781,8 +1781,13 @@ function getSbHeaders() {
 }
 
 function loadCloudConfig() {
-  sbUrl = localStorage.getItem('dan_sb_url') || sbUrl;
+  const storedUrl = localStorage.getItem('dan_sb_url') || '';
+  // Ignore stored URL if invalid (missing https://)
+  if (storedUrl.startsWith('https://')) sbUrl = storedUrl;
   sbKey = localStorage.getItem('dan_sb_key') || sbKey;
+  // Fix localStorage with correct values
+  localStorage.setItem('dan_sb_url', sbUrl);
+  localStorage.setItem('dan_sb_key', sbKey);
   if (sbUrl && sbKey) {
     cloudConnected = true;
     updateCloudStatus('connected');
