@@ -66,6 +66,33 @@
     transition: all 0.2s;
   }
   .btn-api:hover { background: rgba(59,130,246,0.25); }
+  .btn-cloud {
+    font-size: 12px; padding: 6px 14px;
+    background: rgba(16,185,129,0.15);
+    border: 1px solid rgba(16,185,129,0.3);
+    color: var(--success); border-radius: 6px; cursor: pointer;
+    transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+  }
+  .btn-cloud:hover { background: rgba(16,185,129,0.25); }
+  .btn-cloud.syncing { animation: pulse 1s ease-in-out infinite; }
+  .btn-cloud.error { color: var(--danger); border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.1); }
+  .btn-cloud.error:hover { background: rgba(239,68,68,0.2); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .cloud-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); flex-shrink:0; }
+  .cloud-dot.connected { background: var(--success); }
+  .cloud-dot.error { background: var(--danger); }
+  /* SUPABASE MODAL extra */
+  .modal-wide { max-width: 560px; }
+  .code-block {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px; font-family: monospace;
+    font-size: 12px; color: #a78bfa; white-space: pre; overflow-x: auto;
+    margin-bottom: 12px; line-height: 1.6;
+  }
+  .step-label {
+    font-size: 11px; font-weight: 700; color: var(--purple-light);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; margin-top: 14px;
+  }
   /* LAYOUT */
   .app-layout {
     display: flex;
@@ -441,6 +468,10 @@
       <div class="api-dot" id="apiDot"></div>
       <span id="apiStatusText">Kein API Key</span>
     </div>
+    <button class="btn-cloud" id="cloudBtn" onclick="openCloudModal()" title="Supabase Cloud-Sync">
+      <div class="cloud-dot" id="cloudDot"></div>
+      <span id="cloudBtnText">☁ Cloud</span>
+    </button>
     <button class="btn-api" onclick="exportSongs()" title="Songs als JSON exportieren">⬇ Export</button>
     <label class="btn-api" style="cursor:pointer;" title="Songs aus JSON importieren">⬆ Import<input type="file" accept=".json" onchange="importSongs(event)" style="display:none"></label>
     <button class="btn-api" onclick="openApiModal()">API Key</button>
@@ -897,6 +928,43 @@
   </div>
 </div>
 
+<!-- SUPABASE CLOUD MODAL -->
+<div class="modal-overlay hidden" id="cloudModal">
+  <div class="modal modal-wide">
+    <div class="modal-title">☁ Supabase Cloud-Sync</div>
+    <div class="modal-desc">Verbinde deine Supabase-Datenbank, damit deine Songs auf allen Geräten verfügbar sind.</div>
+
+    <div class="step-label">Schritt 1 – Tabelle in Supabase erstellen (SQL Editor)</div>
+    <div class="code-block" id="setupSql">CREATE TABLE IF NOT EXISTS dan_songs (
+  song_id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  data JSONB NOT NULL DEFAULT '{}',
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE dan_songs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "anon full access" ON dan_songs
+  FOR ALL TO anon USING (true) WITH CHECK (true);</div>
+    <button class="btn-copy" style="margin-bottom:14px;" onclick="copyResult('setupSql')">📋 SQL kopieren</button>
+
+    <div class="step-label">Schritt 2 – Deine Supabase-Zugangsdaten</div>
+    <div class="form-group">
+      <label>Supabase Project URL</label>
+      <input type="text" class="modal-input" id="sbUrl" placeholder="https://xxxxxxxxxxxx.supabase.co" style="margin-bottom:10px;font-family:monospace;">
+    </div>
+    <div class="form-group">
+      <label>Anon / Public Key</label>
+      <input type="password" class="modal-input" id="sbKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." style="font-family:monospace;">
+    </div>
+
+    <div class="modal-btns" style="margin-top:16px;">
+      <button class="btn-primary" onclick="saveCloudConfig()">Verbinden & Synchronisieren</button>
+      <button id="cloudSyncNowBtn" class="btn-secondary" onclick="manualSync()" style="display:none;">🔄 Jetzt synchronisieren</button>
+      <button class="btn-cancel" onclick="closeCloudModal()">Schließen</button>
+    </div>
+    <div id="cloudStatusMsg" style="margin-top:12px;font-size:12px;color:var(--text-muted);"></div>
+  </div>
+</div>
+
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
 
@@ -917,6 +985,7 @@ const CHECKLIST_KEYS = ['idee','lyrics','beat','recording','editing','mixing','m
 document.addEventListener('DOMContentLoaded', () => {
   loadFromStorage();
   updateApiStatus();
+  loadCloudConfig();
   renderSongList();
 
   const apiKey = sessionStorage.getItem('dan_api_key') || localStorage.getItem('dan_api_key');
@@ -931,6 +1000,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const songIds = Object.keys(songs);
   if (songIds.length > 0) {
     selectSong(songIds[0]);
+  }
+
+  // Auto-sync from cloud on start
+  if (cloudConnected) {
+    fullSync().then(() => {
+      const ids = Object.keys(songs);
+      if (ids.length > 0 && !currentSongId) selectSong(ids[0]);
+    });
   }
 
   // Keyboard shortcut
@@ -1339,6 +1416,7 @@ function deleteSong(id, e) {
   delete songs[id];
   saveToStorage();
   renderSongList();
+  deleteSongFromCloud(id);
 
   if (currentSongId === id) {
     currentSongId = null;
@@ -1511,6 +1589,7 @@ function autoSave() {
   s.song_notes = getVal('song_notes');
 
   saveToStorage();
+  debouncedCloudSync();
 }
 
 function saveField(field, value) {
@@ -1681,6 +1760,190 @@ function confirmRenameSong() {
   renderSongList();
   closeRenameSongModal();
   showToast(`Song umbenannt zu "${newName}"`, 'success');
+  debouncedCloudSync();
+}
+
+// =============================
+// SUPABASE CLOUD SYNC
+// =============================
+let sbUrl = '', sbKey = '';
+let cloudConnected = false;
+let syncDebounceTimer = null;
+
+function getSbHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'apikey': sbKey,
+    'Authorization': 'Bearer ' + sbKey,
+    'Prefer': 'resolution=merge-duplicates'
+  };
+}
+
+function loadCloudConfig() {
+  sbUrl = localStorage.getItem('dan_sb_url') || '';
+  sbKey = localStorage.getItem('dan_sb_key') || '';
+  if (sbUrl && sbKey) {
+    cloudConnected = true;
+    updateCloudStatus('connected');
+  }
+}
+
+function updateCloudStatus(state, msg) {
+  const dot = document.getElementById('cloudDot');
+  const btn = document.getElementById('cloudBtn');
+  const text = document.getElementById('cloudBtnText');
+  dot.className = 'cloud-dot';
+  btn.className = 'btn-cloud';
+  if (state === 'connected') {
+    dot.classList.add('connected');
+    text.textContent = '☁ Cloud';
+  } else if (state === 'syncing') {
+    dot.classList.add('connected');
+    btn.classList.add('syncing');
+    text.textContent = '☁ Sync...';
+  } else if (state === 'error') {
+    dot.classList.add('error');
+    btn.classList.add('error');
+    text.textContent = '☁ Fehler';
+  } else {
+    text.textContent = '☁ Cloud';
+  }
+}
+
+function openCloudModal() {
+  document.getElementById('sbUrl').value = sbUrl;
+  document.getElementById('sbKey').value = sbKey;
+  document.getElementById('cloudSyncNowBtn').style.display = cloudConnected ? 'inline-flex' : 'none';
+  document.getElementById('cloudStatusMsg').textContent = cloudConnected ? '✓ Verbunden mit ' + sbUrl : '';
+  document.getElementById('cloudModal').classList.remove('hidden');
+}
+
+function closeCloudModal() {
+  document.getElementById('cloudModal').classList.add('hidden');
+}
+
+async function saveCloudConfig() {
+  const url = document.getElementById('sbUrl').value.trim().replace(/\/$/, '');
+  const key = document.getElementById('sbKey').value.trim();
+  if (!url || !key) { showToast('Bitte URL und Key eingeben!', 'error'); return; }
+
+  const statusEl = document.getElementById('cloudStatusMsg');
+  statusEl.textContent = '⏳ Verbinde...';
+
+  try {
+    // Test connection
+    const res = await fetch(`${url}/rest/v1/dan_songs?limit=1`, {
+      headers: { 'apikey': key, 'Authorization': 'Bearer ' + key }
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || err.hint || `HTTP ${res.status} – Tabelle vorhanden?`);
+    }
+
+    sbUrl = url;
+    sbKey = key;
+    cloudConnected = true;
+    localStorage.setItem('dan_sb_url', url);
+    localStorage.setItem('dan_sb_key', key);
+    updateCloudStatus('connected');
+    document.getElementById('cloudSyncNowBtn').style.display = 'inline-flex';
+    statusEl.textContent = '✓ Verbunden! Synchronisiere...';
+
+    await fullSync();
+    statusEl.textContent = '✓ Verbunden und synchronisiert mit ' + url;
+    showToast('Cloud-Sync aktiv!', 'success');
+  } catch(e) {
+    updateCloudStatus('error');
+    statusEl.textContent = '✗ Fehler: ' + e.message;
+    showToast('Verbindungsfehler: ' + e.message, 'error');
+  }
+}
+
+async function pushSongToCloud(song) {
+  if (!cloudConnected || !sbUrl || !sbKey) return;
+  try {
+    await fetch(`${sbUrl}/rest/v1/dan_songs`, {
+      method: 'POST',
+      headers: getSbHeaders(),
+      body: JSON.stringify({
+        song_id: song.id,
+        name: song.name,
+        data: song,
+        updated_at: new Date().toISOString()
+      })
+    });
+  } catch(e) {
+    console.warn('Cloud push failed:', e.message);
+  }
+}
+
+async function deleteSongFromCloud(id) {
+  if (!cloudConnected || !sbUrl || !sbKey) return;
+  try {
+    await fetch(`${sbUrl}/rest/v1/dan_songs?song_id=eq.${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+    });
+  } catch(e) {
+    console.warn('Cloud delete failed:', e.message);
+  }
+}
+
+async function fullSync() {
+  if (!cloudConnected || !sbUrl || !sbKey) return;
+  updateCloudStatus('syncing');
+  try {
+    // Push all local songs
+    const localIds = Object.keys(songs);
+    for (const id of localIds) {
+      await pushSongToCloud(songs[id]);
+    }
+
+    // Pull remote songs not in local
+    const res = await fetch(`${sbUrl}/rest/v1/dan_songs?select=song_id,name,data,updated_at&order=updated_at.desc`, {
+      headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+    });
+    if (res.ok) {
+      const remote = await res.json();
+      let added = 0;
+      for (const row of remote) {
+        const localSong = songs[row.song_id];
+        const remoteDate = new Date(row.updated_at);
+        const localDate = localSong ? new Date(localSong.updatedAt || 0) : new Date(0);
+        // Use remote if newer or not present locally
+        if (!localSong || remoteDate > localDate) {
+          songs[row.song_id] = { ...row.data, id: row.song_id };
+          added++;
+        }
+      }
+      if (added > 0) {
+        saveToStorage();
+        renderSongList();
+      }
+    }
+    updateCloudStatus('connected');
+  } catch(e) {
+    updateCloudStatus('error');
+    showToast('Sync-Fehler: ' + e.message, 'error');
+  }
+}
+
+async function manualSync() {
+  showToast('Synchronisiere...', 'info');
+  await fullSync();
+  showToast('Synchronisiert!', 'success');
+  document.getElementById('cloudStatusMsg').textContent = '✓ Zuletzt synchronisiert: ' + new Date().toLocaleTimeString('de-DE');
+}
+
+function debouncedCloudSync() {
+  if (!cloudConnected) return;
+  clearTimeout(syncDebounceTimer);
+  syncDebounceTimer = setTimeout(() => {
+    if (currentSongId && songs[currentSongId]) {
+      songs[currentSongId].updatedAt = new Date().toISOString();
+      pushSongToCloud(songs[currentSongId]);
+    }
+  }, 2000);
 }
 </script>
 </body>
