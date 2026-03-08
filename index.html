@@ -908,17 +908,17 @@
 <!-- API KEY MODAL -->
 <div class="modal-overlay" id="apiModal">
   <div class="modal">
-    <div class="modal-title">🔑 API Key eingeben</div>
+    <div class="modal-title">🔑 Google Gemini API Key</div>
     <div class="modal-desc">
-      Gib deinen Anthropic API Key ein, um die KI-Funktionen zu nutzen.
+      Gib deinen Google Gemini API Key ein, um die KI-Funktionen zu nutzen.
     </div>
-    <input type="password" class="modal-input" id="apiKeyInput" placeholder="sk-ant-..." onkeydown="if(event.key==='Enter')saveApiKey()">
+    <input type="password" class="modal-input" id="apiKeyInput" placeholder="AIza..." onkeydown="if(event.key==='Enter')saveApiKey()">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
       <input type="checkbox" id="apiKeyPersist" style="width:16px;height:16px;accent-color:var(--purple);flex-shrink:0;">
       <label for="apiKeyPersist" style="font-size:12px;color:var(--text-muted);margin:0;cursor:pointer;">Key dauerhaft speichern (localStorage) – nur auf eigenem Gerät empfohlen</label>
     </div>
     <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">
-      💡 Du kannst deinen Key unter <a href="https://console.anthropic.com/" target="_blank" style="color:var(--blue);">console.anthropic.com</a> finden.
+      💡 Du kannst deinen Key unter <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--blue);">aistudio.google.com/apikey</a> finden.
     </div>
     <div class="modal-btns">
       <button class="btn-primary" onclick="saveApiKey()">Speichern & Starten</button>
@@ -1013,13 +1013,11 @@ document.addEventListener('DOMContentLoaded', () => {
   loadCloudConfig();
   renderSongList();
 
-  const apiKey = sessionStorage.getItem('dan_api_key') || localStorage.getItem('dan_api_key');
-  if (apiKey) {
-    sessionStorage.setItem('dan_api_key', apiKey);
-    document.getElementById('apiModal').classList.add('hidden');
-  } else {
-    document.getElementById('apiModal').classList.remove('hidden');
-  }
+  const defaultKey = 'AIzaSyDhEiU6-ra9JnH4MJNYO74eNlkeTkVN1dA';
+  const apiKey = sessionStorage.getItem('dan_api_key') || localStorage.getItem('dan_api_key') || defaultKey;
+  sessionStorage.setItem('dan_api_key', apiKey);
+  localStorage.setItem('dan_api_key', apiKey);
+  document.getElementById('apiModal').classList.add('hidden');
 
   // Load first song if exists
   const songIds = Object.keys(songs);
@@ -1065,8 +1063,8 @@ function closeApiModal() {
 function saveApiKey() {
   const key = document.getElementById('apiKeyInput').value.trim();
   if (!key) { showToast('Bitte API Key eingeben!', 'error'); return; }
-  if (!key.startsWith('sk-ant-')) {
-    showToast('API Key Format ungültig (sollte mit sk-ant- beginnen)', 'error');
+  if (!key.startsWith('AIza')) {
+    showToast('API Key Format ungültig (sollte mit AIza beginnen)', 'error');
     return;
   }
   const persist = document.getElementById('apiKeyPersist').checked;
@@ -1102,18 +1100,14 @@ async function callClaude(prompt) {
     throw new Error('Kein API Key vorhanden');
   }
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 2000,
-      messages: [{ role: 'user', content: prompt }]
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 2000 }
     })
   });
 
@@ -1123,7 +1117,7 @@ async function callClaude(prompt) {
   }
 
   const data = await response.json();
-  return data.content[0].text;
+  return data.candidates[0].content.parts[0].text;
 }
 
 // =============================
