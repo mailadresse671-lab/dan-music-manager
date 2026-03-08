@@ -594,7 +594,206 @@
     color: #f59e0b; border-radius: 6px; cursor: pointer; transition: all 0.2s;
   }
   .btn-tavily:hover { background: rgba(245,158,11,0.25); }
+
+  /* ===== CUSTOM SELECT ===== */
+  .select-with-add { display:flex; gap:8px; }
+  .select-with-add select { flex:1; }
+  .btn-add-opt {
+    padding:0 12px; background:rgba(124,58,237,0.15);
+    border:1px solid rgba(124,58,237,0.3); border-radius:8px;
+    color:var(--purple-light); cursor:pointer; font-size:20px;
+    transition:all 0.2s; display:flex; align-items:center; flex-shrink:0;
+  }
+  .btn-add-opt:hover { background:rgba(124,58,237,0.3); }
+
+  /* ===== MANAGER PANEL ===== */
+  .manager-card { border-color:rgba(124,58,237,0.25) !important; margin-top:16px; }
+  .mgr-toggle {
+    display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer; padding:14px 16px; transition:background 0.2s;
+    background:rgba(124,58,237,0.05); border-radius:10px; user-select:none;
+  }
+  .mgr-toggle:hover { background:rgba(124,58,237,0.1); }
+  .mgr-toggle.open { border-radius:10px 10px 0 0; border-bottom:1px solid var(--border); }
+  .mgr-toggle-left { display:flex; align-items:center; gap:10px; }
+  .mgr-avatar {
+    width:32px; height:32px; border-radius:8px; display:flex;
+    align-items:center; justify-content:center; font-size:16px; flex-shrink:0;
+  }
+  .mgr-title { font-size:13px; font-weight:700; color:var(--text); }
+  .mgr-subtitle { font-size:11px; color:var(--text-muted); margin-top:1px; }
+  .mgr-arrow { transition:transform 0.25s; color:var(--text-muted); font-size:12px; }
+  .mgr-toggle.open .mgr-arrow { transform:rotate(180deg); }
+  .mgr-body { display:none; }
+  .mgr-body.open { display:flex; flex-direction:column; }
+  .mgr-messages {
+    min-height:80px; max-height:280px; overflow-y:auto;
+    padding:12px; display:flex; flex-direction:column; gap:8px;
+  }
+  .mgr-msg {
+    max-width:90%; padding:10px 14px; border-radius:10px;
+    font-size:13px; line-height:1.65;
+  }
+  .mgr-msg.user {
+    background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.25);
+    align-self:flex-end; color:var(--text);
+  }
+  .mgr-msg.assistant {
+    background:var(--card2); border:1px solid var(--border);
+    align-self:flex-start; color:var(--text); white-space:pre-wrap;
+  }
+  .mgr-msg-time { font-size:10px; color:var(--text-muted); margin-top:4px; }
+  .mgr-empty { text-align:center; padding:20px; font-size:12px; color:var(--text-muted); }
+  .mgr-quick-row {
+    display:flex; flex-wrap:wrap; gap:6px;
+    padding:8px 12px; border-top:1px solid var(--border);
+  }
+  .mgr-quick-btn {
+    padding:4px 10px; font-size:11px;
+    background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.2);
+    border-radius:20px; color:var(--purple-light); cursor:pointer; transition:all 0.2s;
+  }
+  .mgr-quick-btn:hover { background:rgba(124,58,237,0.22); }
+  .mgr-input-area {
+    display:flex; gap:8px; padding:10px 12px;
+    border-top:1px solid var(--border);
+  }
+  .mgr-textarea {
+    flex:1; padding:8px 12px; background:var(--card2);
+    border:1px solid var(--border); border-radius:8px;
+    color:var(--text); font-size:13px; outline:none; resize:none;
+    font-family:inherit; min-height:38px; max-height:100px;
+  }
+  .mgr-textarea:focus { border-color:var(--purple); }
+  .mgr-send {
+    padding:0 14px; height:38px; background:var(--purple);
+    border:none; border-radius:8px; color:white; font-size:15px;
+    cursor:pointer; transition:opacity 0.2s; flex-shrink:0;
+  }
+  .mgr-send:hover { opacity:0.85; }
+  .mgr-send:disabled { opacity:0.5; cursor:not-allowed; }
+
+  /* ===== MATERIALS ===== */
+  .materials-bar {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .material-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:10px; margin-top:10px;
+  }
+  .material-item {
+    background:var(--card2); border:1px solid var(--border); border-radius:8px;
+    padding:12px; display:flex; flex-direction:column; gap:4px; position:relative;
+  }
+  .material-item-icon { font-size:22px; }
+  .material-item-type {
+    font-size:10px; font-weight:700; color:var(--text-muted);
+    text-transform:uppercase; letter-spacing:0.5px;
+  }
+  .material-item-note { font-size:12px; color:var(--text); line-height:1.4; }
+  .material-item-url {
+    font-size:11px; color:var(--blue); overflow:hidden;
+    text-overflow:ellipsis; white-space:nowrap; cursor:pointer;
+  }
+  .material-item-url:hover { text-decoration:underline; }
+  .material-item-del {
+    position:absolute; top:6px; right:6px;
+    background:none; border:none; color:var(--text-muted);
+    cursor:pointer; font-size:16px; line-height:1;
+  }
+  .material-item-del:hover { color:var(--danger); }
+  .no-materials { font-size:13px; color:var(--text-muted); text-align:center; padding:16px; }
+
+  /* ===== YOUTUBE PANEL ===== */
+  .yt-channel-bar {
+    display:flex; align-items:center; gap:12px;
+    padding:14px; background:rgba(255,0,0,0.05);
+    border:1px solid rgba(255,0,0,0.15); border-radius:10px; margin-bottom:14px;
+  }
+  .yt-avatar {
+    width:48px; height:48px; border-radius:50%; background:#ff0000;
+    display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;
+  }
+  .yt-channel-name { font-size:15px; font-weight:700; color:var(--text); }
+  .yt-channel-sub { font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .btn-yt {
+    display:inline-flex; align-items:center; gap:6px; padding:9px 16px;
+    background:rgba(255,0,0,0.15); border:1px solid rgba(255,0,0,0.3);
+    border-radius:8px; color:#ff4444; font-size:13px; font-weight:600;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .btn-yt:hover { background:rgba(255,0,0,0.25); }
+  .yt-video-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+    gap:10px; margin-top:12px;
+  }
+  .yt-video-item {
+    background:var(--card2); border:1px solid var(--border); border-radius:8px;
+    overflow:hidden; cursor:pointer; transition:all 0.2s;
+  }
+  .yt-video-item:hover { border-color:var(--purple); }
+  .yt-thumb {
+    width:100%; aspect-ratio:16/9; object-fit:cover; background:var(--bg);
+    display:block;
+  }
+  .yt-video-info { padding:8px 10px; }
+  .yt-video-title {
+    font-size:12px; font-weight:600; color:var(--text);
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  .yt-video-date { font-size:11px; color:var(--text-muted); margin-top:4px; }
+  .btn-yt-key {
+    font-size:12px; padding:6px 14px;
+    background:rgba(255,0,0,0.1); border:1px solid rgba(255,0,0,0.25);
+    color:#ff6666; border-radius:6px; cursor:pointer; transition:all 0.2s;
+  }
+  .btn-yt-key:hover { background:rgba(255,0,0,0.2); }
+
+  /* ===== GOOGLE DRIVE ===== */
+  .drive-row { display:flex; gap:8px; align-items:center; }
+  .drive-row input { flex:1; }
+  .btn-drive {
+    display:inline-flex; align-items:center; gap:6px; padding:9px 14px;
+    background:rgba(66,133,244,0.15); border:1px solid rgba(66,133,244,0.3);
+    border-radius:8px; color:#4285f4; font-size:13px; font-weight:600;
+    cursor:pointer; transition:all 0.2s; white-space:nowrap;
+  }
+  .btn-drive:hover { background:rgba(66,133,244,0.25); }
+
+  /* ===== EXTENDED NEW SONG MODAL ===== */
+  .modal-step-bar { display:flex; gap:6px; align-items:center; margin-bottom:20px; }
+  .step-dot {
+    width:26px; height:26px; border-radius:50%;
+    background:var(--card2); border:2px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700; color:var(--text-muted); transition:all 0.3s;
+    flex-shrink:0;
+  }
+  .step-dot.active { background:var(--purple); border-color:var(--purple); color:white; }
+  .step-dot.done { background:var(--success); border-color:var(--success); color:white; }
+  .step-line { flex:1; height:2px; background:var(--border); border-radius:1px; }
+  .step-line.done { background:var(--success); }
+
+  /* MATERIAL TYPE BUTTONS */
+  .mat-type-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+  .mat-type-btn {
+    padding:10px; border-radius:8px; border:2px solid var(--border);
+    background:var(--card2); color:var(--text-muted); cursor:pointer;
+    transition:all 0.2s; text-align:center; font-size:13px;
+  }
+  .mat-type-btn.sel { border-color:var(--purple); color:var(--purple-light); background:rgba(124,58,237,0.1); }
+  .mat-type-btn:hover { border-color:rgba(124,58,237,0.5); }
+  .mat-add-form { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:12px; margin-top:8px; }
+
+  /* SUNO PROFILE */
+  .suno-profile-bar {
+    display:flex; align-items:center; gap:10px; padding:10px 14px;
+    background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.2);
+    border-radius:8px; margin-bottom:12px;
+  }
 </style>
+
 </head>
 <body>
 
@@ -617,6 +816,7 @@
     </button>
     <button class="btn-api" onclick="exportSongs()" title="Songs als JSON exportieren">⬇ Export</button>
     <label class="btn-api" style="cursor:pointer;" title="Songs aus JSON importieren">⬆ Import<input type="file" accept=".json" onchange="importSongs(event)" style="display:none"></label>
+    <button class="btn-yt-key" onclick="openYtKeyModal()" title="YouTube Data API Key">▶ YT Key</button>
     <button class="btn-tavily" onclick="openTavilyModal()" title="Tavily Web-Suche Key">🌐 Web-Suche</button>
     <button class="btn-api" onclick="openApiModal()">API Key</button>
   </div>
@@ -696,6 +896,17 @@
           <div class="phase-subtitle">Entwickle dein Song-Konzept mit KI-Unterstützung</div>
         </div>
       </div>
+
+      <!-- Materialien -->
+      <div class="card" id="materialsCard" style="display:none">
+        <div class="materials-bar">
+          <div class="card-title" style="margin-bottom:0;">📁 Song-Materialien</div>
+          <button class="btn-secondary" onclick="openMaterialModal()" style="padding:6px 12px;font-size:12px;">+ Material hinzufügen</button>
+        </div>
+        <div id="materialsList" class="material-grid"></div>
+        <div id="noMaterialsMsg" class="no-materials">Noch keine Materialien. Klicke "+" um Audio, Video oder Bilder zu hinterlegen.</div>
+      </div>
+
       <div class="card">
         <div class="card-title">Eingaben</div>
         <div class="form-row">
@@ -705,17 +916,26 @@
           </div>
           <div class="form-group">
             <label>Emotion / Stimmung</label>
-            <input type="text" id="p1_emotion" placeholder="z.B. Wut, Hoffnung, Nostalgie..." oninput="autoSave()">
+            <div class="select-with-add">
+              <select id="p1_emotion" onchange="onSelChange('p1_emotion','emotion')"></select>
+              <button class="btn-add-opt" onclick="addCustomOpt('p1_emotion','emotion')" title="Eigene Option hinzufügen">+</button>
+            </div>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label>Zielgruppe</label>
-            <input type="text" id="p1_zielgruppe" placeholder="z.B. 20-30 Jahre, Streetwear-Szene..." oninput="autoSave()">
+            <div class="select-with-add">
+              <select id="p1_zielgruppe" onchange="onSelChange('p1_zielgruppe','zielgruppe')"></select>
+              <button class="btn-add-opt" onclick="addCustomOpt('p1_zielgruppe','zielgruppe')" title="Eigene Option hinzufügen">+</button>
+            </div>
           </div>
           <div class="form-group">
             <label>Stil / Einflüsse</label>
-            <input type="text" id="p1_stil" placeholder="z.B. Bushido, 187 Strassenbande, Drill..." oninput="autoSave()">
+            <div class="select-with-add">
+              <select id="p1_stil" onchange="onSelChange('p1_stil','stil')"></select>
+              <button class="btn-add-opt" onclick="addCustomOpt('p1_stil','stil')" title="Eigene Option hinzufügen">+</button>
+            </div>
           </div>
         </div>
         <div class="btn-row">
@@ -737,6 +957,42 @@
         <div class="form-group">
           <label>Allgemeine Notizen zum Song</label>
           <textarea id="song_notes" rows="4" placeholder="Ideen, Inspirationen, Referenzen, To-Dos..." oninput="autoSave()"></textarea>
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label>🗂️ Google Drive Ordner-Link</label>
+          <div class="drive-row">
+            <input type="text" id="drive_link" placeholder="https://drive.google.com/drive/folders/..." oninput="autoSave()">
+            <button class="btn-drive" onclick="openDriveLink()">📂 Öffnen</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KONZEPT-MANAGER -->
+      <div class="card manager-card">
+        <div class="mgr-toggle" id="mgrToggle1" onclick="toggleMgr(1)">
+          <div class="mgr-toggle-left">
+            <div class="mgr-avatar" style="background:rgba(124,58,237,0.2);">💡</div>
+            <div>
+              <div class="mgr-title">Konzept-Manager</div>
+              <div class="mgr-subtitle">A&R & Song-Konzept Experte · Frag mich alles</div>
+            </div>
+          </div>
+          <span class="mgr-arrow" id="mgrArrow1">▼</span>
+        </div>
+        <div class="mgr-body" id="mgrBody1">
+          <div class="mgr-messages" id="mgrMsgs1">
+            <div class="mgr-empty">👋 Ich bin dein Konzept-Manager. Frag mich alles rund um Song-Idee, Thema, Storyline und Konzept.</div>
+          </div>
+          <div class="mgr-quick-row">
+            <button class="mgr-quick-btn" onclick="sendMgr(1,'Gib mir 5 kreative Themen-Ideen für einen deutschen Rap Song.')">💡 Themen-Ideen</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(1,'Wie entwickle ich eine gute Storyline für meinen Song?')">📖 Storyline</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(1,'Welche Hooks funktionieren gerade gut im deutschen Rap?')">🎯 Hook-Ideen</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(1,'Welche Künstler sollte ich als Referenz nehmen?')">🎤 Referenzen</button>
+          </div>
+          <div class="mgr-input-area">
+            <textarea class="mgr-textarea" id="mgrInput1" rows="1" placeholder="Frag den Konzept-Manager..." onkeydown="handleMgrKey(event,1)"></textarea>
+            <button class="mgr-send" id="mgrSend1" onclick="sendMgr(1)">→</button>
+          </div>
         </div>
       </div>
     </div>
@@ -772,6 +1028,35 @@
           <button class="btn-secondary" onclick="copyText('p2_lyrics')">📋 Lyrics kopieren</button>
         </div>
       </div>
+
+      <!-- LYRICS-MANAGER -->
+      <div class="card manager-card">
+        <div class="mgr-toggle" id="mgrToggle2" onclick="toggleMgr(2)">
+          <div class="mgr-toggle-left">
+            <div class="mgr-avatar" style="background:rgba(59,130,246,0.2);">✍️</div>
+            <div>
+              <div class="mgr-title">Lyrics-Manager</div>
+              <div class="mgr-subtitle">Professioneller Texter & Punchline-Coach</div>
+            </div>
+          </div>
+          <span class="mgr-arrow" id="mgrArrow2">▼</span>
+        </div>
+        <div class="mgr-body" id="mgrBody2">
+          <div class="mgr-messages" id="mgrMsgs2">
+            <div class="mgr-empty">✍️ Ich bin dein Lyrics-Manager. Ich helfe bei Reimen, Flow, Punchlines und Struktur.</div>
+          </div>
+          <div class="mgr-quick-row">
+            <button class="mgr-quick-btn" onclick="sendMgr(2,'Verbessere meinen Hook und mach ihn eingängiger.')">🎯 Hook verbessern</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(2,'Gib mir Reime und Punchline-Ideen für meinen aktuellen Vers.')">🔥 Punchlines</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(2,'Wie verbessere ich meinen Flow und Rhythmus im Text?')">🎵 Flow checken</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(2,'Welche Storytelling-Techniken funktionieren im deutschen Rap?')">📖 Storytelling</button>
+          </div>
+          <div class="mgr-input-area">
+            <textarea class="mgr-textarea" id="mgrInput2" rows="1" placeholder="Frag den Lyrics-Manager..." onkeydown="handleMgrKey(event,2)"></textarea>
+            <button class="mgr-send" id="mgrSend2" onclick="sendMgr(2)">→</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- PHASE 3: Beat-Briefing Suno -->
@@ -796,35 +1081,44 @@
           <div class="form-group">
             <label>Key (Tonart)</label>
             <select id="p3_key" onchange="autoSave()">
-              <option value="C minor">C minor</option>
-              <option value="D minor">D minor</option>
-              <option value="E minor">E minor</option>
-              <option value="F minor">F minor</option>
-              <option value="G minor" selected>G minor</option>
               <option value="A minor">A minor</option>
-              <option value="B minor">B minor</option>
-              <option value="C major">C major</option>
-              <option value="D major">D major</option>
-              <option value="E major">E major</option>
-              <option value="F major">F major</option>
-              <option value="G major">G major</option>
               <option value="A major">A major</option>
+              <option value="B minor">B minor</option>
               <option value="B major">B major</option>
+              <option value="C minor">C minor</option>
+              <option value="C major">C major</option>
+              <option value="D minor">D minor</option>
+              <option value="D major">D major</option>
+              <option value="E minor">E minor</option>
+              <option value="E major">E major</option>
+              <option value="F minor">F minor</option>
+              <option value="F major">F major</option>
+              <option value="G minor" selected>G minor</option>
+              <option value="G major">G major</option>
             </select>
           </div>
           <div class="form-group">
             <label>Mood / Atmosphäre</label>
-            <input type="text" id="p3_mood" placeholder="z.B. dark, aggressive, melancholic..." oninput="autoSave()">
+            <div class="select-with-add">
+              <select id="p3_mood" onchange="onSelChange('p3_mood','mood')"></select>
+              <button class="btn-add-opt" onclick="addCustomOpt('p3_mood','mood')" title="Eigene Option hinzufügen">+</button>
+            </div>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label>Stil / Genre</label>
-            <input type="text" id="p3_stil" placeholder="z.B. German Trap, Drill, Boom Bap..." oninput="autoSave()">
+            <div class="select-with-add">
+              <select id="p3_stil" onchange="onSelChange('p3_stil','genre')"></select>
+              <button class="btn-add-opt" onclick="addCustomOpt('p3_stil','genre')" title="Eigene Option hinzufügen">+</button>
+            </div>
           </div>
           <div class="form-group">
             <label>Instrumente</label>
-            <input type="text" id="p3_instrumente" placeholder="z.B. 808s, Piano, Strings, Hi-Hats..." oninput="autoSave()">
+            <div class="select-with-add">
+              <select id="p3_instrumente" onchange="onSelChange('p3_instrumente','instrumente')"></select>
+              <button class="btn-add-opt" onclick="addCustomOpt('p3_instrumente','instrumente')" title="Eigene Option hinzufügen">+</button>
+            </div>
           </div>
         </div>
         <div class="btn-row">
@@ -842,6 +1136,17 @@
             </div>
           </div>
           <div class="result-content" id="p3_result_content"></div>
+        </div>
+
+        <!-- Suno Profil -->
+        <div class="suno-profile-bar">
+          <span style="font-size:18px;">🎵</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--text);">Dein Suno Profil</div>
+            <div style="font-size:12px;color:var(--text-muted);">suno.com/@DaN_90_rap</div>
+          </div>
+          <button class="btn-secondary" onclick="window.open('https://suno.com/@DaN_90_rap','_blank')" style="font-size:12px;padding:6px 12px;">🔗 Öffnen</button>
+          <button class="btn-secondary" onclick="window.open('https://suno.com/create','_blank')" style="font-size:12px;padding:6px 12px;border-color:rgba(16,185,129,0.4);color:#10b981;">+ Neuer Beat</button>
         </div>
 
         <!-- Suno Feedback Loop -->
@@ -863,6 +1168,36 @@
               <span id="p3_improve_icon">🔄</span>
               <span id="p3_improve_text">Prompt verbessern</span>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <!-- BEAT-MANAGER -->
+      <div class="card manager-card">
+        <div class="mgr-toggle" id="mgrToggle3" onclick="toggleMgr(3)">
+          <div class="mgr-toggle-left">
+            <div class="mgr-avatar" style="background:rgba(245,158,11,0.2);">🎹</div>
+            <div>
+              <div class="mgr-title">Beat-Manager</div>
+              <div class="mgr-subtitle">Beatmaker & Suno AI Experte</div>
+            </div>
+          </div>
+          <span class="mgr-arrow" id="mgrArrow3">▼</span>
+        </div>
+        <div class="mgr-body" id="mgrBody3">
+          <div class="mgr-messages" id="mgrMsgs3">
+            <div class="mgr-empty">🎹 Ich bin dein Beat-Manager. Frag mich zu Suno AI, BPM, Sound-Design und Beat-Produktion.</div>
+          </div>
+          <div class="mgr-quick-row">
+            <button class="mgr-quick-btn" onclick="sendMgr(3,'Welche Suno AI Tipps gibt es für deutschen Rap?')">🔧 Suno Tipps</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(3,'Erkläre mir die besten 808-Techniken für Trap.')">🥁 808 Techniken</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(3,'Welches BPM empfiehlst du für meinen Song-Stil?')">⚡ BPM empfehlen</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(3,'Was sind aktuelle Beat-Trends im deutschen Rap 2025?')">🔥 Beat Trends</button>
+          </div>
+          <div class="mgr-input-area">
+            <textarea class="mgr-textarea" id="mgrInput3" rows="1" placeholder="Frag den Beat-Manager..." onkeydown="handleMgrKey(event,3)"></textarea>
+            <button class="mgr-send" id="mgrSend3" onclick="sendMgr(3)">→</button>
           </div>
         </div>
       </div>
@@ -944,6 +1279,35 @@
           <div class="result-content" id="p4_result_content"></div>
         </div>
       </div>
+
+      <!-- PRODUKTIONS-MANAGER -->
+      <div class="card manager-card">
+        <div class="mgr-toggle" id="mgrToggle4" onclick="toggleMgr(4)">
+          <div class="mgr-toggle-left">
+            <div class="mgr-avatar" style="background:rgba(16,185,129,0.2);">✅</div>
+            <div>
+              <div class="mgr-title">Produktions-Manager</div>
+              <div class="mgr-subtitle">Workflow & Produktions-Planung Experte</div>
+            </div>
+          </div>
+          <span class="mgr-arrow" id="mgrArrow4">▼</span>
+        </div>
+        <div class="mgr-body" id="mgrBody4">
+          <div class="mgr-messages" id="mgrMsgs4">
+            <div class="mgr-empty">✅ Ich bin dein Produktions-Manager. Ich helfe dir bei Workflow, Zeitplanung und Produktions-Tipps.</div>
+          </div>
+          <div class="mgr-quick-row">
+            <button class="mgr-quick-btn" onclick="sendMgr(4,'Was sind meine nächsten Schritte basierend auf meinem aktuellen Stand?')">🎯 Nächste Schritte</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(4,'Erstelle mir einen realistischen Zeitplan bis zum Release.')">📅 Zeitplan</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(4,'Welche Tools und Software empfiehlst du für meine Produktion?')">🔧 Tools empfehlen</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(4,'Wie manage ich mehrere Songs gleichzeitig?')">📋 Organisation</button>
+          </div>
+          <div class="mgr-input-area">
+            <textarea class="mgr-textarea" id="mgrInput4" rows="1" placeholder="Frag den Produktions-Manager..." onkeydown="handleMgrKey(event,4)"></textarea>
+            <button class="mgr-send" id="mgrSend4" onclick="sendMgr(4)">→</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- PHASE 5: Cover & Artwork -->
@@ -960,21 +1324,33 @@
         <div class="form-row">
           <div class="form-group">
             <label>Song-Stimmung</label>
-            <input type="text" id="p5_stimmung" placeholder="z.B. dunkel, kraftvoll, melancholisch..." oninput="autoSave()">
+            <div class="select-with-add">
+              <select id="p5_stimmung" onchange="onSelChange('p5_stimmung','stimmung')"></select>
+              <button class="btn-add-opt" onclick="addCustomOpt('p5_stimmung','stimmung')" title="Eigene Option">+</button>
+            </div>
           </div>
           <div class="form-group">
             <label>Visueller Stil</label>
-            <input type="text" id="p5_stil" placeholder="z.B. cinematic, street art, neon, minimal..." oninput="autoSave()">
+            <div class="select-with-add">
+              <select id="p5_stil" onchange="onSelChange('p5_stil','visual_stil')"></select>
+              <button class="btn-add-opt" onclick="addCustomOpt('p5_stil','visual_stil')" title="Eigene Option">+</button>
+            </div>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label>Farbpalette</label>
-            <input type="text" id="p5_farben" placeholder="z.B. schwarz, lila, gold..." oninput="autoSave()">
+            <div class="select-with-add">
+              <select id="p5_farben" onchange="onSelChange('p5_farben','farben')"></select>
+              <button class="btn-add-opt" onclick="addCustomOpt('p5_farben','farben')" title="Eigene Option">+</button>
+            </div>
           </div>
           <div class="form-group">
             <label>Motiv-Ideen</label>
-            <input type="text" id="p5_motiv" placeholder="z.B. Portrait, Stadt, Silhouette..." oninput="autoSave()">
+            <div class="select-with-add">
+              <select id="p5_motiv" onchange="onSelChange('p5_motiv','motiv')"></select>
+              <button class="btn-add-opt" onclick="addCustomOpt('p5_motiv','motiv')" title="Eigene Option">+</button>
+            </div>
           </div>
         </div>
         <div class="btn-row">
@@ -989,6 +1365,35 @@
             <button class="btn-copy" onclick="copyResult('p5_result_content')">📋 Kopieren</button>
           </div>
           <div class="result-content" id="p5_result_content"></div>
+        </div>
+      </div>
+
+      <!-- ARTWORK-MANAGER -->
+      <div class="card manager-card">
+        <div class="mgr-toggle" id="mgrToggle5" onclick="toggleMgr(5)">
+          <div class="mgr-toggle-left">
+            <div class="mgr-avatar" style="background:rgba(236,72,153,0.2);">🎨</div>
+            <div>
+              <div class="mgr-title">Artwork-Manager</div>
+              <div class="mgr-subtitle">Creative Director & Visual Design Experte</div>
+            </div>
+          </div>
+          <span class="mgr-arrow" id="mgrArrow5">▼</span>
+        </div>
+        <div class="mgr-body" id="mgrBody5">
+          <div class="mgr-messages" id="mgrMsgs5">
+            <div class="mgr-empty">🎨 Ich bin dein Artwork-Manager. Frag mich zu Cover-Design, KI-Bildgenerierung und visueller Identität.</div>
+          </div>
+          <div class="mgr-quick-row">
+            <button class="mgr-quick-btn" onclick="sendMgr(5,'Was sind aktuelle Trends bei Rap-Cover-Designs?')">🔥 Design Trends</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(5,'Gib mir Tipps für bessere Midjourney Prompts für Musik-Artwork.')">🖼️ Midjourney Tipps</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(5,'Welche Farbkombinationen wirken am stärksten für Rap-Cover?')">🎨 Farb-Trends</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(5,'Nenne mir Referenz-Künstler für gutes Rap-Artwork.')">👁️ Referenzen</button>
+          </div>
+          <div class="mgr-input-area">
+            <textarea class="mgr-textarea" id="mgrInput5" rows="1" placeholder="Frag den Artwork-Manager..." onkeydown="handleMgrKey(event,5)"></textarea>
+            <button class="mgr-send" id="mgrSend5" onclick="sendMgr(5)">→</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1022,6 +1427,35 @@
           <div class="result-content" id="p6_result_content"></div>
         </div>
       </div>
+
+      <!-- SOCIAL MEDIA MANAGER -->
+      <div class="card manager-card">
+        <div class="mgr-toggle" id="mgrToggle6" onclick="toggleMgr(6)">
+          <div class="mgr-toggle-left">
+            <div class="mgr-avatar" style="background:rgba(245,158,11,0.2);">📱</div>
+            <div>
+              <div class="mgr-title">Social Media Manager</div>
+              <div class="mgr-subtitle">TikTok, Instagram & Marketing Experte</div>
+            </div>
+          </div>
+          <span class="mgr-arrow" id="mgrArrow6">▼</span>
+        </div>
+        <div class="mgr-body" id="mgrBody6">
+          <div class="mgr-messages" id="mgrMsgs6">
+            <div class="mgr-empty">📱 Ich bin dein Social Media Manager. Frag mich zu TikTok-Trends, Instagram-Strategie und Release-Marketing.</div>
+          </div>
+          <div class="mgr-quick-row">
+            <button class="mgr-quick-btn" onclick="sendMgr(6,'Was sind aktuelle TikTok-Trends für Rapper 2025?')">🔥 TikTok Trends</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(6,'Wann ist die beste Zeit zum Posten für maximale Reichweite?')">⏰ Posting-Zeit</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(6,'Welche Hashtags sollte ich für deutschen Rap nutzen?')">🏷️ Hashtags</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(6,'Wie baue ich in 30 Tagen meine Instagram-Reichweite auf?')">📈 Wachstums-Plan</button>
+          </div>
+          <div class="mgr-input-area">
+            <textarea class="mgr-textarea" id="mgrInput6" rows="1" placeholder="Frag den Social Media Manager..." onkeydown="handleMgrKey(event,6)"></textarea>
+            <button class="mgr-send" id="mgrSend6" onclick="sendMgr(6)">→</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- PHASE 7: YouTube Upload -->
@@ -1030,11 +1464,38 @@
         <div class="phase-icon">▶️</div>
         <div>
           <div class="phase-title">YouTube Upload</div>
-          <div class="phase-subtitle">SEO-optimierter YouTube-Content</div>
+          <div class="phase-subtitle">SEO-optimierter YouTube-Content & Live-Kanal-Integration</div>
         </div>
       </div>
+
+      <!-- YouTube Channel Info -->
       <div class="card">
-        <div class="card-title">Upload-Details</div>
+        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>YouTube Kanal</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-yt-key" onclick="openYtKeyModal()">🔑 YouTube API Key</button>
+            <button class="btn-secondary" onclick="loadYouTubeChannel()" style="font-size:12px;padding:6px 12px;">🔄 Laden</button>
+          </div>
+        </div>
+        <div class="yt-channel-bar" id="ytChannelBar">
+          <div class="yt-avatar">▶️</div>
+          <div style="flex:1;">
+            <div class="yt-channel-name">DaN_90_rap</div>
+            <div class="yt-channel-sub" id="ytChannelSub">Kanal-Info laden → YouTube API Key eingeben</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <button class="btn-yt" onclick="window.open('https://www.youtube.com/@DaN_90_rap','_blank')">▶ Kanal öffnen</button>
+            <button class="btn-yt" onclick="window.open('https://studio.youtube.com','_blank')" style="background:rgba(255,165,0,0.15);border-color:rgba(255,165,0,0.3);color:#ffa500;">🎬 YouTube Studio</button>
+          </div>
+        </div>
+        <div id="ytVideosSection" style="display:none;">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Neueste Videos:</div>
+          <div class="yt-video-grid" id="ytVideoGrid"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Upload-Details & SEO</div>
         <div class="form-group">
           <label>Optionale Zusatzinfos</label>
           <textarea id="p7_zusatz" rows="3" placeholder="z.B. Features, Sample-Credits, Release-Anlass..." oninput="autoSave()"></textarea>
@@ -1048,9 +1509,41 @@
         <div class="result-box" id="p7_result">
           <div class="result-box-header">
             <span class="result-box-title">YouTube SEO Content</span>
-            <button class="btn-copy" onclick="copyResult('p7_result_content')">📋 Kopieren</button>
+            <div style="display:flex;gap:6px;">
+              <button class="btn-copy" onclick="copyResult('p7_result_content')">📋 Kopieren</button>
+              <button class="btn-copy" onclick="window.open('https://studio.youtube.com/channel/UCc72jjvyE5AGgY4It7uLn-Q/videos/upload','_blank')" style="background:rgba(255,0,0,0.1);border-color:rgba(255,0,0,0.3);color:#ff6666;">🚀 In Studio öffnen</button>
+            </div>
           </div>
           <div class="result-content" id="p7_result_content"></div>
+        </div>
+      </div>
+
+      <!-- YOUTUBE MANAGER -->
+      <div class="card manager-card">
+        <div class="mgr-toggle" id="mgrToggle7" onclick="toggleMgr(7)">
+          <div class="mgr-toggle-left">
+            <div class="mgr-avatar" style="background:rgba(255,0,0,0.2);">▶️</div>
+            <div>
+              <div class="mgr-title">YouTube Manager</div>
+              <div class="mgr-subtitle">YouTube SEO & Channel-Wachstum Experte</div>
+            </div>
+          </div>
+          <span class="mgr-arrow" id="mgrArrow7">▼</span>
+        </div>
+        <div class="mgr-body" id="mgrBody7">
+          <div class="mgr-messages" id="mgrMsgs7">
+            <div class="mgr-empty">▶️ Ich bin dein YouTube Manager. Frag mich zu SEO, Thumbnails, Titeln und Channel-Wachstum.</div>
+          </div>
+          <div class="mgr-quick-row">
+            <button class="mgr-quick-btn" onclick="sendMgr(7,'Wie optimiere ich meine YouTube-Videos für maximale Reichweite?')">🔍 SEO Tipps</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(7,'Was macht ein gutes Thumbnail für deutschen Rap aus?')">🖼️ Thumbnail</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(7,'Wie oft sollte ich auf YouTube posten und wann?')">📅 Upload-Plan</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(7,'Wie bekomme ich die ersten 1000 Abonnenten?')">📈 Wachstum</button>
+          </div>
+          <div class="mgr-input-area">
+            <textarea class="mgr-textarea" id="mgrInput7" rows="1" placeholder="Frag den YouTube Manager..." onkeydown="handleMgrKey(event,7)"></textarea>
+            <button class="mgr-send" id="mgrSend7" onclick="sendMgr(7)">→</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1201,6 +1694,35 @@
           <div class="result-content" id="p8_result_content"></div>
         </div>
       </div>
+
+      <!-- STUDIO MANAGER -->
+      <div class="card manager-card">
+        <div class="mgr-toggle" id="mgrToggle8" onclick="toggleMgr(8)">
+          <div class="mgr-toggle-left">
+            <div class="mgr-avatar" style="background:rgba(245,158,11,0.2);">🎧</div>
+            <div>
+              <div class="mgr-title">Studio Manager</div>
+              <div class="mgr-subtitle">Audio Engineer & Mixing/Mastering Experte</div>
+            </div>
+          </div>
+          <span class="mgr-arrow" id="mgrArrow8">▼</span>
+        </div>
+        <div class="mgr-body" id="mgrBody8">
+          <div class="mgr-messages" id="mgrMsgs8">
+            <div class="mgr-empty">🎧 Ich bin dein Studio Manager. Frag mich zu Mixing, Mastering, Vocal-Recording und Audio-Technik.</div>
+          </div>
+          <div class="mgr-quick-row">
+            <button class="mgr-quick-btn" onclick="sendMgr(8,'Wie soll ich meinen Rap-Vocal am besten mixen?')">🎚️ Vocal Mixing</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(8,'Was sind die wichtigsten Mastering-Schritte für Rap?')">💿 Mastering</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(8,'Welches Setup brauche ich für professionelles Vocal-Recording zuhause?')">🎤 Recording Setup</button>
+            <button class="mgr-quick-btn" onclick="sendMgr(8,'Wie benutze ich Referenz-Tracks beim Mixing richtig?')">📊 Referenz-Tracks</button>
+          </div>
+          <div class="mgr-input-area">
+            <textarea class="mgr-textarea" id="mgrInput8" rows="1" placeholder="Frag den Studio Manager..." onkeydown="handleMgrKey(event,8)"></textarea>
+            <button class="mgr-send" id="mgrSend8" onclick="sendMgr(8)">→</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- PHASE 9: Producer Chat -->
@@ -1278,13 +1800,61 @@
 
 <!-- NEW SONG MODAL -->
 <div class="modal-overlay hidden" id="newSongModal">
-  <div class="modal">
+  <div class="modal" style="max-width:520px;">
     <div class="modal-title">🎵 Neuer Song</div>
-    <div class="modal-desc">Gib einen Namen für deinen neuen Song ein.</div>
-    <input type="text" class="modal-input" id="newSongName" placeholder="Song-Titel..." onkeydown="if(event.key==='Enter')confirmNewSong()">
-    <div class="modal-btns">
-      <button class="btn-primary" onclick="confirmNewSong()">Erstellen</button>
-      <button class="btn-cancel" onclick="closeNewSongModal()">Abbrechen</button>
+    <div class="modal-step-bar">
+      <div class="step-dot active" id="stepDot1">1</div>
+      <div class="step-line" id="stepLine1"></div>
+      <div class="step-dot" id="stepDot2">2</div>
+    </div>
+
+    <!-- STEP 1: Name -->
+    <div id="newSongStep1">
+      <div class="modal-desc">Gib einen Namen für deinen neuen Song ein.</div>
+      <input type="text" class="modal-input" id="newSongName" placeholder="Song-Titel..." onkeydown="if(event.key==='Enter')newSongStep2()">
+      <div class="modal-btns">
+        <button class="btn-primary" onclick="newSongStep2()">Weiter →</button>
+        <button class="btn-cancel" onclick="closeNewSongModal()">Abbrechen</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Materials -->
+    <div id="newSongStep2" style="display:none;">
+      <div class="modal-desc">Welche Materialien hast du bereits für diesen Song?</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;">
+            <input type="checkbox" id="matHasAudio" style="width:16px;height:16px;accent-color:var(--purple);">
+            <span style="font-size:13px;">🎤 Ich habe originale Audio-Aufnahmen</span>
+          </label>
+          <input type="text" id="matAudioNote" placeholder="z.B. Demo-Vocals, Rough Mix, Instrumentals..." style="font-size:12px;display:none;margin-top:6px;">
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;">
+            <input type="checkbox" id="matHasVideo" style="width:16px;height:16px;accent-color:var(--purple);">
+            <span style="font-size:13px;">🎬 Ich habe Video-Material</span>
+          </label>
+          <input type="text" id="matVideoNote" placeholder="z.B. Handy-Footage, Live-Clips, B-Roll..." style="font-size:12px;display:none;margin-top:6px;">
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;">
+            <input type="checkbox" id="matHasImage" style="width:16px;height:16px;accent-color:var(--purple);">
+            <span style="font-size:13px;">🖼️ Ich habe Bild-Material</span>
+          </label>
+          <input type="text" id="matImageNote" placeholder="z.B. Fotos, Artwork-Ideen, Vorlagen..." style="font-size:12px;display:none;margin-top:6px;">
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;">
+            <input type="checkbox" id="matHasDrive" style="width:16px;height:16px;accent-color:var(--purple);">
+            <span style="font-size:13px;">📂 Ich habe einen Google Drive Ordner</span>
+          </label>
+          <input type="text" id="matDriveLink" placeholder="https://drive.google.com/drive/folders/..." style="font-size:12px;display:none;margin-top:6px;">
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-primary" onclick="confirmNewSong()">Song erstellen 🎵</button>
+        <button class="btn-cancel" onclick="document.getElementById('newSongStep2').style.display='none';document.getElementById('newSongStep1').style.display='block';">← Zurück</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1389,6 +1959,51 @@ CREATE POLICY "anon full access" ON dan_songs
   </div>
 </div>
 
+<!-- MATERIAL MODAL -->
+<div class="modal-overlay hidden" id="materialModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-title">📁 Material hinzufügen</div>
+    <div class="modal-desc">Füge Audio, Video, Bild oder Dokument zu diesem Song hinzu.</div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:13px;color:var(--text-muted);display:block;margin-bottom:8px;">Typ auswählen</label>
+      <div class="mat-type-grid" id="matTypeGrid">
+        <button class="mat-type-btn sel" data-type="audio" onclick="selectMatType('audio')">🎤 Audio</button>
+        <button class="mat-type-btn" data-type="video" onclick="selectMatType('video')">🎬 Video</button>
+        <button class="mat-type-btn" data-type="bild" onclick="selectMatType('bild')">🖼️ Bild</button>
+        <button class="mat-type-btn" data-type="dokument" onclick="selectMatType('dokument')">📄 Dokument</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Beschreibung / Notiz</label>
+      <input type="text" class="modal-input" id="matNoteInput" placeholder="z.B. Demo-Vocal vom 01.03.2026..." style="margin-bottom:8px;">
+    </div>
+    <div class="form-group">
+      <label>Link / URL (optional)</label>
+      <input type="text" class="modal-input" id="matUrlInput" placeholder="https://drive.google.com/... oder anderer Link" style="margin-bottom:8px;">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="confirmAddMaterial()">Hinzufügen</button>
+      <button class="btn-cancel" onclick="closeMaterialModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- YOUTUBE API KEY MODAL -->
+<div class="modal-overlay hidden" id="ytKeyModal">
+  <div class="modal">
+    <div class="modal-title">🔑 YouTube API Key</div>
+    <div class="modal-desc">
+      Für Live-Kanal-Daten brauchst du einen YouTube Data API v3 Key.<br>
+      Kostenlos unter <a href="https://console.cloud.google.com" target="_blank" style="color:var(--blue);">console.cloud.google.com</a> → APIs & Services → YouTube Data API v3.
+    </div>
+    <input type="password" class="modal-input" id="ytKeyInput" placeholder="AIza..." onkeydown="if(event.key==='Enter')saveYtKey()">
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="saveYtKey()">Speichern & Kanal laden</button>
+      <button class="btn-cancel" onclick="closeYtKeyModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
 
@@ -1403,6 +2018,28 @@ let sidebarOpen = false;
 
 const CHECKLIST_KEYS = ['idee','lyrics','beat','recording','editing','mixing','mastering','artwork','promo','release'];
 
+// Manager state
+const mgrMessages = {1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[]};
+let selectedMatType = 'audio';
+let ytApiKey = '';
+const YT_CHANNEL_ID = 'UCc72jjvyE5AGgY4It7uLn-Q';
+
+// ===========================
+// OPTION PRESETS (A-Z)
+// ===========================
+const OPTION_PRESETS = {
+  emotion: ['Aggressiv','Aufbruch','Bittersüß','Dankbarkeit','Depression','Einsamkeit','Entschlossenheit','Euphorie','Freude','Hoffnung','Hunger','Kraft','Melancholie','Nostalgie','Schmerz','Sehnsucht','Stolz','Trauer','Verlorenheit','Verzweiflung','Wut','Zuversicht'],
+  stil: ['187 Strassenbande Stil','Afro Trap','Aggressive','Atmosphärisch','Boombap','Bushido Stil','Cloud Rap','Drill','Emo Rap','Gangsta Rap','German Trap','Gzuz Stil','Hamburgrap','Hardcore Rap','Lo-Fi Hip Hop','Melodic Rap','OG Rap','Oldschool','Phonk','Pluggnb','Punchline Rap','Storytelling','Underground'],
+  zielgruppe: ['13-17 Jahre','18-24 Jahre','25-34 Jahre','35+ Jahre','Alle Altersgruppen','Frauen','Hip-Hop Fans','Jugendliche','Männer','Musikliebhaber','Partypeople','Streetwear-Szene'],
+  mood: ['Aggressive','Atmospheric','Calm','Cinematic','Dark','Deep','Dramatic','Emotional','Energetic','Epic','Gritty','Hard','Heavy','Hypnotic','Intense','Melancholic','Menacing','Mysterious','Ominous','Raw','Relaxed','Sad','Smooth','Triumphant'],
+  genre: ['Afrobeat','Afro Trap','Boom Bap','Cloud Rap','Conscious Rap','Dancehall','Drill','East Coast','Emo Rap','Gangsta Rap','German Trap','Hardcore Rap','Lo-Fi Hip Hop','Melodic Rap','NYC Drill','Oldschool Hip Hop','Phonk','Plugg','R&B Rap','Streetrap','Trap','UK Drill','West Coast'],
+  instrumente: ['808s','Akustik-Gitarre','Bells','Brass','Choir','Claps','Distorted Guitar','Drums','E-Gitarre','Flute','FX Sounds','Hi-Hats','Kick Drum','Piano','Melodica','Oud','Pad Sounds','Saxophone','Shakers','Snare','Strings','Synth Bass','Synthesizer','Timpani','Trumpet','Violine','Xylophone'],
+  stimmung: ['Aggressiv','Brutal','Dunkel','Düster','Elegant','Energetisch','Episch','Feierlich','Geheimnisvoll','Hoffnungsvoll','Kraftvoll','Melancholisch','Minimalistisch','Nostalgisch','Optimistisch','Poetisch','Rau','Romantisch','Stark','Triumphierend','Urban'],
+  visual_stil: ['Abstract Art','Anime','Cinematic','Comic Art','Concept Art','Dark Fantasy','Digital Art','Film Noir','Futurism','Graffiti','Impressionism','Lo-Fi Art','Manga','Minimalist','Neon','Oil Painting','Photorealism','Pop Art','Street Art','Surrealism','Urban'],
+  farben: ['Blau & Silber','Gold & Schwarz','Grün & Grau','Lila & Schwarz','Monochrom Schwarz','Monochrom Weiß','Neonfarben','Pastell','Rot & Schwarz','Rot & Weiß','Schwarz & Weiß','Schwarz Lila Gold','Sepia','Urban Grau'],
+  motiv: ['Abstrakt','Cityscape','Dark Landscape','Figur im Gegenlicht','Gesicht / Portrait','Graffiti Wall','Gruppenaufnahme','Hände','Mikrofonaufnahme','Portrait','Silhouette','Skyline','Spotlight','Stadium / Crowd','Studio Setup','Symbolik','Urban Street']
+};
+
 // =============================
 // INIT
 // =============================
@@ -1411,12 +2048,24 @@ document.addEventListener('DOMContentLoaded', () => {
   updateApiStatus();
   loadCloudConfig();
   loadTavilyKey();
+  loadYtKey();
   renderSongList();
+  initAllSelects();
 
   const apiKey = sessionStorage.getItem('dan_api_key') || localStorage.getItem('dan_api_key');
   if (apiKey && apiKey.startsWith('gsk_')) {
     document.getElementById('apiModal').classList.add('hidden');
   }
+
+  // Wire up step2 material checkboxes
+  ['Audio','Video','Image','Drive'].forEach(t => {
+    const cb = document.getElementById('matHas'+t);
+    const inp = document.getElementById('mat'+t+'Note') || document.getElementById('mat'+t.charAt(0).toUpperCase()+t.slice(1)+'Link');
+    if(cb && inp) cb.addEventListener('change', () => { inp.style.display = cb.checked ? 'block' : 'none'; });
+  });
+  const driveCb = document.getElementById('matHasDrive');
+  const driveInp = document.getElementById('matDriveLink');
+  if(driveCb && driveInp) driveCb.addEventListener('change', () => { driveInp.style.display = driveCb.checked ? 'block' : 'none'; });
 
   // Load first song if exists
   const songIds = Object.keys(songs);
@@ -1443,6 +2092,62 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// =============================
+// CUSTOM SELECT SYSTEM
+// =============================
+function getCustomOpts(key) {
+  try { return JSON.parse(localStorage.getItem('dan_co_' + key) || '[]'); } catch { return []; }
+}
+function saveCustomOpt(key, val) {
+  const ex = getCustomOpts(key);
+  if (!ex.includes(val)) { ex.push(val); localStorage.setItem('dan_co_' + key, JSON.stringify(ex)); }
+}
+function buildSelect(selId, key, currentVal) {
+  const el = document.getElementById(selId);
+  if (!el) return;
+  const presets = OPTION_PRESETS[key] || [];
+  const custom = getCustomOpts(key);
+  const all = [...new Set([...presets, ...custom])].sort((a,b) => a.localeCompare(b,'de'));
+  el.innerHTML = `<option value="">-- Auswählen... --</option>` +
+    all.map(o => `<option value="${escHtml(o)}"${o === currentVal ? ' selected':''}>${escHtml(o)}</option>`).join('') +
+    `<option value="__custom__">➕ Eigene Option hinzufügen...</option>`;
+  if (currentVal && !all.includes(currentVal)) {
+    const opt = document.createElement('option');
+    opt.value = currentVal; opt.textContent = currentVal; opt.selected = true;
+    el.insertBefore(opt, el.lastElementChild);
+  }
+}
+function onSelChange(selId, key) {
+  const el = document.getElementById(selId);
+  if (!el) return;
+  if (el.value === '__custom__') {
+    addCustomOpt(selId, key);
+  } else {
+    autoSave();
+  }
+}
+function addCustomOpt(selId, key) {
+  const el = document.getElementById(selId);
+  const val = prompt('Eigene Option eingeben:');
+  if (val && val.trim()) {
+    const v = val.trim();
+    saveCustomOpt(key, v);
+    buildSelect(selId, key, v);
+    if (el) el.value = v;
+    autoSave();
+  } else if (el) {
+    el.value = el.options[0]?.value || '';
+  }
+}
+function initAllSelects() {
+  const map = [
+    ['p1_emotion','emotion'],['p1_zielgruppe','zielgruppe'],['p1_stil','stil'],
+    ['p3_mood','mood'],['p3_stil','genre'],['p3_instrumente','instrumente'],
+    ['p5_stimmung','stimmung'],['p5_stil','visual_stil'],['p5_farben','farben'],['p5_motiv','motiv']
+  ];
+  map.forEach(([id, key]) => buildSelect(id, key, ''));
+}
 
 // =============================
 // API
@@ -1570,13 +2275,17 @@ function showResult(resultBoxId, contentId, text) {
 // Phase 1
 async function generatePhase1() {
   const thema = document.getElementById('p1_thema').value.trim();
-  const emotion = document.getElementById('p1_emotion').value.trim();
-  const zielgruppe = document.getElementById('p1_zielgruppe').value.trim();
-  const stil = document.getElementById('p1_stil').value.trim();
+  const emotion = document.getElementById('p1_emotion')?.value || '';
+  const zielgruppe = document.getElementById('p1_zielgruppe')?.value || '';
+  const stil = document.getElementById('p1_stil')?.value || '';
+
+  // Include materials context
+  const mats = (currentSongId && songs[currentSongId]?.materials) || [];
+  const matCtx = mats.length > 0 ? `\n\nVorhandene Materialien: ${mats.map(m => m.type + ': ' + m.note).join(', ')}` : '';
 
   if (!thema && !emotion) { showToast('Bitte mindestens Thema und Emotion ausfüllen!', 'error'); return; }
 
-  const prompt = `Du bist ein erfahrener Musikproduzent und A&R für deutschen Rap. Entwickle ein detailliertes Song-Konzept für @DaN_90_rap basierend auf: Thema: ${thema || 'offen'}, Emotion: ${emotion || 'offen'}, Zielgruppe: ${zielgruppe || 'allgemein'}, Stil/Einflüsse: ${stil || 'Deutscher Rap'}. Erstelle: 3 Titel-Vorschläge, eine Storyline (3-4 Sätze), die emotionale Botschaft, Stimmungsbeschreibung, und konkrete Bild/Metapher-Vorschläge für die Lyrics.`;
+  const prompt = `Du bist ein erfahrener Musikproduzent und A&R für deutschen Rap. Entwickle ein detailliertes Song-Konzept für @DaN_90_rap basierend auf: Thema: ${thema || 'offen'}, Emotion: ${emotion || 'offen'}, Zielgruppe: ${zielgruppe || 'allgemein'}, Stil/Einflüsse: ${stil || 'Deutscher Rap'}.${matCtx}\n\nErstelle: 3 Titel-Vorschläge, eine Storyline (3-4 Sätze), die emotionale Botschaft, Stimmungsbeschreibung, und konkrete Bild/Metapher-Vorschläge für die Lyrics.`;
 
   setLoading('p1_spinner_icon', 'p1_btn_text', true, '✨', 'Mit KI generieren');
   try {
@@ -1646,9 +2355,9 @@ async function generatePhase3() {
   const song = songs[currentSongId] || {};
   const bpm = document.getElementById('p3_bpm').value;
   const key = document.getElementById('p3_key').value;
-  const stil = document.getElementById('p3_stil').value.trim();
-  const mood = document.getElementById('p3_mood').value.trim();
-  const instrumente = document.getElementById('p3_instrumente').value.trim();
+  const stil = document.getElementById('p3_stil')?.value || '';
+  const mood = document.getElementById('p3_mood')?.value || '';
+  const instrumente = document.getElementById('p3_instrumente')?.value || '';
 
   const konzeptCtx = song.p1_ai_result ? `\n\nSong-Konzept (Phase 1):\n${song.p1_ai_result}` : '';
   const lyricsCtx = song.p2_lyrics ? `\n\nLyrics (Phase 2):\n${song.p2_lyrics}` : '';
@@ -1774,12 +2483,15 @@ async function generatePhase4() {
 // Phase 5
 async function generatePhase5() {
   const songName = getCurrentSongName();
-  const stimmung = document.getElementById('p5_stimmung').value.trim();
-  const stil = document.getElementById('p5_stil').value.trim();
-  const farben = document.getElementById('p5_farben').value.trim();
-  const motiv = document.getElementById('p5_motiv').value.trim();
+  const stimmung = document.getElementById('p5_stimmung')?.value || '';
+  const stil = document.getElementById('p5_stil')?.value || '';
+  const farben = document.getElementById('p5_farben')?.value || '';
+  const motiv = document.getElementById('p5_motiv')?.value || '';
+  // Include image materials if available
+  const mats = (currentSongId && songs[currentSongId]?.materials?.filter(m => m.type==='bild')) || [];
+  const matCtx = mats.length > 0 ? ` Vorhandene Bild-Materialien: ${mats.map(m=>m.note).join(', ')}.` : '';
 
-  const prompt = `Du bist ein kreativer Director für Musik-Artwork. Erstelle detaillierte Bildprompts für den Song: ${songName}. Stimmung: ${stimmung || 'dunkel, kraftvoll'}, Stil: ${stil || 'cinematic'}, Farben: ${farben || 'schwarz, lila'}, Motiv: ${motiv || 'Portrait'}. Erstelle: 1 Midjourney-Prompt (mit --ar 1:1 --style raw) und 1 DALL-E-Prompt, beide auf Englisch, sehr detailliert und künstlerisch.`;
+  const prompt = `Du bist ein kreativer Director für Musik-Artwork. Erstelle detaillierte Bildprompts für den Song: ${songName}. Stimmung: ${stimmung || 'dunkel, kraftvoll'}, Stil: ${stil || 'cinematic'}, Farben: ${farben || 'schwarz, lila'}, Motiv: ${motiv || 'Portrait'}.${matCtx} Erstelle: 1 Midjourney-Prompt (mit --ar 1:1 --style raw) und 1 DALL-E-Prompt, beide auf Englisch, sehr detailliert und künstlerisch.`;
 
   setLoading('p5_spinner_icon', 'p5_btn_text', true, '✨', 'Prompts generieren');
   try {
@@ -1818,8 +2530,12 @@ async function generatePhase6() {
 async function generatePhase7() {
   const songName = getCurrentSongName();
   const zusatz = document.getElementById('p7_zusatz').value.trim();
+  const song = songs[currentSongId] || {};
+  const lyricCtx = song.p2_lyrics ? `\n\nLyrics (Ausschnitt):\n${song.p2_lyrics.substring(0,400)}` : '';
+  const videoMats = (song.materials||[]).filter(m=>m.type==='video');
+  const vidCtx = videoMats.length ? `\n\nVorhandenes Video-Material: ${videoMats.map(m=>m.note).join(', ')}` : '';
 
-  const prompt = `Du bist ein YouTube SEO Experte für Musik. Optimiere den Upload für '${songName}' von @DaN_90_rap. Genre: Deutscher Rap. Zusatzinfo: ${zusatz || 'kein'}. Erstelle: 1 optimierten Titel (max 70 Zeichen), vollständige Videobeschreibung (mit Intro-Text, Lyrics-Hinweis, Social Media Links Platzhalter, Timestamps-Vorlage), 30 relevante Tags (kommasepariert), 3 Thumbnail-Text-Ideen.`;
+  const prompt = `Du bist ein YouTube SEO Experte für Musik. Kanal: youtube.com/@DaN_90_rap (Kanal-ID: UCc72jjvyE5AGgY4It7uLn-Q). Optimiere den Upload für '${songName}' von @DaN_90_rap. Genre: Deutscher Rap. Zusatzinfo: ${zusatz || 'kein'}.${lyricCtx}${vidCtx}\n\nErstelle: 1 optimierten Titel (max 70 Zeichen), vollständige Videobeschreibung (mit Intro-Text, Lyrics-Hinweis, YouTube-Links zum Kanal, Social Media Platzhalter, Timestamps-Vorlage), 30 relevante Tags (kommasepariert), 3 Thumbnail-Text-Ideen, und eine Posting-Zeit-Empfehlung.`;
 
   setLoading('p7_spinner_icon', 'p7_btn_text', true, '▶️', 'YouTube Content generieren');
   try {
@@ -1835,6 +2551,238 @@ async function generatePhase7() {
 }
 
 // =============================
+// MANAGER SYSTEM (per phase)
+// =============================
+const MGR_PROMPTS = {
+  1: `Du bist ein erfahrener A&R Manager und Song-Konzept Experte für deutschen Rap mit 15+ Jahren Erfahrung. Du kennst die Szene, aktuelle Trends und hilfst beim Entwickeln von überzeugenden Song-Ideen, Themen, Storylines und Konzepten für @DaN_90_rap. Antworte konkret, kreativ und auf Augenhöhe.`,
+  2: `Du bist ein professioneller Rap-Texter und Punchline-Coach für deutschen Rap. Du hast unzählige Texte für Top-Künstler geschrieben. Du hilfst bei Reimen, Flow, Punchlines, Hook-Writing und Lyrics-Struktur für @DaN_90_rap. Antworte konkret mit echten Beispielen.`,
+  3: `Du bist ein erfahrener Beatmaker und Suno AI Experte. Du kennst alle aktuellen Produktions-Techniken, BPM-Ranges für verschiedene Genres und wie man perfekte Suno AI Prompts schreibt. Du hilfst @DaN_90_rap den perfekten Beat zu finden.`,
+  4: `Du bist ein erfahrener Musik-Produktionsmanager der den kompletten Workflow von der Idee bis zum Release kennt. Du hilfst @DaN_90_rap bei Zeitplanung, Workflow-Optimierung und Produktions-Entscheidungen. Priorisiere realistisch.`,
+  5: `Du bist ein Creative Director und Visual Design Experte für Musik-Artwork. Du kennst aktuelle Design-Trends, KI-Bildgenerierungs-Tools (Midjourney, DALL-E, Stable Diffusion) und hilfst @DaN_90_rap ein starkes visuelles Bild zu entwickeln.`,
+  6: `Du bist ein Social Media Manager spezialisiert auf Musik und deutschen Rap. Du kennst TikTok-Algorithmen, Instagram-Strategien und aktuelle Viral-Trends. Du hilfst @DaN_90_rap maximale Reichweite zu erzielen.`,
+  7: `Du bist ein YouTube SEO Experte und Channel-Stratege für Musik. Du kennst YouTube-Algorithmen, Thumbnail-Psychologie und Channel-Wachstums-Strategien für Rap-Künstler wie @DaN_90_rap. Gib konkrete, sofort umsetzbare Tipps.`,
+  8: `Du bist ein erfahrener Audio Engineer und Mix/Mastering Engineer mit Spezialisierung auf Rap und Hip-Hop. Du kennst alle Techniken für professionelles Vocal Recording, Mixing und Mastering für @DaN_90_rap. Verwende Fachbegriffe und erkläre sie wenn nötig.`
+};
+
+function toggleMgr(n) {
+  const toggle = document.getElementById('mgrToggle'+n);
+  const body = document.getElementById('mgrBody'+n);
+  if (!toggle || !body) return;
+  const isOpen = body.classList.contains('open');
+  toggle.classList.toggle('open', !isOpen);
+  body.classList.toggle('open', !isOpen);
+}
+
+function handleMgrKey(e, n) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMgr(n); }
+}
+
+async function sendMgr(n, preset) {
+  const inputEl = document.getElementById('mgrInput'+n);
+  const msgsEl = document.getElementById('mgrMsgs'+n);
+  const sendBtn = document.getElementById('mgrSend'+n);
+  if (!msgsEl) return;
+  const msg = preset || (inputEl ? inputEl.value.trim() : '');
+  if (!msg) return;
+  if (inputEl) inputEl.value = '';
+
+  // Clear empty state
+  const emptyEl = msgsEl.querySelector('.mgr-empty');
+  if (emptyEl) emptyEl.remove();
+
+  // Add user message
+  appendMgrMsg(msgsEl, 'user', msg);
+
+  // Disable send
+  if (sendBtn) { sendBtn.disabled = true; }
+  const thinkId = 'mgr_think_'+Date.now();
+  appendMgrMsg(msgsEl, 'assistant', '⏳ ...', thinkId, true);
+
+  try {
+    const song = currentSongId ? songs[currentSongId] : null;
+    let ctx = song ? `\n\nAktueller Song: "${song.name}"` : '';
+    if (song?.p1_thema) ctx += `, Thema: ${song.p1_thema}`;
+    if (song?.p1_emotion) ctx += `, Emotion: ${song.p1_emotion}`;
+    if (song?.p1_stil) ctx += `, Stil: ${song.p1_stil}`;
+    if (song?.p3_bpm || song?.p8_bpm) ctx += `, BPM: ${song.p8_bpm || song.p3_bpm}`;
+    if (song?.p2_lyrics) ctx += `\n\nLyrics (Ausschnitt): ${song.p2_lyrics.substring(0,300)}`;
+
+    // Include history
+    const history = mgrMessages[n] || [];
+    const sysPrompt = (MGR_PROMPTS[n] || PRODUCER_SYSTEM_PROMPT) + ctx;
+    const historyMsgs = history.slice(-6).map(h => ({role:h.role, content:h.content}));
+    historyMsgs.push({role:'user', content:msg});
+
+    const result = await callClaudeChat(historyMsgs, sysPrompt);
+
+    const thinkEl = document.getElementById(thinkId);
+    if (thinkEl) thinkEl.remove();
+    appendMgrMsg(msgsEl, 'assistant', result);
+
+    if (!mgrMessages[n]) mgrMessages[n] = [];
+    mgrMessages[n].push({role:'user', content:msg}, {role:'assistant', content:result});
+    mgrMessages[n] = mgrMessages[n].slice(-12);
+  } catch(e) {
+    const thinkEl = document.getElementById(thinkId);
+    if (thinkEl) thinkEl.remove();
+    appendMgrMsg(msgsEl, 'assistant', 'Fehler: '+e.message);
+  } finally {
+    if (sendBtn) sendBtn.disabled = false;
+  }
+}
+
+function appendMgrMsg(container, role, content, id, isTemp) {
+  const div = document.createElement('div');
+  div.className = 'mgr-msg ' + role;
+  if (id) div.id = id;
+  const now = new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = `<div>${isTemp ? content : escHtml(content).replace(/\n/g,'<br>')}</div><div class="mgr-msg-time">${now}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+// =============================
+// MATERIAL SYSTEM
+// =============================
+function openMaterialModal() {
+  selectedMatType = 'audio';
+  document.getElementById('matNoteInput').value = '';
+  document.getElementById('matUrlInput').value = '';
+  document.querySelectorAll('.mat-type-btn').forEach(b => b.classList.toggle('sel', b.dataset.type === 'audio'));
+  document.getElementById('materialModal').classList.remove('hidden');
+}
+function closeMaterialModal() {
+  document.getElementById('materialModal').classList.add('hidden');
+}
+function selectMatType(type) {
+  selectedMatType = type;
+  document.querySelectorAll('.mat-type-btn').forEach(b => b.classList.toggle('sel', b.dataset.type === type));
+}
+function confirmAddMaterial() {
+  if (!currentSongId || !songs[currentSongId]) return;
+  const note = document.getElementById('matNoteInput').value.trim();
+  const url = document.getElementById('matUrlInput').value.trim();
+  if (!note && !url) { showToast('Bitte Beschreibung oder Link eingeben!', 'error'); return; }
+  if (!songs[currentSongId].materials) songs[currentSongId].materials = [];
+  songs[currentSongId].materials.push({ id:'mat_'+Date.now(), type:selectedMatType, note, url, createdAt:new Date().toISOString() });
+  saveToStorage();
+  debouncedCloudSync();
+  closeMaterialModal();
+  renderMaterials();
+  showToast('Material hinzugefügt!', 'success');
+}
+function deleteMaterial(id) {
+  if (!currentSongId || !songs[currentSongId]) return;
+  songs[currentSongId].materials = (songs[currentSongId].materials || []).filter(m => m.id !== id);
+  saveToStorage();
+  renderMaterials();
+  showToast('Material entfernt', 'info');
+}
+function renderMaterials() {
+  const card = document.getElementById('materialsCard');
+  const list = document.getElementById('materialsList');
+  const noMsg = document.getElementById('noMaterialsMsg');
+  if (!card || !list) return;
+  const mats = (currentSongId && songs[currentSongId]?.materials) || [];
+  card.style.display = 'block';
+  if (mats.length === 0) {
+    list.innerHTML = '';
+    if (noMsg) noMsg.style.display = 'block';
+    return;
+  }
+  if (noMsg) noMsg.style.display = 'none';
+  const icons = { audio:'🎤', video:'🎬', bild:'🖼️', dokument:'📄' };
+  list.innerHTML = '';
+  mats.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'material-item';
+    div.innerHTML = `
+      <div class="material-item-icon">${icons[m.type]||'📁'}</div>
+      <div class="material-item-type">${m.type}</div>
+      ${m.note ? `<div class="material-item-note">${escHtml(m.note)}</div>` : ''}
+      ${m.url ? `<div class="material-item-url" onclick="window.open('${escHtml(m.url)}','_blank')" title="Link öffnen">🔗 ${escHtml(m.url.substring(0,40))}...</div>` : ''}
+      <button class="material-item-del" onclick="deleteMaterial('${m.id}')" title="Entfernen">×</button>
+    `;
+    list.appendChild(div);
+  });
+}
+function openDriveLink() {
+  const link = document.getElementById('drive_link')?.value.trim();
+  if (link) window.open(link, '_blank');
+  else showToast('Kein Drive-Link gespeichert!', 'error');
+}
+
+// =============================
+// YOUTUBE API
+// =============================
+function loadYtKey() {
+  ytApiKey = localStorage.getItem('dan_yt_key') || '';
+}
+function openYtKeyModal() {
+  document.getElementById('ytKeyInput').value = ytApiKey;
+  document.getElementById('ytKeyModal').classList.remove('hidden');
+}
+function closeYtKeyModal() {
+  document.getElementById('ytKeyModal').classList.add('hidden');
+}
+function saveYtKey() {
+  const key = document.getElementById('ytKeyInput').value.trim();
+  if (!key) { showToast('Bitte API Key eingeben!', 'error'); return; }
+  ytApiKey = key;
+  localStorage.setItem('dan_yt_key', key);
+  closeYtKeyModal();
+  showToast('YouTube API Key gespeichert!', 'success');
+  loadYouTubeChannel();
+}
+async function loadYouTubeChannel() {
+  if (!ytApiKey) { openYtKeyModal(); return; }
+  const subEl = document.getElementById('ytChannelSub');
+  const vidSection = document.getElementById('ytVideosSection');
+  if (subEl) subEl.textContent = '⏳ Lade Kanal-Daten...';
+  try {
+    // Channel info
+    const chRes = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${YT_CHANNEL_ID}&key=${ytApiKey}`);
+    if (!chRes.ok) { const err = await chRes.json(); throw new Error(err.error?.message || 'YouTube API Fehler'); }
+    const chData = await chRes.json();
+    const ch = chData.items?.[0];
+    if (ch) {
+      const subs = parseInt(ch.statistics?.subscriberCount || 0).toLocaleString('de-DE');
+      const vids = parseInt(ch.statistics?.videoCount || 0).toLocaleString('de-DE');
+      if (subEl) subEl.innerHTML = `<strong>${subs}</strong> Abonnenten · <strong>${vids}</strong> Videos`;
+    }
+    // Videos
+    const vRes = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${YT_CHANNEL_ID}&type=video&order=date&maxResults=8&key=${ytApiKey}`);
+    if (vRes.ok) {
+      const vData = await vRes.json();
+      const grid = document.getElementById('ytVideoGrid');
+      if (grid && vData.items?.length) {
+        grid.innerHTML = '';
+        vData.items.forEach(v => {
+          const div = document.createElement('div');
+          div.className = 'yt-video-item';
+          const thumb = v.snippet.thumbnails?.medium?.url || v.snippet.thumbnails?.default?.url || '';
+          const date = new Date(v.snippet.publishedAt).toLocaleDateString('de-DE');
+          div.innerHTML = `
+            <img class="yt-thumb" src="${escHtml(thumb)}" alt="" loading="lazy">
+            <div class="yt-video-info">
+              <div class="yt-video-title">${escHtml(v.snippet.title)}</div>
+              <div class="yt-video-date">${date}</div>
+            </div>
+          `;
+          div.onclick = () => window.open('https://www.youtube.com/watch?v='+v.id.videoId, '_blank');
+          grid.appendChild(div);
+        });
+        if (vidSection) vidSection.style.display = 'block';
+      }
+    }
+    showToast('YouTube Kanal geladen!', 'success');
+  } catch(e) {
+    if (subEl) subEl.textContent = '✗ Fehler: ' + e.message;
+    showToast('YouTube Fehler: ' + e.message, 'error');
+  }
+}
+
+// =============================
 // SONG MANAGEMENT
 // =============================
 function getCurrentSongName() {
@@ -1844,8 +2792,29 @@ function getCurrentSongName() {
 
 function createNewSong() {
   document.getElementById('newSongName').value = '';
+  document.getElementById('newSongStep1').style.display = 'block';
+  document.getElementById('newSongStep2').style.display = 'none';
+  document.getElementById('stepDot1').className = 'step-dot active';
+  document.getElementById('stepDot2').className = 'step-dot';
+  document.getElementById('stepLine1').className = 'step-line';
+  ['matAudioNote','matVideoNote','matImageNote','matDriveLink'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  ['matHasAudio','matHasVideo','matHasImage','matHasDrive'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.checked = false;
+  });
   document.getElementById('newSongModal').classList.remove('hidden');
   document.getElementById('newSongName').focus();
+}
+
+function newSongStep2() {
+  const name = document.getElementById('newSongName').value.trim();
+  if (!name) { showToast('Bitte Song-Namen eingeben!', 'error'); return; }
+  document.getElementById('newSongStep1').style.display = 'none';
+  document.getElementById('newSongStep2').style.display = 'block';
+  document.getElementById('stepDot1').className = 'step-dot done';
+  document.getElementById('stepDot2').className = 'step-dot active';
+  document.getElementById('stepLine1').className = 'step-line done';
 }
 
 function closeNewSongModal() {
@@ -1856,21 +2825,36 @@ function confirmNewSong() {
   const name = document.getElementById('newSongName').value.trim();
   if (!name) { showToast('Bitte Song-Namen eingeben!', 'error'); return; }
 
+  // Collect materials from step 2
+  const materials = [];
+  if (document.getElementById('matHasAudio')?.checked) {
+    const note = document.getElementById('matAudioNote')?.value.trim();
+    materials.push({ id:'mat_'+Date.now()+'a', type:'audio', note: note||'Audio-Aufnahmen vorhanden', url:'', createdAt: new Date().toISOString() });
+  }
+  if (document.getElementById('matHasVideo')?.checked) {
+    const note = document.getElementById('matVideoNote')?.value.trim();
+    materials.push({ id:'mat_'+Date.now()+'v', type:'video', note: note||'Video-Material vorhanden', url:'', createdAt: new Date().toISOString() });
+  }
+  if (document.getElementById('matHasImage')?.checked) {
+    const note = document.getElementById('matImageNote')?.value.trim();
+    materials.push({ id:'mat_'+Date.now()+'i', type:'bild', note: note||'Bild-Material vorhanden', url:'', createdAt: new Date().toISOString() });
+  }
+  const driveLink = document.getElementById('matHasDrive')?.checked ? (document.getElementById('matDriveLink')?.value.trim() || '') : '';
+
   const id = 'song_' + Date.now();
   songs[id] = {
-    id,
-    name,
+    id, name,
     createdAt: new Date().toISOString(),
-    // Phase data
     p1_thema: '', p1_emotion: '', p1_zielgruppe: '', p1_stil: '', p1_ai_result: '',
     p2_konzept: '', p2_lyrics: '',
     p3_bpm: 140, p3_key: 'G minor', p3_stil: '', p3_mood: '', p3_instrumente: '', p3_ai_result: '', p3_suno_link: '', p3_feedback: '', p3_versions: [],
-    p4_checklist: {},
-    p4_ai_result: '',
+    p4_checklist: {}, p4_ai_result: '',
     p5_stimmung: '', p5_stil: '', p5_farben: '', p5_motiv: '', p5_ai_result: '',
     p6_konzept: '', p6_ai_result: '',
     p7_zusatz: '', p7_ai_result: '',
     song_notes: '',
+    drive_link: driveLink,
+    materials,
     p8_audio_filename: '', p8_bpm: null, p8_transcription: '',
     p8_markers: [], p8_ai_result: '',
     p9_messages: []
@@ -1908,6 +2892,7 @@ function deleteSong(id, e) {
   saveToStorage();
   renderSongList();
   deleteSongFromCloud(id);
+  deleteAudioFromIDB(id);
 
   if (currentSongId === id) {
     currentSongId = null;
@@ -1977,12 +2962,10 @@ function switchPhase(num) {
   }
 
   // Phase-specific init
-  if (num === 8) {
-    updateMarkerList();
-  }
-  if (num === 9) {
-    loadChatHistory();
-  }
+  if (num === 1) { renderMaterials(); }
+  if (num === 7 && ytApiKey) { loadYouTubeChannel(); }
+  if (num === 8) { updateMarkerList(); }
+  if (num === 9) { loadChatHistory(); }
 }
 
 // =============================
@@ -1992,11 +2975,11 @@ function loadSongData(id) {
   const s = songs[id];
   if (!s) return;
 
-  // Phase 1
+  // Phase 1 – custom selects
   setVal('p1_thema', s.p1_thema);
-  setVal('p1_emotion', s.p1_emotion);
-  setVal('p1_zielgruppe', s.p1_zielgruppe);
-  setVal('p1_stil', s.p1_stil);
+  buildSelect('p1_emotion','emotion', s.p1_emotion||'');
+  buildSelect('p1_zielgruppe','zielgruppe', s.p1_zielgruppe||'');
+  buildSelect('p1_stil','stil', s.p1_stil||'');
   if (s.p1_ai_result) { showResult('p1_result', 'p1_result_content', s.p1_ai_result); }
   else { hideResult('p1_result'); }
 
@@ -2004,20 +2987,20 @@ function loadSongData(id) {
   setVal('p2_konzept', s.p2_konzept);
   setVal('p2_lyrics', s.p2_lyrics);
 
-  // Phase 3
+  // Phase 3 – custom selects
   const bpm = s.p3_bpm || 140;
   document.getElementById('p3_bpm').value = bpm;
   document.getElementById('p3_bpm_val').textContent = bpm;
   setSelectVal('p3_key', s.p3_key || 'G minor');
-  setVal('p3_stil', s.p3_stil);
-  setVal('p3_mood', s.p3_mood);
-  setVal('p3_instrumente', s.p3_instrumente);
+  buildSelect('p3_stil','genre', s.p3_stil||'');
+  buildSelect('p3_mood','mood', s.p3_mood||'');
+  buildSelect('p3_instrumente','instrumente', s.p3_instrumente||'');
   setVal('p3_suno_link', s.p3_suno_link);
   setVal('p3_feedback', s.p3_feedback);
   if (s.p3_ai_result) { showResult('p3_result', 'p3_result_content', s.p3_ai_result); }
   else { hideResult('p3_result'); }
 
-  // Phase 4 - checklist
+  // Phase 4
   const chklist = s.p4_checklist || {};
   CHECKLIST_KEYS.forEach(k => {
     const chk = document.getElementById('chk_' + k);
@@ -2027,11 +3010,11 @@ function loadSongData(id) {
   if (s.p4_ai_result) { showResult('p4_result', 'p4_result_content', s.p4_ai_result); }
   else { hideResult('p4_result'); }
 
-  // Phase 5
-  setVal('p5_stimmung', s.p5_stimmung);
-  setVal('p5_stil', s.p5_stil);
-  setVal('p5_farben', s.p5_farben);
-  setVal('p5_motiv', s.p5_motiv);
+  // Phase 5 – custom selects
+  buildSelect('p5_stimmung','stimmung', s.p5_stimmung||'');
+  buildSelect('p5_stil','visual_stil', s.p5_stil||'');
+  buildSelect('p5_farben','farben', s.p5_farben||'');
+  buildSelect('p5_motiv','motiv', s.p5_motiv||'');
   if (s.p5_ai_result) { showResult('p5_result', 'p5_result_content', s.p5_ai_result); }
   else { hideResult('p5_result'); }
 
@@ -2045,13 +3028,30 @@ function loadSongData(id) {
   if (s.p7_ai_result) { showResult('p7_result', 'p7_result_content', s.p7_ai_result); }
   else { hideResult('p7_result'); }
 
-  // Notes
+  // Notes + Drive
   setVal('song_notes', s.song_notes);
+  setVal('drive_link', s.drive_link || '');
+
+  // Materials
+  renderMaterials();
 
   // Phase 8
   if (s.p8_audio_filename) {
     const nameEl = document.getElementById('audioFileName');
     if (nameEl) { nameEl.textContent = '📎 ' + s.p8_audio_filename + ' (Datei erneut laden um Player zu aktivieren)'; nameEl.style.display = 'block'; }
+  } else {
+    const nameEl = document.getElementById('audioFileName');
+    if (nameEl) nameEl.style.display = 'none';
+  }
+  // Show audio cards if filename saved
+  if (s.p8_audio_filename) {
+    ['audioPlayerCard','bpmCard','transcriptionCard','timelineCard','audioAiCard'].forEach(cid => {
+      const el = document.getElementById(cid); if(el) el.style.display = 'block';
+    });
+  } else {
+    ['audioPlayerCard','bpmCard','transcriptionCard','timelineCard','audioAiCard'].forEach(cid => {
+      const el = document.getElementById(cid); if(el) el.style.display = 'none';
+    });
   }
   if (s.p8_bpm) {
     const bpmEl = document.getElementById('bpmValue');
@@ -2065,6 +3065,11 @@ function loadSongData(id) {
   if (s.p8_ai_result) { showResult('p8_result', 'p8_result_content', s.p8_ai_result); }
   else { hideResult('p8_result'); }
   updateMarkerList();
+
+  // Load audio from IndexedDB if available
+  if (s.p8_audio_filename) {
+    loadAudioFromIDB(id);
+  }
 }
 
 function hideResult(id) {
@@ -2077,22 +3082,22 @@ function autoSave() {
   const s = songs[currentSongId];
 
   s.p1_thema = getVal('p1_thema');
-  s.p1_emotion = getVal('p1_emotion');
-  s.p1_zielgruppe = getVal('p1_zielgruppe');
-  s.p1_stil = getVal('p1_stil');
+  // selects: read value directly
+  s.p1_emotion = document.getElementById('p1_emotion')?.value || '';
+  s.p1_zielgruppe = document.getElementById('p1_zielgruppe')?.value || '';
+  s.p1_stil = document.getElementById('p1_stil')?.value || '';
 
   s.p2_konzept = getVal('p2_konzept');
   s.p2_lyrics = getVal('p2_lyrics');
 
   s.p3_bpm = document.getElementById('p3_bpm')?.value || 140;
   s.p3_key = document.getElementById('p3_key')?.value || 'G minor';
-  s.p3_stil = getVal('p3_stil');
-  s.p3_mood = getVal('p3_mood');
-  s.p3_instrumente = getVal('p3_instrumente');
+  s.p3_stil = document.getElementById('p3_stil')?.value || '';
+  s.p3_mood = document.getElementById('p3_mood')?.value || '';
+  s.p3_instrumente = document.getElementById('p3_instrumente')?.value || '';
   s.p3_suno_link = getVal('p3_suno_link');
   s.p3_feedback = getVal('p3_feedback');
 
-  // Checklist
   const chklist = {};
   CHECKLIST_KEYS.forEach(k => {
     const chk = document.getElementById('chk_' + k);
@@ -2100,18 +3105,19 @@ function autoSave() {
   });
   s.p4_checklist = chklist;
 
-  s.p5_stimmung = getVal('p5_stimmung');
-  s.p5_stil = getVal('p5_stil');
-  s.p5_farben = getVal('p5_farben');
-  s.p5_motiv = getVal('p5_motiv');
+  s.p5_stimmung = document.getElementById('p5_stimmung')?.value || '';
+  s.p5_stil = document.getElementById('p5_stil')?.value || '';
+  s.p5_farben = document.getElementById('p5_farben')?.value || '';
+  s.p5_motiv = document.getElementById('p5_motiv')?.value || '';
 
   s.p6_konzept = getVal('p6_konzept');
   s.p7_zusatz = getVal('p7_zusatz');
   s.song_notes = getVal('song_notes');
+  s.drive_link = getVal('drive_link');
 
-  // Phase 8
   s.p8_transcription = getVal('p8_transcription');
 
+  s.updatedAt = new Date().toISOString();
   saveToStorage();
   debouncedCloudSync();
 }
@@ -2467,6 +3473,57 @@ async function manualSync() {
 }
 
 // =============================
+// INDEXEDDB – AUDIO STORAGE
+// =============================
+let idb = null;
+function openIDB() {
+  if (idb) return Promise.resolve(idb);
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('dan_audio', 1);
+    req.onupgradeneeded = e => { e.target.result.createObjectStore('audio', {keyPath:'songId'}); };
+    req.onsuccess = e => { idb = e.target.result; res(idb); };
+    req.onerror = () => rej(req.error);
+  });
+}
+async function saveAudioToIDB(songId, file) {
+  try {
+    const db = await openIDB();
+    const blob = new Blob([await file.arrayBuffer()], {type: file.type});
+    return new Promise((res, rej) => {
+      const tx = db.transaction('audio','readwrite');
+      tx.objectStore('audio').put({songId, blob, name: file.name, type: file.type});
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  } catch(e) { console.warn('IDB save failed:', e.message); }
+}
+async function loadAudioFromIDB(songId) {
+  try {
+    const db = await openIDB();
+    return new Promise((res) => {
+      const tx = db.transaction('audio','readonly');
+      const req = tx.objectStore('audio').get(songId);
+      req.onsuccess = () => {
+        const row = req.result;
+        if (row) {
+          const file = new File([row.blob], row.name, {type: row.type});
+          loadAudioFile(file, false); // false = don't save to IDB again
+        }
+        res(row || null);
+      };
+      req.onerror = () => res(null);
+    });
+  } catch(e) { return null; }
+}
+async function deleteAudioFromIDB(songId) {
+  try {
+    const db = await openIDB();
+    const tx = db.transaction('audio','readwrite');
+    tx.objectStore('audio').delete(songId);
+  } catch(e) {}
+}
+
+// =============================
 // AUDIO STUDIO (PHASE 8)
 // =============================
 let currentAudioFile = null;
@@ -2492,8 +3549,8 @@ function handleAudioFile(event) {
   if (file) loadAudioFile(file);
 }
 
-function loadAudioFile(file) {
-  if (file.size > 25 * 1024 * 1024) { showToast('Datei zu groß! Max. 25 MB', 'error'); return; }
+function loadAudioFile(file, saveToIdb = true) {
+  if (file.size > 50 * 1024 * 1024) { showToast('Datei zu groß! Max. 50 MB', 'error'); return; }
   currentAudioFile = file;
   const url = URL.createObjectURL(file);
   const audio = document.getElementById('audioElement');
@@ -2507,8 +3564,14 @@ function loadAudioFile(file) {
   audio.ontimeupdate = updateAudioProgress;
   audio.onended = () => { const b = document.getElementById('playBtn'); if(b) b.textContent = '▶'; };
   audio.onloadedmetadata = () => { currentAudioDuration = audio.duration; updateAudioProgress(); };
-  if (currentSongId && songs[currentSongId]) { songs[currentSongId].p8_audio_filename = file.name; saveToStorage(); }
-  showToast('Audio geladen: ' + file.name, 'success');
+  if (currentSongId && songs[currentSongId]) {
+    songs[currentSongId].p8_audio_filename = file.name;
+    saveToStorage();
+    if (saveToIdb) {
+      saveAudioToIDB(currentSongId, file).then(() => showToast('Audio gespeichert! ✓', 'success'));
+    }
+  }
+  if (saveToIdb) showToast('Audio geladen: ' + file.name, 'success');
   updateMarkerList();
 }
 
