@@ -683,9 +683,34 @@
         <div class="result-box" id="p3_result">
           <div class="result-box-header">
             <span class="result-box-title">Suno AI Prompt</span>
-            <button class="btn-copy" onclick="copyResult('p3_result_content')">📋 Kopieren</button>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-copy" onclick="copyResult('p3_result_content')">📋 Kopieren</button>
+              <button class="btn-copy" onclick="openInSuno()" style="background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.4);color:#10b981;" title="Prompt kopieren & Suno öffnen">🚀 In Suno öffnen</button>
+            </div>
           </div>
           <div class="result-content" id="p3_result_content"></div>
+        </div>
+
+        <!-- Suno Feedback Loop -->
+        <div class="card" style="margin-top:12px;border-color:rgba(16,185,129,0.2);">
+          <div class="card-title" style="color:#10b981;">🔄 Suno Feedback Loop</div>
+          <div class="form-group">
+            <label>Suno Track Link speichern</label>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="p3_suno_link" placeholder="https://suno.com/song/..." oninput="autoSave()" style="flex:1;">
+              <button class="btn-secondary" onclick="openSunoLink()" style="white-space:nowrap;">🎵 Anhören</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Was soll verbessert werden? (Feedback an Claude)</label>
+            <textarea id="p3_feedback" rows="3" placeholder="z.B. Bass zu schwach, klingt zu langsam, Vocals zu hoch, mehr Energie..." oninput="autoSave()"></textarea>
+          </div>
+          <div class="btn-row">
+            <button class="btn-ai" onclick="improveSunoPrompt()" style="background:linear-gradient(135deg,#059669,#10b981);">
+              <span id="p3_improve_icon">🔄</span>
+              <span id="p3_improve_text">Prompt verbessern</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1206,13 +1231,17 @@ function updateBpmDisplay() {
 }
 
 async function generatePhase3() {
+  const song = songs[currentSongId] || {};
   const bpm = document.getElementById('p3_bpm').value;
   const key = document.getElementById('p3_key').value;
   const stil = document.getElementById('p3_stil').value.trim();
   const mood = document.getElementById('p3_mood').value.trim();
   const instrumente = document.getElementById('p3_instrumente').value.trim();
 
-  const prompt = `Create a detailed Suno AI music prompt in English for a German rap song. Style: ${stil || 'German Trap'}, BPM: ${bpm}, Key: ${key}, Mood: ${mood || 'dark'}, Instruments: ${instrumente || '808s, hi-hats, piano'}. Include: genre tags, mood descriptors, instrument specifications, production style, vocal style guidance. Format it as a ready-to-paste Suno prompt.`;
+  const konzeptCtx = song.p1_ai_result ? `\n\nSong-Konzept (Phase 1):\n${song.p1_ai_result}` : '';
+  const lyricsCtx = song.p2_lyrics ? `\n\nLyrics (Phase 2):\n${song.p2_lyrics}` : '';
+
+  const prompt = `Create a detailed Suno AI music prompt in English for a German rap song. Style: ${stil || 'German Trap'}, BPM: ${bpm}, Key: ${key}, Mood: ${mood || 'dark'}, Instruments: ${instrumente || '808s, hi-hats, piano'}.${konzeptCtx}${lyricsCtx}\n\nInclude: genre tags, mood descriptors, instrument specifications, production style, vocal style guidance. Use the song concept and lyrics as context for maximum accuracy. Format it as a ready-to-paste Suno prompt.`;
 
   setLoading('p3_spinner_icon', 'p3_btn_text', true, '✨', 'Suno Prompt generieren');
   try {
@@ -1225,6 +1254,53 @@ async function generatePhase3() {
   } finally {
     setLoading('p3_spinner_icon', 'p3_btn_text', false, '✨', 'Suno Prompt generieren');
   }
+}
+
+async function improveSunoPrompt() {
+  const song = songs[currentSongId] || {};
+  const currentPrompt = document.getElementById('p3_result_content').textContent.trim();
+  const feedback = document.getElementById('p3_feedback').value.trim();
+
+  if (!currentPrompt) { showToast('Zuerst einen Suno Prompt generieren!', 'error'); return; }
+  if (!feedback) { showToast('Bitte Feedback eingeben was verbessert werden soll!', 'error'); return; }
+
+  const konzeptCtx = song.p1_ai_result ? `\nKonzept: ${song.p1_ai_result}` : '';
+  const lyricsCtx = song.p2_lyrics ? `\nLyrics: ${song.p2_lyrics}` : '';
+
+  const prompt = `Du bist ein Experte für Suno AI Prompts.\n\nSong: ${song.name || 'Unbekannt'}${konzeptCtx}${lyricsCtx}\n\nAktueller Suno-Prompt:\n${currentPrompt}\n\nFeedback / Was verbessert werden soll:\n${feedback}\n\nErstelle einen verbesserten Suno-Prompt der das Feedback berücksichtigt. Nutze alle Song-Infos für maximale Qualität. Gib nur den fertigen Prompt zurück, keinen Erklärungstext.`;
+
+  setLoading('p3_improve_icon', 'p3_improve_text', true, '🔄', 'Prompt verbessern');
+  try {
+    const result = await callClaude(prompt);
+    showResult('p3_result', 'p3_result_content', result);
+    saveField('p3_ai_result', result);
+    if (!songs[currentSongId].p3_versions) songs[currentSongId].p3_versions = [];
+    songs[currentSongId].p3_versions.push({ prompt: result, feedback, ts: new Date().toISOString() });
+    saveToStorage();
+    showToast('Prompt verbessert!', 'success');
+  } catch(e) {
+    showToast('Fehler: ' + e.message, 'error');
+  } finally {
+    setLoading('p3_improve_icon', 'p3_improve_text', false, '🔄', 'Prompt verbessern');
+  }
+}
+
+function openInSuno() {
+  const prompt = document.getElementById('p3_result_content').textContent.trim();
+  if (!prompt) { showToast('Zuerst Suno Prompt generieren!', 'error'); return; }
+  navigator.clipboard.writeText(prompt).then(() => {
+    showToast('Prompt kopiert! Suno öffnet sich...', 'success');
+    setTimeout(() => window.open('https://suno.com/create', '_blank'), 700);
+  }).catch(() => {
+    window.open('https://suno.com/create', '_blank');
+    showToast('Suno geöffnet – Prompt manuell einfügen', 'info');
+  });
+}
+
+function openSunoLink() {
+  const link = document.getElementById('p3_suno_link').value.trim();
+  if (!link) { showToast('Kein Suno Link gespeichert!', 'error'); return; }
+  window.open(link, '_blank');
 }
 
 // Phase 4
@@ -1376,7 +1452,7 @@ function confirmNewSong() {
     // Phase data
     p1_thema: '', p1_emotion: '', p1_zielgruppe: '', p1_stil: '', p1_ai_result: '',
     p2_konzept: '', p2_lyrics: '',
-    p3_bpm: 140, p3_key: 'G minor', p3_stil: '', p3_mood: '', p3_instrumente: '', p3_ai_result: '',
+    p3_bpm: 140, p3_key: 'G minor', p3_stil: '', p3_mood: '', p3_instrumente: '', p3_ai_result: '', p3_suno_link: '', p3_feedback: '', p3_versions: [],
     p4_checklist: {},
     p4_ai_result: '',
     p5_stimmung: '', p5_stil: '', p5_farben: '', p5_motiv: '', p5_ai_result: '',
@@ -1513,6 +1589,8 @@ function loadSongData(id) {
   setVal('p3_stil', s.p3_stil);
   setVal('p3_mood', s.p3_mood);
   setVal('p3_instrumente', s.p3_instrumente);
+  setVal('p3_suno_link', s.p3_suno_link);
+  setVal('p3_feedback', s.p3_feedback);
   if (s.p3_ai_result) { showResult('p3_result', 'p3_result_content', s.p3_ai_result); }
   else { hideResult('p3_result'); }
 
@@ -1570,6 +1648,8 @@ function autoSave() {
   s.p3_stil = getVal('p3_stil');
   s.p3_mood = getVal('p3_mood');
   s.p3_instrumente = getVal('p3_instrumente');
+  s.p3_suno_link = getVal('p3_suno_link');
+  s.p3_feedback = getVal('p3_feedback');
 
   // Checklist
   const chklist = {};
