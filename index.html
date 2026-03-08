@@ -451,6 +451,149 @@
     color: var(--text-muted);
   }
   .phase-locked .lock-icon { font-size: 36px; margin-bottom: 12px; }
+
+  /* AUDIO STUDIO */
+  .audio-dropzone {
+    border: 2px dashed var(--border); border-radius: 12px;
+    padding: 40px 20px; text-align: center; cursor: pointer;
+    transition: all 0.2s; background: var(--card2);
+  }
+  .audio-dropzone:hover, .audio-dropzone.dragover {
+    border-color: var(--purple); background: rgba(124,58,237,0.06);
+  }
+  .audio-dropzone-icon { font-size: 36px; margin-bottom: 10px; }
+  .audio-dropzone-text { color: var(--text-muted); font-size: 14px; }
+  .audio-dropzone-text strong { color: var(--text); }
+  .audio-player-bar {
+    background: var(--card2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .audio-play-btn {
+    width: 38px; height: 38px; background: var(--purple);
+    border: none; border-radius: 50%; color: white; font-size: 14px;
+    cursor: pointer; flex-shrink: 0; display: flex; align-items: center;
+    justify-content: center; transition: opacity 0.2s;
+  }
+  .audio-play-btn:hover { opacity: 0.85; }
+  .audio-progress {
+    flex: 1; height: 5px; background: var(--border);
+    border-radius: 3px; position: relative; cursor: pointer;
+  }
+  .audio-progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--purple), var(--blue));
+    border-radius: 3px; pointer-events: none; transition: width 0.1s linear;
+  }
+  .audio-time { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+  .bpm-display { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .bpm-value {
+    font-size: 52px; font-weight: 800; line-height: 1;
+    background: linear-gradient(135deg, var(--purple-light), var(--blue));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .bpm-label { font-size: 13px; color: var(--text-muted); }
+  .bpm-confidence { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  /* TIMELINE */
+  .timeline-bar {
+    width: 100%; height: 40px; background: var(--card2);
+    border: 1px solid var(--border); border-radius: 8px;
+    position: relative; cursor: crosshair; overflow: hidden; margin: 12px 0;
+  }
+  .timeline-progress-line {
+    position: absolute; top: 0; bottom: 0; width: 2px;
+    background: rgba(255,255,255,0.25); pointer-events: none; transition: left 0.1s linear;
+  }
+  .timeline-marker-pin {
+    position: absolute; top: 4px; bottom: 4px; width: 3px;
+    border-radius: 2px; cursor: pointer; transition: opacity 0.2s;
+  }
+  .timeline-marker-pin:hover { opacity: 0.7; }
+  .timeline-marker-pin::before {
+    content: ''; position: absolute; top: -6px; left: -5px;
+    width: 12px; height: 12px; border-radius: 50%; background: inherit;
+  }
+  .marker-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .marker-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 12px; background: var(--card2);
+    border: 1px solid var(--border); border-radius: 8px;
+  }
+  .marker-time {
+    font-size: 12px; font-weight: 700; color: var(--purple-light);
+    white-space: nowrap; min-width: 38px; padding-top: 2px; cursor: pointer;
+  }
+  .marker-time:hover { text-decoration: underline; }
+  .marker-type-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 8px;
+    border-radius: 10px; text-transform: uppercase; white-space: nowrap; flex-shrink: 0;
+  }
+  .marker-instruction { flex: 1; font-size: 13px; color: var(--text); line-height: 1.5; }
+  .marker-del {
+    background: none; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 18px; padding: 0 2px; transition: color 0.2s; line-height: 1;
+  }
+  .marker-del:hover { color: var(--danger); }
+  /* PRODUCER CHAT */
+  .chat-wrap {
+    display: flex; flex-direction: column;
+    height: calc(100vh - 280px); min-height: 400px;
+  }
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .chat-message {
+    max-width: 86%; padding: 12px 16px; border-radius: 12px;
+    font-size: 14px; line-height: 1.65;
+  }
+  .chat-message.user {
+    background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.3);
+    align-self: flex-end; color: var(--text);
+  }
+  .chat-message.assistant {
+    background: var(--card2); border: 1px solid var(--border);
+    align-self: flex-start; color: var(--text); white-space: pre-wrap;
+  }
+  .chat-message .msg-time { font-size: 10px; color: var(--text-muted); margin-top: 6px; }
+  .chat-input-area {
+    padding: 12px 16px; border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .chat-input-row { display: flex; gap: 8px; align-items: flex-end; }
+  .chat-textarea {
+    flex: 1; padding: 10px 14px; background: var(--card2);
+    border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-size: 14px; outline: none; resize: none;
+    font-family: inherit; min-height: 44px; max-height: 120px;
+  }
+  .chat-textarea:focus { border-color: var(--purple); }
+  .chat-send-btn {
+    height: 44px; padding: 0 18px; background: var(--purple);
+    border: none; border-radius: 8px; color: white; font-size: 14px;
+    font-weight: 600; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; flex-shrink: 0;
+  }
+  .chat-send-btn:hover { opacity: 0.9; }
+  .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .chat-quick-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chat-quick-btn {
+    padding: 5px 12px; background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.2); border-radius: 20px;
+    color: var(--purple-light); font-size: 12px; cursor: pointer; transition: all 0.2s;
+  }
+  .chat-quick-btn:hover { background: rgba(124,58,237,0.25); }
+  .chat-empty {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; height: 100%; color: var(--text-muted); text-align: center; gap: 8px;
+  }
+  .chat-empty-icon { font-size: 40px; }
+  .search-toggle { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; }
+  .search-toggle input { accent-color: var(--purple); cursor: pointer; }
+  .btn-tavily {
+    font-size: 12px; padding: 6px 14px;
+    background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+    color: #f59e0b; border-radius: 6px; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-tavily:hover { background: rgba(245,158,11,0.25); }
 </style>
 </head>
 <body>
@@ -474,6 +617,7 @@
     </button>
     <button class="btn-api" onclick="exportSongs()" title="Songs als JSON exportieren">⬇ Export</button>
     <label class="btn-api" style="cursor:pointer;" title="Songs aus JSON importieren">⬆ Import<input type="file" accept=".json" onchange="importSongs(event)" style="display:none"></label>
+    <button class="btn-tavily" onclick="openTavilyModal()" title="Tavily Web-Suche Key">🌐 Web-Suche</button>
     <button class="btn-api" onclick="openApiModal()">API Key</button>
   </div>
 </div>
@@ -512,6 +656,15 @@
       <div class="nav-item" data-phase="7" onclick="switchPhase(7)">
         <div class="phase-num">7</div>
         <span>YouTube Upload</span>
+      </div>
+      <hr class="sidebar-divider">
+      <div class="nav-item" data-phase="8" onclick="switchPhase(8)">
+        <div class="phase-num" style="background:rgba(245,158,11,0.2);color:#f59e0b;">8</div>
+        <span>Audio Studio</span>
+      </div>
+      <div class="nav-item" data-phase="9" onclick="switchPhase(9)">
+        <div class="phase-num" style="background:rgba(16,185,129,0.2);color:#10b981;">9</div>
+        <span>Producer Chat</span>
       </div>
     </div>
 
@@ -902,6 +1055,202 @@
       </div>
     </div>
 
+    <!-- PHASE 8: Audio Studio -->
+    <div class="phase-panel" id="phase8">
+      <div class="phase-header">
+        <div class="phase-icon">🎧</div>
+        <div>
+          <div class="phase-title">Audio Studio</div>
+          <div class="phase-subtitle">Songs & Beats importieren, analysieren und mit Zeitmarken annotieren</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Audio Importieren</div>
+        <div class="audio-dropzone" id="audioDropzone"
+             onclick="document.getElementById('audioFileInput').click()"
+             ondragover="handleDragOver(event)" ondrop="handleAudioDrop(event)" ondragleave="handleDragLeave(event)">
+          <div class="audio-dropzone-icon">🎵</div>
+          <div class="audio-dropzone-text">
+            <strong>Datei hier reinziehen</strong> oder klicken zum Auswählen<br>
+            MP3, WAV, OGG, AAC, FLAC – max. 25 MB
+          </div>
+        </div>
+        <input type="file" id="audioFileInput" accept="audio/*" style="display:none" onchange="handleAudioFile(event)">
+        <div id="audioFileName" style="margin-top:10px;font-size:12px;color:var(--text-muted);display:none;"></div>
+      </div>
+
+      <div class="card" id="audioPlayerCard" style="display:none">
+        <div class="card-title">Player</div>
+        <audio id="audioElement" style="display:none"></audio>
+        <div class="audio-player-bar">
+          <button class="audio-play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+          <div class="audio-progress" id="audioProgress" onclick="seekAudio(event)">
+            <div class="audio-progress-fill" id="audioProgressFill" style="width:0%"></div>
+          </div>
+          <span class="audio-time" id="audioTime">0:00 / 0:00</span>
+          <button class="btn-secondary" onclick="addMarkerAtCurrentTime()" style="padding:6px 12px;font-size:12px;" title="Zeitmarke setzen">+ Marke</button>
+        </div>
+      </div>
+
+      <div class="card" id="bpmCard" style="display:none">
+        <div class="card-title">Beat-Analyse</div>
+        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+          <div class="bpm-display">
+            <div>
+              <div class="bpm-value" id="bpmValue">—</div>
+              <div class="bpm-label">BPM</div>
+            </div>
+            <div>
+              <div class="bpm-confidence" id="bpmInfo" style="margin-top:4px;">Noch nicht analysiert</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button class="btn-ai" onclick="analyzeBPM()" id="bpmBtn" style="background:linear-gradient(135deg,#d97706,#f59e0b);">
+              <span id="bpmBtnIcon">🥁</span>
+              <span id="bpmBtnText">BPM erkennen</span>
+            </button>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <label style="font-size:12px;margin:0;white-space:nowrap;">Manuell:</label>
+              <input type="number" id="bpmManual" min="40" max="300" placeholder="z.B. 140" style="width:80px;padding:6px 10px;font-size:12px;" oninput="saveBpmManual()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="transcriptionCard" style="display:none">
+        <div class="card-title">Text-Extraktion via Groq Whisper</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
+          Extrahiert automatisch Lyrics / gesprochene Texte aus dem Audio per KI-Transkription.
+        </div>
+        <div class="btn-row">
+          <button class="btn-ai" onclick="transcribeAudio()" id="transcribeBtn">
+            <span id="transcribeIcon">🎤</span>
+            <span id="transcribeText">Lyrics extrahieren</span>
+          </button>
+          <select id="transcribeLang" style="padding:8px 12px;font-size:13px;width:auto;">
+            <option value="de">Deutsch</option>
+            <option value="en">Englisch</option>
+            <option value="">Auto-detect</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-top:14px;">
+          <label>Erkannte Texte / Lyrics</label>
+          <textarea id="p8_transcription" rows="8" placeholder="Transkription erscheint hier..." oninput="autoSave()" style="font-family:'Courier New',monospace;font-size:13px;line-height:1.8;"></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="copyText('p8_transcription')">📋 Kopieren</button>
+          <button class="btn-secondary" onclick="sendTranscriptionToLyrics()">→ In Lyrics-Editor übernehmen</button>
+        </div>
+      </div>
+
+      <div class="card" id="timelineCard" style="display:none">
+        <div class="card-title">Produktions-Timeline</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
+          Klicke auf die Timeline oder nutze "+ Marke" im Player um Anweisungen zu setzen.
+          Sag z.B. <em>„Hier soll der Drop kommen"</em> oder <em>„Vocal hier rauer singen"</em>.
+        </div>
+        <div class="timeline-bar" id="timelineBar" onclick="addMarkerFromTimeline(event)" title="Klicken um Marke zu setzen">
+          <div class="timeline-progress-line" id="timelineProgressLine" style="left:0%"></div>
+          <div id="timelinePins"></div>
+        </div>
+        <div id="markerForm" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px;display:none;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Neue Marke bei <span id="markerFormTime" style="color:var(--purple-light);">0:00</span></div>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Typ</label>
+              <select id="markerTypeSelect" style="padding:8px 12px;font-size:13px;">
+                <option value="vocal">🎤 Vocal / Gesang</option>
+                <option value="beat">🥁 Beat / Rhythmus</option>
+                <option value="arrangement">🎼 Arrangement</option>
+                <option value="allgemein">📝 Allgemein</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Anweisung</label>
+              <input type="text" id="markerInstructionInput" placeholder="z.B. Hier kommt der Drop, Bass lauter..." onkeydown="if(event.key==='Enter')confirmAddMarker()">
+            </div>
+          </div>
+          <div class="btn-row" style="margin-top:10px;">
+            <button class="btn-ai" onclick="confirmAddMarker()" style="padding:8px 16px;font-size:13px;">Marke speichern</button>
+            <button class="btn-secondary" onclick="cancelMarker()" style="padding:8px 16px;font-size:13px;">Abbrechen</button>
+          </div>
+        </div>
+        <div id="markerList" class="marker-list"></div>
+        <div id="noMarkersMsg" style="font-size:13px;color:var(--text-muted);text-align:center;padding:16px;">
+          Noch keine Marken gesetzt. Klicke auf die Timeline oder "+ Marke" im Player.
+        </div>
+      </div>
+
+      <div class="card" id="audioAiCard" style="display:none">
+        <div class="card-title">KI-Produzenten-Analyse</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
+          Die KI analysiert alle Zeitmarken und gibt professionelles Feedback wie ein echter Musikproduzent.
+        </div>
+        <div class="btn-row">
+          <button class="btn-ai" onclick="analyzeMarkers()">
+            <span id="analyzeMarkersIcon">🎵</span>
+            <span id="analyzeMarkersText">Alle Marken analysieren</span>
+          </button>
+        </div>
+        <div class="result-box" id="p8_result">
+          <div class="result-box-header">
+            <span class="result-box-title">Produzenten-Feedback</span>
+            <button class="btn-copy" onclick="copyResult('p8_result_content')">📋 Kopieren</button>
+          </div>
+          <div class="result-content" id="p8_result_content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 9: Producer Chat -->
+    <div class="phase-panel" id="phase9">
+      <div class="phase-header">
+        <div class="phase-icon">🎙️</div>
+        <div>
+          <div class="phase-title">Producer Chat</div>
+          <div class="phase-subtitle">Dein KI-Musikproduzent – recherchiert, berät und unterstützt dich</div>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Schnell-Anfragen</div>
+          <div class="chat-quick-btns">
+            <button class="chat-quick-btn" onclick="sendQuickMessage('Analysiere die aktuellen Trends im deutschen Rap und was ich für meine Musik beachten sollte. Sei so konkret wie möglich.')">🔥 Trend-Check</button>
+            <button class="chat-quick-btn" onclick="sendQuickMessage('Gib mir professionelle Mixing-Tipps für meinen aktuellen Song. Was muss ich beim Mixing und Mastering unbedingt beachten?')">🎚️ Mixing Tipps</button>
+            <button class="chat-quick-btn" onclick="sendQuickMessage('Erkläre mir die besten Techniken für Vocal Recording. Was brauche ich und wie klinge ich professionell?')">🎤 Vocal Tipps</button>
+            <button class="chat-quick-btn" onclick="sendQuickMessage('Welche Beat-Sounds und Produktionsstile sind gerade aktuell im deutschen Rap? Konkrete Empfehlungen!')">🥁 Beat Trends</button>
+            <button class="chat-quick-btn" onclick="sendQuickMessage('Erstelle einen detaillierten Marketing-Plan für meinen nächsten Release auf TikTok und Instagram.')">📱 Marketing Plan</button>
+            <button class="chat-quick-btn" onclick="sendQuickMessage('Wie schreibe ich einen wirklich guten Hook der hängenbleibt? Gib mir Techniken und Beispiele.')">✍️ Hook schreiben</button>
+          </div>
+        </div>
+        <div class="chat-wrap">
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-empty" id="chatEmpty">
+              <div class="chat-empty-icon">🎵</div>
+              <div style="font-size:15px;font-weight:600;color:var(--text);">Dein Producer ist bereit</div>
+              <div style="font-size:13px;">Stell eine Frage oder wähle eine Schnell-Anfrage oben</div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <label class="search-toggle">
+                <input type="checkbox" id="useWebSearch" onchange="checkTavily()">
+                <span>🌐 Web-Recherche</span>
+                <span id="tavilyStatus" style="font-size:11px;color:var(--danger);">(kein Key)</span>
+              </label>
+              <button class="btn-secondary" onclick="clearChat()" style="padding:4px 10px;font-size:11px;">🗑 Chat leeren</button>
+            </div>
+            <div class="chat-input-row">
+              <textarea class="chat-textarea" id="chatInput" placeholder="Stell dem Producer eine Frage..." rows="2" onkeydown="handleChatKey(event)"></textarea>
+              <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">Senden</button>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);">Enter zum Senden · Shift+Enter für neue Zeile</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -949,6 +1298,22 @@
     <div class="modal-btns">
       <button class="btn-primary" onclick="confirmRenameSong()">Umbenennen</button>
       <button class="btn-cancel" onclick="closeRenameSongModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAVILY WEB-SUCHE MODAL -->
+<div class="modal-overlay hidden" id="tavilyModal">
+  <div class="modal">
+    <div class="modal-title">🌐 Web-Recherche Key</div>
+    <div class="modal-desc">
+      Mit einem Tavily API Key kann der Producer Chat das Internet durchsuchen und dir immer aktuelle Infos geben.
+      Kostenlosen Key unter <a href="https://tavily.com" target="_blank" style="color:var(--blue);">tavily.com</a> holen.
+    </div>
+    <input type="password" class="modal-input" id="tavilyKeyInput" placeholder="tvly-..." onkeydown="if(event.key==='Enter')saveTavilyKey()">
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="saveTavilyKey()">Speichern</button>
+      <button class="btn-cancel" onclick="closeTavilyModal()">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -1011,6 +1376,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadFromStorage();
   updateApiStatus();
   loadCloudConfig();
+  loadTavilyKey();
   renderSongList();
 
   const apiKey = sessionStorage.getItem('dan_api_key') || localStorage.getItem('dan_api_key');
@@ -1092,12 +1458,29 @@ function updateApiStatus() {
   }
 }
 
-async function callClaude(prompt) {
+const PRODUCER_SYSTEM_PROMPT = `Du bist ein professioneller Musikproduzent, A&R Manager und Songwriting Coach mit über 20 Jahren Erfahrung in der deutschen Rap- und Hip-Hop-Szene. Du hast mit Top-Künstlern gearbeitet und kennst alle aktuellen Trends, Produktionstechniken und die Szene in- und auswendig.
+
+Deine Prinzipien:
+1. Du recherchierst IMMER sorgfältig bevor du antwortest – keine übereilten Antworten
+2. Du gibst KONKRETE, DIREKT UMSETZBARE Ratschläge – keine Floskeln
+3. Du kennst die aktuellen Trends im deutschen Rap und beziehst diese immer ein
+4. Du nutzt Fachbegriffe der Musikproduktion korrekt und erklärt sie wenn nötig
+5. Du sprichst den User direkt und auf Augenhöhe an
+6. Wenn du dir bei etwas nicht 100% sicher bist, sagst du das ehrlich
+
+Antworte auf Deutsch, professionell aber zugänglich.`;
+
+async function callClaude(prompt, systemPrompt = null) {
   const apiKey = sessionStorage.getItem('dan_api_key');
   if (!apiKey) {
     openApiModal();
     throw new Error('Kein API Key vorhanden');
   }
+
+  const messages = [
+    { role: 'system', content: systemPrompt || PRODUCER_SYSTEM_PROMPT },
+    { role: 'user', content: prompt }
+  ];
 
   const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
@@ -1107,7 +1490,7 @@ async function callClaude(prompt) {
     },
     body: JSON.stringify({
       model: 'llama-3.3-70b-versatile',
-      messages: [{ role: 'user', content: prompt }],
+      messages,
       max_tokens: 2000
     })
   });
@@ -1453,7 +1836,10 @@ function confirmNewSong() {
     p5_stimmung: '', p5_stil: '', p5_farben: '', p5_motiv: '', p5_ai_result: '',
     p6_konzept: '', p6_ai_result: '',
     p7_zusatz: '', p7_ai_result: '',
-    song_notes: ''
+    song_notes: '',
+    p8_audio_filename: '', p8_bpm: null, p8_transcription: '',
+    p8_markers: [], p8_ai_result: '',
+    p9_messages: []
   };
 
   saveToStorage();
@@ -1555,6 +1941,14 @@ function switchPhase(num) {
   if (window.innerWidth <= 600) {
     closeSidebar();
   }
+
+  // Phase-specific init
+  if (num === 8) {
+    updateMarkerList();
+  }
+  if (num === 9) {
+    loadChatHistory();
+  }
 }
 
 // =============================
@@ -1619,6 +2013,24 @@ function loadSongData(id) {
 
   // Notes
   setVal('song_notes', s.song_notes);
+
+  // Phase 8
+  if (s.p8_audio_filename) {
+    const nameEl = document.getElementById('audioFileName');
+    if (nameEl) { nameEl.textContent = '📎 ' + s.p8_audio_filename + ' (Datei erneut laden um Player zu aktivieren)'; nameEl.style.display = 'block'; }
+  }
+  if (s.p8_bpm) {
+    const bpmEl = document.getElementById('bpmValue');
+    const infoEl = document.getElementById('bpmInfo');
+    const manEl = document.getElementById('bpmManual');
+    if (bpmEl) bpmEl.textContent = s.p8_bpm;
+    if (infoEl) infoEl.textContent = 'Gespeichert';
+    if (manEl) manEl.value = s.p8_bpm;
+  }
+  setVal('p8_transcription', s.p8_transcription);
+  if (s.p8_ai_result) { showResult('p8_result', 'p8_result_content', s.p8_ai_result); }
+  else { hideResult('p8_result'); }
+  updateMarkerList();
 }
 
 function hideResult(id) {
@@ -1662,6 +2074,9 @@ function autoSave() {
   s.p6_konzept = getVal('p6_konzept');
   s.p7_zusatz = getVal('p7_zusatz');
   s.song_notes = getVal('song_notes');
+
+  // Phase 8
+  s.p8_transcription = getVal('p8_transcription');
 
   saveToStorage();
   debouncedCloudSync();
@@ -2016,6 +2431,542 @@ async function manualSync() {
   showToast('Synchronisiert!', 'success');
   document.getElementById('cloudStatusMsg').textContent = '✓ Zuletzt synchronisiert: ' + new Date().toLocaleTimeString('de-DE');
 }
+
+// =============================
+// AUDIO STUDIO (PHASE 8)
+// =============================
+let currentAudioFile = null;
+let currentAudioDuration = 0;
+let pendingMarkerTimeVal = null;
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('audioDropzone').classList.add('dragover');
+}
+function handleDragLeave() {
+  document.getElementById('audioDropzone').classList.remove('dragover');
+}
+function handleAudioDrop(e) {
+  e.preventDefault();
+  document.getElementById('audioDropzone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('audio/')) loadAudioFile(file);
+  else showToast('Bitte eine Audiodatei auswählen!', 'error');
+}
+function handleAudioFile(event) {
+  const file = event.target.files[0];
+  if (file) loadAudioFile(file);
+}
+
+function loadAudioFile(file) {
+  if (file.size > 25 * 1024 * 1024) { showToast('Datei zu groß! Max. 25 MB', 'error'); return; }
+  currentAudioFile = file;
+  const url = URL.createObjectURL(file);
+  const audio = document.getElementById('audioElement');
+  audio.src = url;
+  audio.load();
+  const nameEl = document.getElementById('audioFileName');
+  if (nameEl) { nameEl.textContent = '📎 ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)'; nameEl.style.display = 'block'; }
+  ['audioPlayerCard','bpmCard','transcriptionCard','timelineCard','audioAiCard'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'block';
+  });
+  audio.ontimeupdate = updateAudioProgress;
+  audio.onended = () => { const b = document.getElementById('playBtn'); if(b) b.textContent = '▶'; };
+  audio.onloadedmetadata = () => { currentAudioDuration = audio.duration; updateAudioProgress(); };
+  if (currentSongId && songs[currentSongId]) { songs[currentSongId].p8_audio_filename = file.name; saveToStorage(); }
+  showToast('Audio geladen: ' + file.name, 'success');
+  updateMarkerList();
+}
+
+function togglePlay() {
+  const audio = document.getElementById('audioElement');
+  if (!audio.src || audio.src === window.location.href) { showToast('Kein Audio geladen!', 'error'); return; }
+  if (audio.paused) { audio.play(); document.getElementById('playBtn').textContent = '⏸'; }
+  else { audio.pause(); document.getElementById('playBtn').textContent = '▶'; }
+}
+
+function formatTime(secs) {
+  if (!secs || isNaN(secs)) return '0:00';
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+function updateAudioProgress() {
+  const audio = document.getElementById('audioElement');
+  const dur = audio.duration || 0;
+  const cur = audio.currentTime || 0;
+  const pct = dur > 0 ? (cur / dur) * 100 : 0;
+  const f = document.getElementById('audioProgressFill');
+  const t = document.getElementById('audioTime');
+  const l = document.getElementById('timelineProgressLine');
+  if (f) f.style.width = pct + '%';
+  if (t) t.textContent = formatTime(cur) + ' / ' + formatTime(dur);
+  if (l) l.style.left = pct + '%';
+}
+
+function seekAudio(e) {
+  const audio = document.getElementById('audioElement');
+  const bar = document.getElementById('audioProgress');
+  if (!bar) return;
+  const rect = bar.getBoundingClientRect();
+  audio.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * (audio.duration || 0);
+}
+
+async function analyzeBPM() {
+  if (!currentAudioFile) { showToast('Erst Audio importieren!', 'error'); return; }
+  const btn = document.getElementById('bpmBtn');
+  const icon = document.getElementById('bpmBtnIcon');
+  const text = document.getElementById('bpmBtnText');
+  const info = document.getElementById('bpmInfo');
+  btn.disabled = true;
+  icon.innerHTML = '<span class="spinner"></span>';
+  text.textContent = 'Analysiere...';
+  if (info) info.textContent = 'Beat wird erkannt...';
+  try {
+    const ab = await currentAudioFile.arrayBuffer();
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const audioBuffer = await ctx.decodeAudioData(ab);
+    ctx.close();
+    const bpm = detectBPMFromBuffer(audioBuffer);
+    if (bpm) {
+      const bpmEl = document.getElementById('bpmValue');
+      if (bpmEl) bpmEl.textContent = bpm;
+      if (info) info.textContent = 'Automatisch erkannt';
+      document.getElementById('bpmManual').value = bpm;
+      if (currentSongId && songs[currentSongId]) {
+        songs[currentSongId].p8_bpm = bpm;
+        songs[currentSongId].p3_bpm = bpm;
+        document.getElementById('p3_bpm').value = bpm;
+        document.getElementById('p3_bpm_val').textContent = bpm;
+        saveToStorage();
+      }
+      showToast('BPM erkannt: ' + bpm, 'success');
+    } else {
+      const bpmEl = document.getElementById('bpmValue');
+      if (bpmEl) bpmEl.textContent = '?';
+      if (info) info.textContent = 'Nicht eindeutig – manuell eingeben';
+      showToast('BPM konnte nicht erkannt werden', 'error');
+    }
+  } catch(e) { showToast('BPM-Fehler: ' + e.message, 'error'); }
+  finally { btn.disabled = false; icon.textContent = '🥁'; text.textContent = 'BPM erkennen'; }
+}
+
+function detectBPMFromBuffer(audioBuffer) {
+  const sr = audioBuffer.sampleRate;
+  const data = audioBuffer.getChannelData(0);
+  const hop = Math.round(sr * 0.01);
+  const win = Math.round(sr * 0.05);
+  const energies = [];
+  for (let i = 0; i < data.length - win; i += hop) {
+    let e = 0;
+    for (let j = 0; j < win; j++) e += data[i+j] * data[i+j];
+    energies.push(e / win);
+  }
+  const odf = [0];
+  for (let i = 1; i < energies.length; i++) odf.push(Math.max(0, energies[i] - energies[i-1]));
+  const fr = sr / hop;
+  const minDist = Math.round(fr * 0.25);
+  const thWin = Math.round(fr * 2);
+  const peaks = [];
+  for (let i = minDist; i < odf.length - minDist; i++) {
+    let sum = 0, cnt = 0;
+    for (let k = Math.max(0,i-thWin); k < Math.min(odf.length,i+thWin); k++) { sum+=odf[k]; cnt++; }
+    if (odf[i] > (sum/cnt) * 1.5) {
+      let isMax = true;
+      for (let k = i-minDist; k <= i+minDist && isMax; k++) if (k!==i && odf[k]>=odf[i]) isMax=false;
+      if (isMax) peaks.push(i);
+    }
+  }
+  if (peaks.length < 4) return null;
+  const iois = [];
+  for (let i = 1; i < peaks.length; i++) iois.push((peaks[i]-peaks[i-1])/fr);
+  const counts = {};
+  iois.forEach(ioi => {
+    for (let m = 0.5; m <= 2; m *= 2) {
+      const b = Math.round(60/(ioi*m));
+      if (b >= 50 && b <= 240) counts[b] = (counts[b]||0) + (m===1?2:1);
+    }
+  });
+  if (!Object.keys(counts).length) return null;
+  return parseInt(Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0]);
+}
+
+function saveBpmManual() {
+  const val = parseInt(document.getElementById('bpmManual').value);
+  if (val && val >= 40 && val <= 300) {
+    const bpmEl = document.getElementById('bpmValue');
+    const info = document.getElementById('bpmInfo');
+    if (bpmEl) bpmEl.textContent = val;
+    if (info) info.textContent = 'Manuell eingegeben';
+    if (currentSongId && songs[currentSongId]) {
+      songs[currentSongId].p8_bpm = val;
+      songs[currentSongId].p3_bpm = val;
+      document.getElementById('p3_bpm').value = val;
+      document.getElementById('p3_bpm_val').textContent = val;
+      saveToStorage();
+    }
+  }
+}
+
+async function transcribeAudio() {
+  if (!currentAudioFile) { showToast('Erst Audio importieren!', 'error'); return; }
+  const apiKey = sessionStorage.getItem('dan_api_key');
+  if (!apiKey) { openApiModal(); return; }
+  const lang = document.getElementById('transcribeLang').value;
+  const btn = document.getElementById('transcribeBtn');
+  const icon = document.getElementById('transcribeIcon');
+  const text = document.getElementById('transcribeText');
+  btn.disabled = true;
+  icon.innerHTML = '<span class="spinner"></span>';
+  text.textContent = 'Transkribiere...';
+  try {
+    const fd = new FormData();
+    fd.append('file', currentAudioFile, currentAudioFile.name);
+    fd.append('model', 'whisper-large-v3');
+    if (lang) fd.append('language', lang);
+    fd.append('response_format', 'json');
+    const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+      method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}` }, body: fd
+    });
+    if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.error?.message||`HTTP ${res.status}`); }
+    const data = await res.json();
+    const tr = data.text || '';
+    document.getElementById('p8_transcription').value = tr;
+    saveField('p8_transcription', tr);
+    showToast('Transkription abgeschlossen!', 'success');
+  } catch(e) { showToast('Transkriptions-Fehler: ' + e.message, 'error'); }
+  finally { btn.disabled = false; icon.textContent = '🎤'; text.textContent = 'Lyrics extrahieren'; }
+}
+
+function sendTranscriptionToLyrics() {
+  const text = document.getElementById('p8_transcription').value.trim();
+  if (!text) { showToast('Keine Transkription vorhanden!', 'error'); return; }
+  if (currentSongId && songs[currentSongId]) {
+    const ex = songs[currentSongId].p2_lyrics || '';
+    songs[currentSongId].p2_lyrics = ex ? ex + '\n\n--- Transkription ---\n' + text : text;
+    document.getElementById('p2_lyrics').value = songs[currentSongId].p2_lyrics;
+    saveToStorage();
+    showToast('In Lyrics-Editor übernommen!', 'success');
+    switchPhase(2);
+  }
+}
+
+function addMarkerAtCurrentTime() {
+  const audio = document.getElementById('audioElement');
+  if (!audio.src || audio.src === window.location.href) { showToast('Erst Audio laden!', 'error'); return; }
+  pendingMarkerTimeVal = audio.currentTime;
+  openMarkerForm(audio.currentTime);
+}
+
+function addMarkerFromTimeline(e) {
+  const bar = document.getElementById('timelineBar');
+  const rect = bar.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  pendingMarkerTimeVal = pct * (currentAudioDuration || 0);
+  openMarkerForm(pendingMarkerTimeVal);
+}
+
+function openMarkerForm(time) {
+  const formEl = document.getElementById('markerForm');
+  const timeEl = document.getElementById('markerFormTime');
+  const inputEl = document.getElementById('markerInstructionInput');
+  if (timeEl) timeEl.textContent = formatTime(time);
+  if (inputEl) inputEl.value = '';
+  if (formEl) formEl.style.display = 'block';
+  if (inputEl) inputEl.focus();
+}
+
+function cancelMarker() {
+  pendingMarkerTimeVal = null;
+  const f = document.getElementById('markerForm');
+  if (f) f.style.display = 'none';
+}
+
+function confirmAddMarker() {
+  const inputEl = document.getElementById('markerInstructionInput');
+  const instruction = inputEl ? inputEl.value.trim() : '';
+  if (!instruction) { showToast('Bitte Anweisung eingeben!', 'error'); return; }
+  if (!currentSongId || !songs[currentSongId]) return;
+  const typeEl = document.getElementById('markerTypeSelect');
+  const type = typeEl ? typeEl.value : 'allgemein';
+  const marker = { id: 'mk_' + Date.now(), time: pendingMarkerTimeVal || 0, type, instruction };
+  if (!songs[currentSongId].p8_markers) songs[currentSongId].p8_markers = [];
+  songs[currentSongId].p8_markers.push(marker);
+  songs[currentSongId].p8_markers.sort((a, b) => a.time - b.time);
+  saveToStorage();
+  cancelMarker();
+  updateMarkerList();
+  showToast('Marke gesetzt!', 'success');
+}
+
+function deleteMarker(id) {
+  if (!currentSongId || !songs[currentSongId]) return;
+  songs[currentSongId].p8_markers = (songs[currentSongId].p8_markers || []).filter(m => m.id !== id);
+  saveToStorage();
+  updateMarkerList();
+  showToast('Marke gelöscht', 'info');
+}
+
+function jumpToMarker(time) {
+  const audio = document.getElementById('audioElement');
+  if (audio && audio.src && audio.src !== window.location.href) audio.currentTime = time;
+}
+
+function updateMarkerList() {
+  const markers = (currentSongId && songs[currentSongId]?.p8_markers) || [];
+  const list = document.getElementById('markerList');
+  const noMsg = document.getElementById('noMarkersMsg');
+  const pins = document.getElementById('timelinePins');
+  if (!list) return;
+  const TC = { vocal:'#3b82f6', beat:'#f59e0b', arrangement:'#10b981', allgemein:'#a78bfa' };
+  const TL = { vocal:'🎤 Vocal', beat:'🥁 Beat', arrangement:'🎼 Arrangement', allgemein:'📝 Allgemein' };
+  if (markers.length === 0) {
+    list.innerHTML = '';
+    if (noMsg) noMsg.style.display = 'block';
+    if (pins) pins.innerHTML = '';
+    return;
+  }
+  if (noMsg) noMsg.style.display = 'none';
+  if (pins && currentAudioDuration > 0) {
+    pins.innerHTML = '';
+    markers.forEach(m => {
+      const pin = document.createElement('div');
+      pin.className = 'timeline-marker-pin';
+      pin.style.cssText = `left:${(m.time/currentAudioDuration)*100}%;background:${TC[m.type]||TC.allgemein}`;
+      pin.title = formatTime(m.time) + ': ' + m.instruction;
+      pin.onclick = (e) => { e.stopPropagation(); jumpToMarker(m.time); };
+      pins.appendChild(pin);
+    });
+  }
+  list.innerHTML = '';
+  markers.forEach(m => {
+    const col = TC[m.type] || TC.allgemein;
+    const lbl = TL[m.type] || m.type;
+    const item = document.createElement('div');
+    item.className = 'marker-item';
+    item.innerHTML = `<span class="marker-time" onclick="jumpToMarker(${m.time})" title="Zu dieser Zeit springen">${escHtml(formatTime(m.time))}</span><span class="marker-type-badge" style="background:${col}22;border:1px solid ${col}44;color:${col};">${escHtml(lbl)}</span><span class="marker-instruction">${escHtml(m.instruction)}</span><button class="marker-del" onclick="deleteMarker('${escHtml(m.id)}')" title="Löschen">×</button>`;
+    list.appendChild(item);
+  });
+}
+
+async function analyzeMarkers() {
+  if (!currentSongId || !songs[currentSongId]) return;
+  const song = songs[currentSongId];
+  const markers = song.p8_markers || [];
+  if (markers.length === 0) { showToast('Keine Marken vorhanden!', 'error'); return; }
+  const markerText = markers.map(m => `[${formatTime(m.time)}] ${m.type.toUpperCase()}: ${m.instruction}`).join('\n');
+  const bpm = song.p8_bpm || song.p3_bpm || '?';
+  const trSnip = song.p8_transcription ? `\n\nTranskription:\n${song.p8_transcription.substring(0, 600)}` : '';
+  const lySnip = song.p2_lyrics ? `\n\nLyrics:\n${song.p2_lyrics.substring(0, 500)}` : '';
+  const prompt = `Song: "${song.name}" von @DaN_90_rap | BPM: ${bpm}${trSnip}${lySnip}
+
+Produktions-Zeitmarken:
+${markerText}
+
+Analysiere alle Zeitmarken professionell. Für jede Marke: konkrete Vocal-Anweisungen, Beat-Elemente, Arrangement-Struktur und Mixing-Hinweise. Nutze Fachbegriffe. Sei so detailliert wie ein echter Produzent im Studio.`;
+  const btn = document.getElementById('analyzeMarkersIcon')?.closest('button');
+  const icon = document.getElementById('analyzeMarkersIcon');
+  const txt = document.getElementById('analyzeMarkersText');
+  if (btn) btn.disabled = true;
+  if (icon) icon.innerHTML = '<span class="spinner"></span>';
+  if (txt) txt.textContent = 'Analysiere...';
+  try {
+    const result = await callClaude(prompt);
+    showResult('p8_result', 'p8_result_content', result);
+    saveField('p8_ai_result', result);
+    showToast('Analyse abgeschlossen!', 'success');
+  } catch(e) { showToast('Fehler: ' + e.message, 'error'); }
+  finally {
+    if (btn) btn.disabled = false;
+    if (icon) icon.textContent = '🎵';
+    if (txt) txt.textContent = 'Alle Marken analysieren';
+  }
+}
+
+// =============================
+// PRODUCER CHAT (PHASE 9)
+// =============================
+let tavilyKey = '';
+
+function loadTavilyKey() {
+  tavilyKey = localStorage.getItem('dan_tavily_key') || '';
+  updateTavilyStatus();
+}
+
+function updateTavilyStatus() {
+  const el = document.getElementById('tavilyStatus');
+  if (!el) return;
+  if (tavilyKey) { el.textContent = '(aktiv)'; el.style.color = 'var(--success)'; }
+  else { el.textContent = '(kein Key)'; el.style.color = 'var(--danger)'; }
+}
+
+function openTavilyModal() {
+  document.getElementById('tavilyModal').classList.remove('hidden');
+  document.getElementById('tavilyKeyInput').value = tavilyKey;
+  document.getElementById('tavilyKeyInput').focus();
+}
+
+function closeTavilyModal() {
+  document.getElementById('tavilyModal').classList.add('hidden');
+}
+
+function saveTavilyKey() {
+  const key = document.getElementById('tavilyKeyInput').value.trim();
+  if (!key) { showToast('Bitte Key eingeben!', 'error'); return; }
+  tavilyKey = key;
+  localStorage.setItem('dan_tavily_key', key);
+  updateTavilyStatus();
+  closeTavilyModal();
+  showToast('Tavily Key gespeichert!', 'success');
+}
+
+function checkTavily() {
+  if (document.getElementById('useWebSearch').checked && !tavilyKey) {
+    document.getElementById('useWebSearch').checked = false;
+    showToast('Tavily Key benötigt für Web-Suche', 'info');
+    openTavilyModal();
+  }
+}
+
+async function searchWeb(query) {
+  if (!tavilyKey) return null;
+  try {
+    const res = await fetch('https://api.tavily.com/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ api_key: tavilyKey, query, search_depth: 'advanced', max_results: 4, include_answer: true })
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch(e) { console.warn('Tavily:', e.message); return null; }
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const useSearch = document.getElementById('useWebSearch').checked;
+  input.value = '';
+  appendChatMessage('user', msg);
+  if (!currentSongId || !songs[currentSongId]) {
+    appendChatMessage('assistant', 'Bitte erst einen Song auswählen!');
+    return;
+  }
+  const sendBtn = document.getElementById('chatSendBtn');
+  sendBtn.disabled = true;
+  sendBtn.textContent = '...';
+  const thinkingId = 'thinking_' + Date.now();
+  appendChatMessage('assistant', '🔍 Recherchiere...', thinkingId, true);
+  try {
+    const song = songs[currentSongId];
+    let songCtx = `Song: "${song.name}"`;
+    if (song.p1_thema) songCtx += `, Thema: ${song.p1_thema}`;
+    if (song.p1_emotion) songCtx += `, Emotion: ${song.p1_emotion}`;
+    if (song.p1_stil) songCtx += `, Stil: ${song.p1_stil}`;
+    if (song.p8_bpm || song.p3_bpm) songCtx += `, BPM: ${song.p8_bpm || song.p3_bpm}`;
+    if (song.p3_key) songCtx += `, Key: ${song.p3_key}`;
+    if (song.p2_lyrics) songCtx += `\n\nLyrics (Ausschnitt):\n${song.p2_lyrics.substring(0, 400)}`;
+
+    let searchCtx = '';
+    if (useSearch && tavilyKey) {
+      const results = await searchWeb(msg + ' deutsch rap musikproduktion 2025');
+      if (results) {
+        if (results.answer) searchCtx = `\n\n## Aktuelle Web-Recherche:\n${results.answer}`;
+        if (results.results?.length) searchCtx += '\n\nQuellen:\n' + results.results.slice(0,3).map(r => `- ${r.title}: ${r.content?.substring(0,200)}`).join('\n');
+      }
+    }
+
+    const history = (song.p9_messages || []).slice(-8);
+    const sysPrompt = `${PRODUCER_SYSTEM_PROMPT}
+
+Aktueller Song-Kontext:
+${songCtx}
+Heutiges Datum: ${new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})}${searchCtx}`;
+
+    const messages = history.map(h => ({ role: h.role, content: h.content }));
+    messages.push({ role: 'user', content: msg });
+    const result = await callClaudeChat(messages, sysPrompt);
+
+    const thinkEl = document.getElementById(thinkingId);
+    if (thinkEl) thinkEl.remove();
+    appendChatMessage('assistant', result);
+
+    if (!songs[currentSongId].p9_messages) songs[currentSongId].p9_messages = [];
+    songs[currentSongId].p9_messages.push(
+      { role: 'user', content: msg, ts: new Date().toISOString() },
+      { role: 'assistant', content: result, ts: new Date().toISOString() }
+    );
+    songs[currentSongId].p9_messages = songs[currentSongId].p9_messages.slice(-20);
+    saveToStorage();
+  } catch(e) {
+    const thinkEl = document.getElementById(thinkingId);
+    if (thinkEl) thinkEl.remove();
+    appendChatMessage('assistant', 'Fehler: ' + e.message);
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Senden';
+  }
+}
+
+async function callClaudeChat(messages, systemPrompt) {
+  const apiKey = sessionStorage.getItem('dan_api_key');
+  if (!apiKey) { openApiModal(); throw new Error('Kein API Key'); }
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: systemPrompt }, ...messages], max_tokens: 2500 })
+  });
+  if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.error?.message||`API Fehler: ${res.status}`); }
+  return (await res.json()).choices[0].message.content;
+}
+
+function appendChatMessage(role, content, id = null, isTemporary = false) {
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+  const emptyEl = document.getElementById('chatEmpty');
+  if (emptyEl) emptyEl.style.display = 'none';
+  const div = document.createElement('div');
+  div.className = 'chat-message ' + role;
+  if (id) div.id = id;
+  const now = new Date().toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
+  div.innerHTML = `<div>${isTemporary ? content : escHtml(content).replace(/\n/g,'<br>')}</div><div class="msg-time">${now}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendQuickMessage(msg) {
+  document.getElementById('chatInput').value = msg;
+  await sendChatMessage();
+}
+
+function clearChat() {
+  if (!currentSongId || !songs[currentSongId]) return;
+  if (!confirm('Chat-Verlauf löschen?')) return;
+  songs[currentSongId].p9_messages = [];
+  saveToStorage();
+  const container = document.getElementById('chatMessages');
+  if (container) container.innerHTML = '<div class="chat-empty" id="chatEmpty"><div class="chat-empty-icon">🎵</div><div style="font-size:15px;font-weight:600;color:var(--text);">Dein Producer ist bereit</div><div style="font-size:13px;">Stell eine Frage oder wähle eine Schnell-Anfrage oben</div></div>';
+  showToast('Chat geleert', 'info');
+}
+
+function loadChatHistory() {
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+  container.innerHTML = '';
+  const messages = (currentSongId && songs[currentSongId]?.p9_messages) || [];
+  if (messages.length === 0) {
+    container.innerHTML = '<div class="chat-empty" id="chatEmpty"><div class="chat-empty-icon">🎵</div><div style="font-size:15px;font-weight:600;color:var(--text);">Dein Producer ist bereit</div><div style="font-size:13px;">Stell eine Frage oder wähle eine Schnell-Anfrage oben</div></div>';
+    return;
+  }
+  messages.forEach(m => appendChatMessage(m.role, m.content));
+}
+
+// =============================
 
 function debouncedCloudSync() {
   if (!cloudConnected) return;
