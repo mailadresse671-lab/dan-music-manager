@@ -704,6 +704,18 @@
   }
   .material-item-del:hover { color:var(--danger); }
   .no-materials { font-size:13px; color:var(--text-muted); text-align:center; padding:16px; }
+  .mat-file-drop {
+    border:2px dashed var(--border); border-radius:8px; padding:14px 12px;
+    text-align:center; cursor:pointer; font-size:13px; color:var(--text-muted);
+    transition:all 0.2s; margin-top:4px;
+  }
+  .mat-file-drop:hover, .mat-file-drop.drag { border-color:var(--purple); color:var(--purple-light); background:rgba(124,58,237,0.05); }
+  .mat-file-drop.has-file { border-color:var(--success); color:#10b981; background:rgba(16,185,129,0.05); }
+  .material-item-file {
+    font-size:11px; color:#10b981; overflow:hidden;
+    text-overflow:ellipsis; white-space:nowrap; cursor:pointer;
+  }
+  .material-item-file:hover { text-decoration:underline; }
 
   /* ===== YOUTUBE PANEL ===== */
   .yt-channel-bar {
@@ -1977,6 +1989,17 @@ CREATE POLICY "anon full access" ON dan_songs
       <label>Link / URL (optional)</label>
       <input type="text" class="modal-input" id="matUrlInput" placeholder="https://drive.google.com/... oder anderer Link" style="margin-bottom:8px;">
     </div>
+    <div class="form-group">
+      <label>Datei hochladen (optional)</label>
+      <div class="mat-file-drop" id="matFileDrop"
+        onclick="document.getElementById('matFileInput').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleMatFileDrop(event)">
+        <span id="matFileLabel">📎 Klicken oder Datei hierher ziehen</span>
+      </div>
+      <input type="file" id="matFileInput" style="display:none" onchange="handleMatFileSelect(event)">
+    </div>
     <div class="modal-btns">
       <button class="btn-primary" onclick="confirmAddMaterial()">Hinzufügen</button>
       <button class="btn-cancel" onclick="closeMaterialModal()">Abbrechen</button>
@@ -2017,6 +2040,7 @@ const CHECKLIST_KEYS = ['idee','lyrics','beat','recording','editing','mixing','m
 // Manager state
 const mgrMessages = {1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[]};
 let selectedMatType = 'audio';
+let pendingMatFile = null;
 let ytApiKey = '';
 const YT_CHANNEL_ID = 'UCc72jjvyE5AGgY4It7uLn-Q';
 
@@ -2602,6 +2626,9 @@ async function sendMgr(n, preset) {
     if (song?.p1_stil) ctx += `, Stil: ${song.p1_stil}`;
     if (song?.p3_bpm || song?.p8_bpm) ctx += `, BPM: ${song.p8_bpm || song.p3_bpm}`;
     if (song?.p2_lyrics) ctx += `\n\nLyrics (Ausschnitt): ${song.p2_lyrics.substring(0,300)}`;
+    if (song?.materials && song.materials.length > 0) {
+      ctx += `\n\nVorhandene Song-Materialien:\n${song.materials.map(m => `- [${m.type.toUpperCase()}] ${m.note || m.fileName || ''}${m.url ? ' → ' + m.url : ''}${m.fileName ? ' (Datei: ' + m.fileName + ')' : ''}`).join('\n')}`;
+    }
 
     // Include history
     const history = mgrMessages[n] || [];
@@ -2642,8 +2669,13 @@ function appendMgrMsg(container, role, content, id, isTemp) {
 // =============================
 function openMaterialModal() {
   selectedMatType = 'audio';
+  pendingMatFile = null;
   document.getElementById('matNoteInput').value = '';
   document.getElementById('matUrlInput').value = '';
+  document.getElementById('matFileInput').value = '';
+  const drop = document.getElementById('matFileDrop');
+  drop.classList.remove('has-file');
+  document.getElementById('matFileLabel').textContent = '📎 Klicken oder Datei hierher ziehen';
   document.querySelectorAll('.mat-type-btn').forEach(b => b.classList.toggle('sel', b.dataset.type === 'audio'));
   document.getElementById('materialModal').classList.remove('hidden');
 }
@@ -2654,13 +2686,42 @@ function selectMatType(type) {
   selectedMatType = type;
   document.querySelectorAll('.mat-type-btn').forEach(b => b.classList.toggle('sel', b.dataset.type === type));
 }
-function confirmAddMaterial() {
+function handleMatFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) setMatFile(file);
+}
+function handleMatFileDrop(event) {
+  event.preventDefault();
+  document.getElementById('matFileDrop').classList.remove('drag');
+  const file = event.dataTransfer.files[0];
+  if (file) setMatFile(file);
+}
+function setMatFile(file) {
+  pendingMatFile = file;
+  const drop = document.getElementById('matFileDrop');
+  drop.classList.add('has-file');
+  const sizeMB = (file.size / 1048576).toFixed(1);
+  document.getElementById('matFileLabel').textContent = `✅ ${file.name} (${sizeMB} MB)`;
+  if (!document.getElementById('matNoteInput').value.trim()) {
+    document.getElementById('matNoteInput').value = file.name.replace(/\.[^.]+$/, '');
+  }
+}
+async function confirmAddMaterial() {
   if (!currentSongId || !songs[currentSongId]) return;
   const note = document.getElementById('matNoteInput').value.trim();
   const url = document.getElementById('matUrlInput').value.trim();
-  if (!note && !url) { showToast('Bitte Beschreibung oder Link eingeben!', 'error'); return; }
+  if (!note && !url && !pendingMatFile) { showToast('Bitte Beschreibung, Link oder Datei angeben!', 'error'); return; }
   if (!songs[currentSongId].materials) songs[currentSongId].materials = [];
-  songs[currentSongId].materials.push({ id:'mat_'+Date.now(), type:selectedMatType, note, url, createdAt:new Date().toISOString() });
+  const matId = 'mat_'+Date.now();
+  const mat = { id: matId, type: selectedMatType, note: note || (pendingMatFile ? pendingMatFile.name : ''), url, createdAt: new Date().toISOString() };
+  if (pendingMatFile) {
+    mat.fileName = pendingMatFile.name;
+    mat.fileType = pendingMatFile.type;
+    mat.fileSize = pendingMatFile.size;
+    await saveMatFileToIDB(matId, pendingMatFile);
+  }
+  songs[currentSongId].materials.push(mat);
+  pendingMatFile = null;
   saveToStorage();
   debouncedCloudSync();
   closeMaterialModal();
@@ -2669,6 +2730,8 @@ function confirmAddMaterial() {
 }
 function deleteMaterial(id) {
   if (!currentSongId || !songs[currentSongId]) return;
+  const mat = (songs[currentSongId].materials || []).find(m => m.id === id);
+  if (mat?.fileName) deleteMatFileFromIDB(id);
   songs[currentSongId].materials = (songs[currentSongId].materials || []).filter(m => m.id !== id);
   saveToStorage();
   renderMaterials();
@@ -2692,11 +2755,13 @@ function renderMaterials() {
   mats.forEach(m => {
     const div = document.createElement('div');
     div.className = 'material-item';
+    const sizeTxt = m.fileSize ? ` · ${(m.fileSize/1048576).toFixed(1)} MB` : '';
     div.innerHTML = `
       <div class="material-item-icon">${icons[m.type]||'📁'}</div>
       <div class="material-item-type">${m.type}</div>
       ${m.note ? `<div class="material-item-note">${escHtml(m.note)}</div>` : ''}
-      ${m.url ? `<div class="material-item-url" onclick="window.open('${escHtml(m.url)}','_blank')" title="Link öffnen">🔗 ${escHtml(m.url.substring(0,40))}...</div>` : ''}
+      ${m.url ? `<div class="material-item-url" onclick="window.open('${escHtml(m.url)}','_blank')" title="Link öffnen">🔗 ${escHtml(m.url.substring(0,40))}${m.url.length>40?'...':''}</div>` : ''}
+      ${m.fileName ? `<div class="material-item-file" onclick="openMatFile('${m.id}')" title="Datei öffnen/abspielen">📂 ${escHtml(m.fileName)}${sizeTxt}</div>` : ''}
       <button class="material-item-del" onclick="deleteMaterial('${m.id}')" title="Entfernen">×</button>
     `;
     list.appendChild(div);
@@ -3513,6 +3578,48 @@ async function deleteAudioFromIDB(songId) {
     const tx = db.transaction('audio','readwrite');
     tx.objectStore('audio').delete(songId);
   } catch(e) {}
+}
+async function saveMatFileToIDB(matId, file) {
+  try {
+    const db = await openIDB();
+    const blob = new Blob([await file.arrayBuffer()], {type: file.type});
+    return new Promise((res, rej) => {
+      const tx = db.transaction('audio','readwrite');
+      tx.objectStore('audio').put({songId: 'mat_file_'+matId, blob, name: file.name, type: file.type});
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  } catch(e) { console.warn('Mat IDB save failed:', e.message); }
+}
+async function loadMatFileFromIDB(matId) {
+  try {
+    const db = await openIDB();
+    return new Promise((res) => {
+      const tx = db.transaction('audio','readonly');
+      const req = tx.objectStore('audio').get('mat_file_'+matId);
+      req.onsuccess = () => res(req.result || null);
+      req.onerror = () => res(null);
+    });
+  } catch(e) { return null; }
+}
+async function deleteMatFileFromIDB(matId) {
+  try {
+    const db = await openIDB();
+    const tx = db.transaction('audio','readwrite');
+    tx.objectStore('audio').delete('mat_file_'+matId);
+  } catch(e) {}
+}
+async function openMatFile(matId) {
+  const row = await loadMatFileFromIDB(matId);
+  if (!row) { showToast('Datei nicht gefunden im lokalen Speicher!', 'error'); return; }
+  const url = URL.createObjectURL(row.blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = row.name;
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
 }
 
 // =============================
