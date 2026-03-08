@@ -852,6 +852,38 @@
   .mat-type-btn:hover { border-color:rgba(124,58,237,0.5); }
   .mat-add-form { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:12px; margin-top:8px; }
 
+  /* ===== OVERVIEW DASHBOARD ===== */
+  .ov-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+  @media(max-width:700px) { .ov-grid { grid-template-columns:1fr; } }
+  .ov-card { margin-bottom:0 !important; }
+  .ov-list { display:flex; flex-direction:column; gap:6px; margin-top:4px; }
+  .ov-row { display:flex; flex-direction:column; gap:2px; }
+  .ov-label { font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); }
+  .ov-value { font-size:13px; color:var(--text); }
+  .ov-tags { display:flex; flex-wrap:wrap; gap:4px; }
+  .ov-tag { background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.3); color:var(--purple-light); border-radius:4px; padding:2px 6px; font-size:11px; }
+  .ov-copy-box { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:12px; font-size:13px; color:var(--text); min-height:40px; }
+  .ov-progress-content { margin-top:4px; }
+  .ov-prog-bar-bg { background:var(--border); border-radius:4px; height:8px; margin:6px 0 8px; }
+  .ov-prog-bar { background:var(--success); border-radius:4px; height:8px; transition:width 0.3s; }
+  /* ===== SUNO COCKPIT ===== */
+  .suno-cockpit-card {}
+  .suno-toggle-row { display:flex; gap:6px; flex-wrap:wrap; }
+  .suno-toggle-btn {
+    padding:6px 12px; border-radius:6px; border:1px solid var(--border);
+    background:var(--card2); color:var(--text-muted); cursor:pointer;
+    font-size:12px; transition:all 0.2s;
+  }
+  .suno-toggle-btn.sel { border-color:var(--purple); color:var(--purple-light); background:rgba(124,58,237,0.1); }
+  .suno-toggle-btn:hover { border-color:rgba(124,58,237,0.5); }
+  .suno-slider-val { font-size:11px; color:var(--purple-light); margin-left:6px; }
+  .suno-live-box { font-size:13px; color:var(--text); background:var(--card); border-radius:6px; padding:8px 10px; min-height:32px; word-break:break-word; }
+  .suno-ref-group { margin-bottom:4px; }
+  .suno-ref-title { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; margin-top:6px; }
+  .suno-ref-item { font-size:12px; color:var(--text); padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; gap:6px; }
+  .suno-badge { font-size:9px; padding:1px 5px; border-radius:3px; background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
+  .suno-badge.pro { background:rgba(245,158,11,0.15); color:#f59e0b; border-color:rgba(245,158,11,0.3); }
+
   /* SUNO PROFILE */
   .suno-profile-bar {
     display:flex; align-items:center; gap:10px; padding:10px 14px;
@@ -894,6 +926,10 @@
   <div class="sidebar" id="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-section-title">Phasen</div>
+      <div class="nav-item" data-phase="0" onclick="switchPhase(0)">
+        <div class="phase-num" style="background:rgba(59,130,246,0.2);color:#60a5fa;font-size:12px;">DB</div>
+        <span>Übersicht & Suno</span>
+      </div>
       <div class="nav-item active" data-phase="1" onclick="switchPhase(1)">
         <div class="phase-num">1</div>
         <span>Song-Idee & Konzept</span>
@@ -950,6 +986,57 @@
       <div class="no-song-icon">🎵</div>
       <h3>Kein Song ausgewählt</h3>
       <p>Erstelle einen neuen Song oder wähle einen aus der Liste</p>
+    </div>
+
+    <!-- PHASE 0: Übersicht & Suno Dashboard -->
+    <div class="phase-panel" id="phase0">
+      <div class="phase-header">
+        <div class="phase-icon">📊</div>
+        <div>
+          <div class="phase-title">Übersicht & Suno-Cockpit</div>
+          <div class="phase-subtitle">Alle Einstellungen auf einen Blick – direkt kopierbar</div>
+        </div>
+      </div>
+
+      <!-- Overview Grid -->
+      <div class="ov-grid">
+        <div class="card ov-card">
+          <div class="card-title">💡 Song-Konzept</div>
+          <div id="ov_konzept" class="ov-list"></div>
+        </div>
+        <div class="card ov-card">
+          <div class="card-title">🎵 Suno-Einstellungen</div>
+          <div id="ov_suno" class="ov-list"></div>
+        </div>
+        <div class="card ov-card">
+          <div class="card-title">✅ Fortschritt</div>
+          <div id="ov_progress" class="ov-progress-content"></div>
+        </div>
+      </div>
+
+      <!-- Suno Style Prompt (for Stile field) -->
+      <div class="card" style="margin-top:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div class="card-title" style="margin-bottom:0;">🎨 Suno → Stile-Feld</div>
+          <button class="btn-copy" onclick="copyOvField('ov_style_prompt')">📋 Kopieren</button>
+        </div>
+        <div class="ov-copy-box" id="ov_style_prompt">–</div>
+      </div>
+
+      <!-- Suno Lyrics -->
+      <div class="card" style="margin-top:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div class="card-title" style="margin-bottom:0;">📝 Suno → Text-Feld (Lyrics)</div>
+          <button class="btn-copy" onclick="copyOvField('ov_lyrics_prompt')">📋 Kopieren</button>
+        </div>
+        <div class="ov-copy-box" id="ov_lyrics_prompt" style="max-height:200px;overflow-y:auto;white-space:pre-wrap;font-family:monospace;font-size:12px;">–</div>
+      </div>
+
+      <!-- Materials -->
+      <div class="card" style="margin-top:12px;">
+        <div class="card-title">📁 Materialien</div>
+        <div id="ov_materials" class="ov-list"></div>
+      </div>
     </div>
 
     <!-- PHASE 1: Song-Idee & Konzept -->
@@ -1237,6 +1324,151 @@
         </div>
       </div>
     </div>
+
+      <!-- SUNO-COCKPIT -->
+      <div class="card suno-cockpit-card" style="margin-top:16px;border-color:rgba(16,185,129,0.3);">
+        <div class="card-title" style="color:#10b981;">🎛️ Suno-Cockpit <span style="font-size:11px;color:var(--text-muted);font-weight:400;">– Einstellungen direkt für suno.com</span></div>
+
+        <!-- Modus -->
+        <div class="form-row" style="margin-bottom:12px;">
+          <div class="form-group">
+            <label>Modus</label>
+            <div class="suno-toggle-row" id="suno_modus_row">
+              <button class="suno-toggle-btn sel" data-val="einfach" onclick="setSunoToggle('suno_modus','einfach',this.closest('.suno-toggle-row'))">Einfach</button>
+              <button class="suno-toggle-btn" data-val="fortschrittlich" onclick="setSunoToggle('suno_modus','fortschrittlich',this.closest('.suno-toggle-row'))">Fortschrittlich</button>
+              <button class="suno-toggle-btn" data-val="geraeusche" onclick="setSunoToggle('suno_modus','geraeusche',this.closest('.suno-toggle-row'))">Geräusche</button>
+            </div>
+            <input type="hidden" id="suno_modus" value="einfach">
+          </div>
+          <div class="form-group">
+            <label>Version</label>
+            <select id="suno_version" onchange="autoSave();updateSunoCockpit();" style="font-size:13px;">
+              <option value="v5pro">V5 Pro – Authentischer Gesang</option>
+              <option value="v45plus">Version 4.5+ Pro – Erweiterte Erstellung</option>
+              <option value="v45" selected>Version 4.5 Pro – Intelligente Prompts</option>
+              <option value="v45all">v4.5-all – Bestes kostenloses Modell</option>
+              <option value="v4pro">V4 Pro – Verbesserte Klangqualität</option>
+              <option value="v35">Version 3.5</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Zusatz -->
+        <div class="form-group" style="margin-bottom:12px;">
+          <label>Zusatz</label>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="suno_add_audio" onchange="autoSave();updateSunoCockpit();" style="accent-color:var(--purple);"> + Audio</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="suno_add_persona" onchange="autoSave();updateSunoCockpit();" style="accent-color:var(--purple);"> + Persona</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="suno_add_inspo" onchange="autoSave();updateSunoCockpit();" style="accent-color:var(--purple);"> + Inspo</label>
+          </div>
+        </div>
+
+        <!-- Stile + Stile ausschließen -->
+        <div class="form-row" style="margin-bottom:12px;">
+          <div class="form-group">
+            <label>Stile <span style="font-size:11px;color:var(--text-muted);">(auto aus Phase 3)</span></label>
+            <input type="text" id="suno_stile" placeholder="Trap, dark, heavy 808s, german rap..." oninput="autoSave();updateSunoCockpit();">
+          </div>
+          <div class="form-group">
+            <label>Stile ausschließen</label>
+            <input type="text" id="suno_stile_exclude" placeholder="Pop, Country, Reggaeton..." oninput="autoSave();updateSunoCockpit();">
+          </div>
+        </div>
+
+        <!-- Geschlecht + Lyrics Mode -->
+        <div class="form-row" style="margin-bottom:12px;">
+          <div class="form-group">
+            <label>Stimmliches Geschlecht</label>
+            <div class="suno-toggle-row" id="suno_geschlecht_row">
+              <button class="suno-toggle-btn" data-val="maennlich" onclick="setSunoToggle('suno_geschlecht','maennlich',this.closest('.suno-toggle-row'))">Männlich</button>
+              <button class="suno-toggle-btn sel" data-val="auto" onclick="setSunoToggle('suno_geschlecht','auto',this.closest('.suno-toggle-row'))">Auto</button>
+              <button class="suno-toggle-btn" data-val="weiblich" onclick="setSunoToggle('suno_geschlecht','weiblich',this.closest('.suno-toggle-row'))">Weiblich</button>
+            </div>
+            <input type="hidden" id="suno_geschlecht" value="auto">
+          </div>
+          <div class="form-group">
+            <label>Lyrics Mode</label>
+            <div class="suno-toggle-row" id="suno_lyrics_mode_row">
+              <button class="suno-toggle-btn sel" data-val="handbuch" onclick="setSunoToggle('suno_lyrics_mode','handbuch',this.closest('.suno-toggle-row'))">Handbuch</button>
+              <button class="suno-toggle-btn" data-val="auto" onclick="setSunoToggle('suno_lyrics_mode','auto',this.closest('.suno-toggle-row'))">Auto</button>
+            </div>
+            <input type="hidden" id="suno_lyrics_mode" value="handbuch">
+          </div>
+        </div>
+
+        <!-- Seltsamkeit + Stileinfluss -->
+        <div class="form-row" style="margin-bottom:12px;">
+          <div class="form-group">
+            <label>Seltsamkeit <span class="suno-slider-val" id="suno_weird_val">50%</span></label>
+            <input type="range" id="suno_seltsamkeit" min="0" max="100" value="50" oninput="document.getElementById('suno_weird_val').textContent=this.value+'%';autoSave();updateSunoCockpit();">
+          </div>
+          <div class="form-group">
+            <label>Stileinfluss <span class="suno-slider-val" id="suno_stilinfl_val">75%</span></label>
+            <input type="range" id="suno_stileinfluss" min="0" max="100" value="75" oninput="document.getElementById('suno_stilinfl_val').textContent=this.value+'%';autoSave();updateSunoCockpit();">
+          </div>
+        </div>
+
+        <!-- Songtitel -->
+        <div class="form-group" style="margin-bottom:14px;">
+          <label>Songtitel (optional)</label>
+          <input type="text" id="suno_titel" placeholder="Songtitel für Suno..." oninput="autoSave();updateSunoCockpit();">
+        </div>
+
+        <!-- Live Preview -->
+        <div style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-size:13px;font-weight:600;color:#10b981;">🎯 Suno → Stile-Feld (Live)</span>
+            <button class="btn-copy" onclick="copyEl('suno_live_stile')" style="font-size:11px;padding:4px 8px;">📋 Kopieren</button>
+          </div>
+          <div class="suno-live-box" id="suno_live_stile">–</div>
+        </div>
+
+        <!-- Post-Generation Reference -->
+        <details style="margin-top:12px;">
+          <summary style="cursor:pointer;font-size:13px;color:var(--text-muted);padding:8px 0;user-select:none;">
+            📋 Nach dem Generieren – verfügbare Optionen
+          </summary>
+          <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="suno-ref-group">
+              <div class="suno-ref-title">🎛️ Remix / Edit</div>
+              <div class="suno-ref-item">Im Studio öffnen <span class="suno-badge">Neu</span></div>
+              <div class="suno-ref-item">Im Editor öffnen <span class="suno-badge pro">Pro</span></div>
+              <div class="suno-ref-item">Abdeckung</div>
+              <div class="suno-ref-item">Verlängern</div>
+              <div class="suno-ref-item">Vermanschen</div>
+              <div class="suno-ref-item">Hörprobe <span class="suno-badge">Beta</span></div>
+              <div class="suno-ref-item">Als Inspiration nutzen <span class="suno-badge pro">Pro</span></div>
+              <div class="suno-ref-item">Geschwindigkeit anpassen</div>
+              <div class="suno-ref-item">Stile und Texte verwenden</div>
+              <div class="suno-ref-item">Ernte <span class="suno-badge pro">Pro</span></div>
+              <div class="suno-ref-item">Abschnitt ersetzen <span class="suno-badge pro">Pro</span></div>
+            </div>
+            <div>
+              <div class="suno-ref-group">
+                <div class="suno-ref-title">✨ Erstellen</div>
+                <div class="suno-ref-item">Persona erstellen <span class="suno-badge pro">Pro</span></div>
+                <div class="suno-ref-item">Remaster <span class="suno-badge pro">Pro</span></div>
+                <div class="suno-ref-item">Song Radio</div>
+                <div class="suno-ref-item">Stängel holen <span class="suno-badge pro">Pro</span></div>
+              </div>
+              <div class="suno-ref-group" style="margin-top:8px;">
+                <div class="suno-ref-title">⚙️ Verwalten</div>
+                <div class="suno-ref-item">Zur Warteschlange</div>
+                <div class="suno-ref-item">Zur Playlist</div>
+                <div class="suno-ref-item">Zum Arbeitsbereich</div>
+                <div class="suno-ref-item">Veröffentlichen</div>
+                <div class="suno-ref-item">Cover generieren</div>
+              </div>
+              <div class="suno-ref-group" style="margin-top:8px;">
+                <div class="suno-ref-title">⬇️ Download</div>
+                <div class="suno-ref-item">MP3-Audio</div>
+                <div class="suno-ref-item">WAV-Audio <span class="suno-badge pro">Pro</span></div>
+                <div class="suno-ref-item">Video <span class="suno-badge pro">Pro</span></div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
 
       <!-- BEAT-MANAGER -->
       <div class="card manager-card">
@@ -3344,6 +3576,22 @@ function autoSave() {
   s.drive_link = getVal('drive_link');
 
   s.p8_transcription = getVal('p8_transcription');
+
+  // Suno Cockpit
+  s.suno_modus = document.getElementById('suno_modus')?.value || 'einfach';
+  s.suno_version = document.getElementById('suno_version')?.value || 'v45';
+  s.suno_add_audio = document.getElementById('suno_add_audio')?.checked || false;
+  s.suno_add_persona = document.getElementById('suno_add_persona')?.checked || false;
+  s.suno_add_inspo = document.getElementById('suno_add_inspo')?.checked || false;
+  s.suno_stile = document.getElementById('suno_stile')?.value || '';
+  s.suno_stile_exclude = document.getElementById('suno_stile_exclude')?.value || '';
+  s.suno_geschlecht = document.getElementById('suno_geschlecht')?.value || 'auto';
+  s.suno_lyrics_mode = document.getElementById('suno_lyrics_mode')?.value || 'handbuch';
+  s.suno_seltsamkeit = document.getElementById('suno_seltsamkeit')?.value || 50;
+  s.suno_stileinfluss = document.getElementById('suno_stileinfluss')?.value || 75;
+  s.suno_titel = document.getElementById('suno_titel')?.value || '';
+  updateSunoCockpit();
+  updateDashboard();
 
   s.updatedAt = new Date().toISOString();
   saveToStorage();
