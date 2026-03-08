@@ -1302,6 +1302,40 @@
   </div>
 </div>
 
+<!-- TRANSCRIBE HELPER MODAL -->
+<div class="modal-overlay hidden" id="transcribeHelperModal">
+  <div class="modal modal-wide" style="max-width:600px;">
+    <div class="modal-title">🎤 Transkription – Kurzanleitung</div>
+    <div class="modal-desc">
+      Groq Audio-Uploads funktionieren leider nicht direkt aus dem Browser (CORS-Einschränkung von Groq).
+      Nutze eine der zwei Optionen:
+    </div>
+
+    <div class="step-label">Option 1 – Terminal / Konsole (empfohlen)</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px;">
+      Ersetze <code style="color:var(--purple-light);">DEINE_DATEI.mp3</code> mit dem echten Dateipfad, dann ausführen:
+    </div>
+    <pre class="code-block" id="transcribeCurlCode" style="font-size:11px;white-space:pre-wrap;word-break:break-all;"></pre>
+    <button class="btn-secondary" onclick="copyTranscribeCurl()" style="margin-bottom:16px;">📋 Curl-Befehl kopieren</button>
+
+    <div class="step-label">Option 2 – Ergebnis hier einfügen</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">
+      Führe den Befehl aus, kopiere die Ausgabe (JSON oder Text) und füge sie hier ein:
+    </div>
+    <textarea id="transcribePasteInput" rows="4" class="modal-input" style="font-family:monospace;font-size:12px;" placeholder='{"text":"Hier dein Ergebnis..."} oder direkt den Text einfügen'></textarea>
+
+    <div class="step-label">Option 3 – Manuell eintippen</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
+      Du kannst Lyrics auch direkt im Textfeld oben eintippen ohne Transkription.
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="pasteTranscriptionResult()">Ergebnis übernehmen</button>
+      <button class="btn-cancel" onclick="closeTranscribeHelperModal()">Schließen</button>
+    </div>
+  </div>
+</div>
+
 <!-- TAVILY WEB-SUCHE MODAL -->
 <div class="modal-overlay hidden" id="tavilyModal">
   <div class="modal">
@@ -2635,8 +2669,49 @@ async function transcribeAudio() {
     document.getElementById('p8_transcription').value = tr;
     saveField('p8_transcription', tr);
     showToast('Transkription abgeschlossen!', 'success');
-  } catch(e) { showToast('Transkriptions-Fehler: ' + e.message, 'error'); }
+  } catch(e) {
+    // Groq audio API blocks browser uploads via CORS – show curl workaround
+    if (e.message === 'Failed to fetch' || e.message.includes('NetworkError') || e.message.includes('CORS')) {
+      openTranscribeHelperModal(apiKey, lang);
+    } else {
+      showToast('Transkriptions-Fehler: ' + e.message, 'error');
+    }
+  }
   finally { btn.disabled = false; icon.textContent = '🎤'; text.textContent = 'Lyrics extrahieren'; }
+}
+
+function openTranscribeHelperModal(apiKey, lang) {
+  const langFlag = lang ? `--form language=${lang} ` : '';
+  const curlCmd = `curl -X POST https://api.groq.com/openai/v1/audio/transcriptions \\
+  -H "Authorization: Bearer ${apiKey}" \\
+  -F "file=@DEINE_DATEI.mp3" \\
+  ${langFlag}-F "model=whisper-large-v3" \\
+  -F "response_format=json"`;
+  document.getElementById('transcribeCurlCode').textContent = curlCmd;
+  document.getElementById('transcribeHelperModal').classList.remove('hidden');
+}
+
+function closeTranscribeHelperModal() {
+  document.getElementById('transcribeHelperModal').classList.add('hidden');
+}
+
+function copyTranscribeCurl() {
+  const text = document.getElementById('transcribeCurlCode').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Kopiert!', 'success')).catch(() => {
+    fallbackCopy(text); showToast('Kopiert!', 'success');
+  });
+}
+
+function pasteTranscriptionResult() {
+  const input = document.getElementById('transcribePasteInput').value.trim();
+  if (!input) { showToast('Bitte Text einfügen!', 'error'); return; }
+  // Parse JSON if user pasted raw JSON
+  let text = input;
+  try { const parsed = JSON.parse(input); if (parsed.text) text = parsed.text; } catch(e) {}
+  document.getElementById('p8_transcription').value = text;
+  saveField('p8_transcription', text);
+  closeTranscribeHelperModal();
+  showToast('Transkription gespeichert!', 'success');
 }
 
 function sendTranscriptionToLyrics() {
