@@ -816,7 +816,6 @@
     </button>
     <button class="btn-api" onclick="exportSongs()" title="Songs als JSON exportieren">⬇ Export</button>
     <label class="btn-api" style="cursor:pointer;" title="Songs aus JSON importieren">⬆ Import<input type="file" accept=".json" onchange="importSongs(event)" style="display:none"></label>
-    <button class="btn-yt-key" onclick="openYtKeyModal()" title="YouTube Data API Key">▶ YT Key</button>
     <button class="btn-tavily" onclick="openTavilyModal()" title="Tavily Web-Suche Key">🌐 Web-Suche</button>
     <button class="btn-api" onclick="openApiModal()">API Key</button>
   </div>
@@ -1471,11 +1470,8 @@
       <!-- YouTube Channel Info -->
       <div class="card">
         <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
-          <span>YouTube Kanal</span>
-          <div style="display:flex;gap:8px;">
-            <button class="btn-yt-key" onclick="openYtKeyModal()">🔑 YouTube API Key</button>
-            <button class="btn-secondary" onclick="loadYouTubeChannel()" style="font-size:12px;padding:6px 12px;">🔄 Laden</button>
-          </div>
+          <span>YouTube Kanal · <span style="color:var(--success);font-size:11px;font-weight:400;">kein API Key nötig</span></span>
+          <button class="btn-secondary" onclick="loadYouTubeChannel()" style="font-size:12px;padding:6px 12px;">🔄 Neu laden</button>
         </div>
         <div class="yt-channel-bar" id="ytChannelBar">
           <div class="yt-avatar">▶️</div>
@@ -2735,47 +2731,43 @@ function saveYtKey() {
   loadYouTubeChannel();
 }
 async function loadYouTubeChannel() {
-  if (!ytApiKey) { openYtKeyModal(); return; }
   const subEl = document.getElementById('ytChannelSub');
   const vidSection = document.getElementById('ytVideosSection');
-  if (subEl) subEl.textContent = '⏳ Lade Kanal-Daten...';
+  if (subEl) subEl.textContent = '⏳ Lade Videos...';
   try {
-    // Channel info
-    const chRes = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${YT_CHANNEL_ID}&key=${ytApiKey}`);
-    if (!chRes.ok) { const err = await chRes.json(); throw new Error(err.error?.message || 'YouTube API Fehler'); }
-    const chData = await chRes.json();
-    const ch = chData.items?.[0];
-    if (ch) {
-      const subs = parseInt(ch.statistics?.subscriberCount || 0).toLocaleString('de-DE');
-      const vids = parseInt(ch.statistics?.videoCount || 0).toLocaleString('de-DE');
-      if (subEl) subEl.innerHTML = `<strong>${subs}</strong> Abonnenten · <strong>${vids}</strong> Videos`;
+    // Kein API Key nötig – nutzt YouTube RSS + rss2json
+    const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${YT_CHANNEL_ID}`;
+    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=8`;
+    const res = await fetch(apiUrl);
+    if (!res.ok) throw new Error('RSS-Fehler ' + res.status);
+    const data = await res.json();
+    if (data.status !== 'ok') throw new Error(data.message || 'RSS-Fehler');
+
+    const count = data.items?.length || 0;
+    if (subEl) subEl.innerHTML = `<strong>${count}</strong> neueste Videos geladen · <a href="https://www.youtube.com/@DaN_90_rap" target="_blank" style="color:var(--blue);">Kanal öffnen</a>`;
+
+    const grid = document.getElementById('ytVideoGrid');
+    if (grid && data.items?.length) {
+      grid.innerHTML = '';
+      data.items.forEach(v => {
+        const vidId = v.link?.split('v=')[1]?.split('&')[0] || '';
+        const thumb = vidId ? `https://img.youtube.com/vi/${vidId}/mqdefault.jpg` : '';
+        const date = new Date(v.pubDate).toLocaleDateString('de-DE');
+        const div = document.createElement('div');
+        div.className = 'yt-video-item';
+        div.innerHTML = `
+          <img class="yt-thumb" src="${escHtml(thumb)}" alt="" loading="lazy">
+          <div class="yt-video-info">
+            <div class="yt-video-title">${escHtml(v.title)}</div>
+            <div class="yt-video-date">${date}</div>
+          </div>
+        `;
+        div.onclick = () => window.open(v.link, '_blank');
+        grid.appendChild(div);
+      });
+      if (vidSection) vidSection.style.display = 'block';
     }
-    // Videos
-    const vRes = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${YT_CHANNEL_ID}&type=video&order=date&maxResults=8&key=${ytApiKey}`);
-    if (vRes.ok) {
-      const vData = await vRes.json();
-      const grid = document.getElementById('ytVideoGrid');
-      if (grid && vData.items?.length) {
-        grid.innerHTML = '';
-        vData.items.forEach(v => {
-          const div = document.createElement('div');
-          div.className = 'yt-video-item';
-          const thumb = v.snippet.thumbnails?.medium?.url || v.snippet.thumbnails?.default?.url || '';
-          const date = new Date(v.snippet.publishedAt).toLocaleDateString('de-DE');
-          div.innerHTML = `
-            <img class="yt-thumb" src="${escHtml(thumb)}" alt="" loading="lazy">
-            <div class="yt-video-info">
-              <div class="yt-video-title">${escHtml(v.snippet.title)}</div>
-              <div class="yt-video-date">${date}</div>
-            </div>
-          `;
-          div.onclick = () => window.open('https://www.youtube.com/watch?v='+v.id.videoId, '_blank');
-          grid.appendChild(div);
-        });
-        if (vidSection) vidSection.style.display = 'block';
-      }
-    }
-    showToast('YouTube Kanal geladen!', 'success');
+    showToast('YouTube Videos geladen!', 'success');
   } catch(e) {
     if (subEl) subEl.textContent = '✗ Fehler: ' + e.message;
     showToast('YouTube Fehler: ' + e.message, 'error');
@@ -2963,7 +2955,7 @@ function switchPhase(num) {
 
   // Phase-specific init
   if (num === 1) { renderMaterials(); }
-  if (num === 7 && ytApiKey) { loadYouTubeChannel(); }
+  if (num === 7) { loadYouTubeChannel(); }
   if (num === 8) { updateMarkerList(); }
   if (num === 9) { loadChatHistory(); }
 }
