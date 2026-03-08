@@ -597,13 +597,67 @@
 
   /* ===== CUSTOM SELECT ===== */
   .select-with-add { display:flex; gap:8px; }
-  .select-with-add select { flex:1; }
+  .select-with-add .multi-sel-wrap { flex:1; }
   .btn-add-opt {
     padding:0 12px; background:rgba(124,58,237,0.15);
     border:1px solid rgba(124,58,237,0.3); border-radius:8px;
     color:var(--purple-light); cursor:pointer; font-size:20px;
     transition:all 0.2s; display:flex; align-items:center; flex-shrink:0;
   }
+  /* ===== MULTI-SELECT ===== */
+  .multi-sel-wrap { position:relative; }
+  .multi-sel-box {
+    min-height:38px; background:var(--card2); border:1px solid var(--border);
+    border-radius:8px; padding:4px 32px 4px 8px; cursor:pointer;
+    display:flex; flex-wrap:wrap; gap:4px; align-items:center; position:relative;
+    transition:border-color 0.2s;
+  }
+  .multi-sel-box:hover { border-color:rgba(124,58,237,0.5); }
+  .multi-sel-box.open { border-color:var(--purple); }
+  .multi-sel-arrow {
+    position:absolute; right:10px; top:50%; transform:translateY(-50%);
+    color:var(--text-muted); pointer-events:none; font-size:11px; transition:transform 0.2s;
+  }
+  .multi-sel-box.open .multi-sel-arrow { transform:translateY(-50%) rotate(180deg); }
+  .multi-sel-ph { font-size:13px; color:var(--text-muted); padding:2px 0; }
+  .multi-sel-tag {
+    background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.35);
+    color:var(--purple-light); border-radius:4px; padding:2px 6px; font-size:11px;
+    display:flex; align-items:center; gap:3px; white-space:nowrap;
+  }
+  .multi-sel-tag-x { cursor:pointer; opacity:0.6; font-size:13px; line-height:1; }
+  .multi-sel-tag-x:hover { opacity:1; }
+  .multi-sel-drop {
+    position:absolute; z-index:2000; top:calc(100% + 3px); left:0; right:0;
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.5); max-height:260px;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .multi-sel-drop.hidden { display:none; }
+  .multi-sel-search {
+    padding:8px 12px; background:var(--card2); border:none;
+    border-bottom:1px solid var(--border); color:var(--text); font-size:12px;
+    outline:none; width:100%; box-sizing:border-box; border-radius:10px 10px 0 0;
+    font-family:inherit;
+  }
+  .multi-sel-opts { overflow-y:auto; flex:1; padding:4px; }
+  .multi-sel-opt {
+    padding:6px 8px; font-size:12px; color:var(--text); cursor:pointer;
+    border-radius:5px; display:flex; align-items:center; gap:7px; transition:background 0.1s;
+  }
+  .multi-sel-opt:hover { background:var(--card2); }
+  .multi-sel-opt.sel { color:var(--purple-light); background:rgba(124,58,237,0.08); }
+  .multi-sel-opt input[type=checkbox] { accent-color:var(--purple); width:13px; height:13px; flex-shrink:0; }
+  .multi-sel-footer {
+    padding:6px 10px; border-top:1px solid var(--border);
+    display:flex; align-items:center; gap:6px;
+  }
+  .multi-sel-footer button {
+    font-size:11px; padding:3px 8px; background:rgba(124,58,237,0.15);
+    border:1px solid rgba(124,58,237,0.3); border-radius:5px;
+    color:var(--purple-light); cursor:pointer;
+  }
+  .multi-sel-count { font-size:10px; color:var(--text-muted); margin-left:auto; }
   .btn-add-opt:hover { background:rgba(124,58,237,0.3); }
 
   /* ===== MANAGER PANEL ===== */
@@ -2049,7 +2103,16 @@ const YT_CHANNEL_ID = 'UCc72jjvyE5AGgY4It7uLn-Q';
 // ===========================
 const OPTION_PRESETS = {
   emotion: ['Aggressiv','Aufbruch','Bittersüß','Dankbarkeit','Depression','Einsamkeit','Entschlossenheit','Euphorie','Freude','Hoffnung','Hunger','Kraft','Melancholie','Nostalgie','Schmerz','Sehnsucht','Stolz','Trauer','Verlorenheit','Verzweiflung','Wut','Zuversicht'],
-  stil: ['187 Strassenbande Stil','Afro Trap','Aggressive','Atmosphärisch','Boombap','Bushido Stil','Cloud Rap','Drill','Emo Rap','Gangsta Rap','German Trap','Gzuz Stil','Hamburgrap','Hardcore Rap','Lo-Fi Hip Hop','Melodic Rap','OG Rap','Oldschool','Phonk','Pluggnb','Punchline Rap','Storytelling','Underground'],
+  stil: [
+    // Genres / Stile
+    '187 Strassenbande Stil','Afro Trap','Aggressive','Atmosphärisch','Boombap','Cloud Rap','Drill','Emo Rap','Gangsta Rap','German Trap','Hamburgrap','Hardcore Rap','Lo-Fi Hip Hop','Melodic Rap','OG Rap','Oldschool','Phonk','Pluggnb','Punchline Rap','Storytelling','Underground',
+    // Deutsche Rapper
+    'Afrob','AK Ausserkontrolle','B-Tight','Bonez MC','Bushido','Capo','Capital Bra','Celo & Abdi','Chakuza','Curse','Eko Fresh','Farid Bang','Fard','Fler','Genetikk','Haftbefehl','KC Rebell','Kollegah','Kool Savas','LX','Manuellsen','Massiv','Maxwell','MC Bogy','MoTrip','Nimo','Olexesh','PA Sports','Samy Deluxe','Sido','Shindy','Ssio','Summer Cem','Ufo361',
+    // US Rapper 90er
+    '2Pac / Tupac','Big L','Big Pun','Biggie / Notorious B.I.G.','Busta Rhymes','Cypress Hill','DMX','Dr. Dre','E-40','Gang Starr','Ice Cube','Ice-T','Jay-Z','Kurupt','LL Cool J','Method Man','Mobb Deep','Nas','Outkast','Rakim','Redman','Scarface','Snoop Dogg','Wu-Tang Clan',
+    // Weitere Referenzen
+    'A Tribe Called Quest','Common','J Dilla','Kendrick Lamar','Lil Wayne','Rick Ross'
+  ],
   zielgruppe: ['13-17 Jahre','18-24 Jahre','25-34 Jahre','35+ Jahre','Alle Altersgruppen','Frauen','Hip-Hop Fans','Jugendliche','Männer','Musikliebhaber','Partypeople','Streetwear-Szene'],
   mood: ['Aggressive','Atmospheric','Calm','Cinematic','Dark','Deep','Dramatic','Emotional','Energetic','Epic','Gritty','Hard','Heavy','Hypnotic','Intense','Melancholic','Menacing','Mysterious','Ominous','Raw','Relaxed','Sad','Smooth','Triumphant'],
   genre: ['Afrobeat','Afro Trap','Boom Bap','Cloud Rap','Conscious Rap','Dancehall','Drill','East Coast','Emo Rap','Gangsta Rap','German Trap','Hardcore Rap','Lo-Fi Hip Hop','Melodic Rap','NYC Drill','Oldschool Hip Hop','Phonk','Plugg','R&B Rap','Streetrap','Trap','UK Drill','West Coast'],
@@ -2128,38 +2191,146 @@ function buildSelect(selId, key, currentVal) {
   if (!el) return;
   const presets = OPTION_PRESETS[key] || [];
   const custom = getCustomOpts(key);
-  const all = [...new Set([...presets, ...custom])].sort((a,b) => a.localeCompare(b,'de'));
-  el.innerHTML = `<option value="">-- Auswählen... --</option>` +
-    all.map(o => `<option value="${escHtml(o)}"${o === currentVal ? ' selected':''}>${escHtml(o)}</option>`).join('') +
-    `<option value="__custom__">➕ Eigene Option hinzufügen...</option>`;
-  if (currentVal && !all.includes(currentVal)) {
-    const opt = document.createElement('option');
-    opt.value = currentVal; opt.textContent = currentVal; opt.selected = true;
-    el.insertBefore(opt, el.lastElementChild);
+  const flatPresets = presets.flat ? presets.flat() : presets;
+  const all = [...new Set([...flatPresets, ...custom])].sort((a,b) => a.localeCompare(b,'de'));
+  const current = currentVal ? currentVal.split(',').map(v=>v.trim()).filter(Boolean) : [];
+  // If already a multi-select wrap, just refresh options
+  const existingWrap = el.tagName === 'INPUT' ? el.closest('.multi-sel-wrap') : null;
+  if (existingWrap) {
+    renderMultiSelOpts(selId, key, all, current, '');
+    renderMultiSelTags(selId, current);
+    return;
+  }
+  // Replace <select> with custom multi-select component
+  const wrap = document.createElement('div');
+  wrap.className = 'multi-sel-wrap';
+  wrap.id = selId + '_wrap';
+  wrap.innerHTML = `
+    <input type="hidden" id="${selId}" value="${escHtml(current.join(','))}">
+    <div class="multi-sel-box" id="${selId}_box" onclick="toggleMultiSel('${selId}')">
+      <div class="multi-sel-tags" id="${selId}_tags"><span class="multi-sel-ph">-- Auswählen... --</span></div>
+      <span class="multi-sel-arrow">▾</span>
+    </div>
+    <div class="multi-sel-drop hidden" id="${selId}_drop">
+      <input class="multi-sel-search" placeholder="🔍 Suchen..." oninput="filterMultiSel('${selId}','${key}',this.value)">
+      <div class="multi-sel-opts" id="${selId}_opts"></div>
+      <div class="multi-sel-footer">
+        <button onclick="event.stopPropagation();addCustomMultiOpt('${selId}','${key}')">➕ Eigene Option</button>
+        <span class="multi-sel-count" id="${selId}_count"></span>
+      </div>
+    </div>`;
+  el.parentNode.replaceChild(wrap, el);
+  renderMultiSelOpts(selId, key, all, current, '');
+  renderMultiSelTags(selId, current);
+}
+function renderMultiSelOpts(selId, key, all, current, filter) {
+  const optsEl = document.getElementById(selId + '_opts');
+  if (!optsEl) return;
+  const f = filter.toLowerCase();
+  const filtered = f ? all.filter(o => o.toLowerCase().includes(f)) : all;
+  optsEl.innerHTML = filtered.map(o => {
+    const sel = current.includes(o);
+    return `<div class="multi-sel-opt${sel?' sel':''}" onclick="event.stopPropagation();toggleMultiOpt('${selId}','${escHtml(o).replace(/'/g,"\\'")}')">
+      <input type="checkbox"${sel?' checked':''} onclick="event.stopPropagation();toggleMultiOpt('${selId}','${escHtml(o).replace(/'/g,"\\'")}')"> ${escHtml(o)}
+    </div>`;
+  }).join('');
+}
+function renderMultiSelTags(selId, current) {
+  const tagsEl = document.getElementById(selId + '_tags');
+  const countEl = document.getElementById(selId + '_count');
+  if (!tagsEl) return;
+  if (!current.length) {
+    tagsEl.innerHTML = '<span class="multi-sel-ph">-- Auswählen... --</span>';
+  } else {
+    tagsEl.innerHTML = current.map(v =>
+      `<span class="multi-sel-tag">${escHtml(v)}<span class="multi-sel-tag-x" onclick="event.stopPropagation();removeMultiOpt('${selId}','${escHtml(v).replace(/'/g,"\\'")}')">×</span></span>`
+    ).join('');
+  }
+  if (countEl) countEl.textContent = current.length ? `${current.length} ausgewählt` : '';
+}
+function toggleMultiSel(selId) {
+  const drop = document.getElementById(selId + '_drop');
+  const box = document.getElementById(selId + '_box');
+  if (!drop) return;
+  const isOpen = !drop.classList.contains('hidden');
+  // Close all other dropdowns
+  document.querySelectorAll('.multi-sel-drop').forEach(d => {
+    d.classList.add('hidden');
+    const b = document.getElementById(d.id.replace('_drop','_box'));
+    if (b) b.classList.remove('open');
+  });
+  if (!isOpen) {
+    drop.classList.remove('hidden');
+    box.classList.add('open');
+    const searchEl = drop.querySelector('.multi-sel-search');
+    if (searchEl) { searchEl.value = ''; searchEl.focus(); }
+    const hidden = document.getElementById(selId);
+    const current = hidden ? hidden.value.split(',').map(v=>v.trim()).filter(Boolean) : [];
+    const key = drop.closest('.multi-sel-wrap')?.querySelector('[id$="_opts"]')?.id?.replace(selId+'_opts','') || '';
+    refreshMultiSelOpts(selId, current, '');
   }
 }
-function onSelChange(selId, key) {
-  const el = document.getElementById(selId);
-  if (!el) return;
-  if (el.value === '__custom__') {
-    addCustomOpt(selId, key);
-  } else {
-    autoSave();
-  }
+function refreshMultiSelOpts(selId, current, filter) {
+  const optsEl = document.getElementById(selId + '_opts');
+  if (!optsEl) return;
+  optsEl.querySelectorAll('.multi-sel-opt').forEach(el => {
+    const txt = el.textContent.trim();
+    const sel = current.includes(txt);
+    el.classList.toggle('sel', sel);
+    const cb = el.querySelector('input[type=checkbox]');
+    if (cb) cb.checked = sel;
+    el.style.display = (!filter || txt.toLowerCase().includes(filter.toLowerCase())) ? '' : 'none';
+  });
+}
+function filterMultiSel(selId, key, query) {
+  const hidden = document.getElementById(selId);
+  const current = hidden ? hidden.value.split(',').map(v=>v.trim()).filter(Boolean) : [];
+  const presets = OPTION_PRESETS[key] || [];
+  const flatPresets = presets.flat ? presets.flat() : presets;
+  const custom = getCustomOpts(key);
+  const all = [...new Set([...flatPresets, ...custom])].sort((a,b) => a.localeCompare(b,'de'));
+  renderMultiSelOpts(selId, key, all, current, query);
+}
+function toggleMultiOpt(selId, value) {
+  const hidden = document.getElementById(selId);
+  if (!hidden) return;
+  let current = hidden.value.split(',').map(v=>v.trim()).filter(Boolean);
+  const idx = current.indexOf(value);
+  if (idx >= 0) current.splice(idx, 1); else current.push(value);
+  hidden.value = current.join(', ');
+  renderMultiSelTags(selId, current);
+  refreshMultiSelOpts(selId, current, document.querySelector('#'+selId+'_drop .multi-sel-search')?.value || '');
+  autoSave();
+}
+function removeMultiOpt(selId, value) {
+  toggleMultiOpt(selId, value);
 }
 function addCustomOpt(selId, key) {
-  const el = document.getElementById(selId);
-  const val = prompt('Eigene Option eingeben:');
-  if (val && val.trim()) {
-    const v = val.trim();
-    saveCustomOpt(key, v);
-    buildSelect(selId, key, v);
-    if (el) el.value = v;
-    autoSave();
-  } else if (el) {
-    el.value = el.options[0]?.value || '';
-  }
+  addCustomMultiOpt(selId, key);
 }
+function addCustomMultiOpt(selId, key) {
+  const val = prompt('Eigene Option eingeben:');
+  if (!val?.trim()) return;
+  const v = val.trim();
+  saveCustomOpt(key, v);
+  // Re-build opts and select the new value
+  const presets = OPTION_PRESETS[key] || [];
+  const flatPresets = presets.flat ? presets.flat() : presets;
+  const custom = getCustomOpts(key);
+  const all = [...new Set([...flatPresets, ...custom])].sort((a,b) => a.localeCompare(b,'de'));
+  const hidden = document.getElementById(selId);
+  const current = hidden ? hidden.value.split(',').map(x=>x.trim()).filter(Boolean) : [];
+  renderMultiSelOpts(selId, key, all, current, '');
+  toggleMultiOpt(selId, v);
+}
+function onSelChange(selId, key) { /* legacy no-op */ }
+// Close dropdowns on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.multi-sel-wrap')) {
+    document.querySelectorAll('.multi-sel-drop').forEach(d => d.classList.add('hidden'));
+    document.querySelectorAll('.multi-sel-box').forEach(b => b.classList.remove('open'));
+  }
+});
 function initAllSelects() {
   const map = [
     ['p1_emotion','emotion'],['p1_zielgruppe','zielgruppe'],['p1_stil','stil'],
