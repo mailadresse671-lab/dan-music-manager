@@ -1014,7 +1014,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSongList();
 
   const defaultKey = 'AIzaSyDhEiU6-ra9JnH4MJNYO74eNlkeTkVN1dA';
-  const apiKey = sessionStorage.getItem('dan_api_key') || localStorage.getItem('dan_api_key') || defaultKey;
+  let apiKey = sessionStorage.getItem('dan_api_key') || localStorage.getItem('dan_api_key') || defaultKey;
+  if (!apiKey.startsWith('AIza')) apiKey = defaultKey;
   sessionStorage.setItem('dan_api_key', apiKey);
   localStorage.setItem('dan_api_key', apiKey);
   document.getElementById('apiModal').classList.add('hidden');
