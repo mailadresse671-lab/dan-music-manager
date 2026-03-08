@@ -1323,7 +1323,6 @@
           </div>
         </div>
       </div>
-    </div>
 
       <!-- SUNO-COCKPIT -->
       <div class="card suno-cockpit-card" style="margin-top:16px;border-color:rgba(16,185,129,0.3);">
@@ -3403,6 +3402,7 @@ function hidePhases() {
 // PHASE NAVIGATION
 // =============================
 function switchPhase(num) {
+  if (num === 0) { updateDashboard(); updateSunoCockpit(); }
   if (!currentSongId) return;
   currentPhase = num;
 
@@ -3459,6 +3459,33 @@ function loadSongData(id) {
   setVal('p3_feedback', s.p3_feedback);
   if (s.p3_ai_result) { showResult('p3_result', 'p3_result_content', s.p3_ai_result); }
   else { hideResult('p3_result'); }
+
+  // Suno Cockpit
+  setSunoField('suno_modus', s.suno_modus||'einfach');
+  setSunoField('suno_geschlecht', s.suno_geschlecht||'auto');
+  setSunoField('suno_lyrics_mode', s.suno_lyrics_mode||'handbuch');
+  const svEl = document.getElementById('suno_version');
+  if (svEl) svEl.value = s.suno_version||'v45';
+  const sadEl = document.getElementById('suno_add_audio');
+  if (sadEl) sadEl.checked = !!s.suno_add_audio;
+  const spEl = document.getElementById('suno_add_persona');
+  if (spEl) spEl.checked = !!s.suno_add_persona;
+  const siEl = document.getElementById('suno_add_inspo');
+  if (siEl) siEl.checked = !!s.suno_add_inspo;
+  setVal('suno_stile', s.suno_stile||'');
+  setVal('suno_stile_exclude', s.suno_stile_exclude||'');
+  const ssEl = document.getElementById('suno_seltsamkeit');
+  if (ssEl) { ssEl.value = s.suno_seltsamkeit||50; document.getElementById('suno_weird_val').textContent = (s.suno_seltsamkeit||50)+'%'; }
+  const siflEl = document.getElementById('suno_stileinfluss');
+  if (siflEl) { siflEl.value = s.suno_stileinfluss||75; document.getElementById('suno_stilinfl_val').textContent = (s.suno_stileinfluss||75)+'%'; }
+  setVal('suno_titel', s.suno_titel||s.name||'');
+  // Auto-populate suno_stile from Phase 3 if empty
+  if (!s.suno_stile) {
+    const parts = [s.p3_stil, s.p3_mood, s.p3_instrumente].filter(Boolean).join(', ');
+    setVal('suno_stile', parts);
+  }
+  updateSunoCockpit();
+  updateDashboard();
 
   // Phase 4
   const chklist = s.p4_checklist || {};
@@ -4633,6 +4660,152 @@ function debouncedCloudSync() {
       pushSongToCloud(songs[currentSongId]);
     }
   }, 2000);
+}
+
+// =============================
+// SUNO COCKPIT
+// =============================
+function setSunoToggle(fieldId, value, row) {
+  const hidden = document.getElementById(fieldId);
+  if (hidden) hidden.value = value;
+  if (row) row.querySelectorAll('.suno-toggle-btn').forEach(b => b.classList.toggle('sel', b.dataset.val === value));
+  autoSave();
+}
+function setSunoField(fieldId, value) {
+  const hidden = document.getElementById(fieldId);
+  if (!hidden) return;
+  hidden.value = value;
+  const row = document.getElementById(fieldId + '_row');
+  if (row) row.querySelectorAll('.suno-toggle-btn').forEach(b => b.classList.toggle('sel', b.dataset.val === value));
+}
+function updateSunoCockpit() {
+  if (!currentSongId || !songs[currentSongId]) return;
+  const s = songs[currentSongId];
+  // Auto-populate suno_stile from Phase 3 if user hasn't set it manually
+  const stileEl = document.getElementById('suno_stile');
+  if (stileEl && !stileEl.value.trim()) {
+    const auto = [s.p3_stil, s.p3_mood, s.p3_instrumente].filter(Boolean).join(', ');
+    stileEl.value = auto;
+  }
+  // Build live preview
+  const stile = stileEl?.value || '';
+  const exclude = document.getElementById('suno_stile_exclude')?.value || '';
+  const bpm = s.p3_bpm || '';
+  const key = s.p3_key || '';
+  const weird = document.getElementById('suno_seltsamkeit')?.value || 50;
+  const stilinfl = document.getElementById('suno_stileinfluss')?.value || 75;
+  const titel = document.getElementById('suno_titel')?.value || s.name || '';
+  const gender = document.getElementById('suno_geschlecht')?.value || 'auto';
+  const parts = [];
+  if (stile) parts.push(stile);
+  if (bpm) parts.push(`${bpm} bpm`);
+  if (key) parts.push(key);
+  if (gender !== 'auto') parts.push(gender === 'maennlich' ? 'male vocals' : 'female vocals');
+  const liveEl = document.getElementById('suno_live_stile');
+  if (liveEl) liveEl.textContent = parts.join(', ') || '–';
+}
+
+// =============================
+// OVERVIEW DASHBOARD
+// =============================
+function updateDashboard() {
+  if (!currentSongId || !songs[currentSongId]) return;
+  const s = songs[currentSongId];
+  // Konzept
+  const ovKonzept = document.getElementById('ov_konzept');
+  if (ovKonzept) {
+    const rows = [
+      ['Thema', s.p1_thema],
+      ['Emotion', s.p1_emotion],
+      ['Zielgruppe', s.p1_zielgruppe],
+      ['Stil / Einflüsse', s.p1_stil],
+      ['BPM', s.p3_bpm ? s.p3_bpm + ' BPM' : ''],
+      ['Key', s.p3_key],
+      ['Mood', s.p3_mood],
+      ['Genre', s.p3_stil],
+    ];
+    ovKonzept.innerHTML = rows.filter(r => r[1]).map(r => `
+      <div class="ov-row">
+        <div class="ov-label">${r[0]}</div>
+        <div class="ov-value">${escHtml(r[1])}</div>
+      </div>`).join('') || '<span style="color:var(--text-muted);font-size:12px;">Phase 1 noch nicht ausgefüllt</span>';
+  }
+  // Suno Settings
+  const ovSuno = document.getElementById('ov_suno');
+  if (ovSuno) {
+    const versionLabels = {'v5pro':'V5 Pro','v45plus':'4.5+ Pro','v45':'4.5 Pro','v45all':'v4.5-all','v4pro':'V4 Pro','v35':'V3.5'};
+    const modus = document.getElementById('suno_modus')?.value || s.suno_modus || 'einfach';
+    const version = document.getElementById('suno_version')?.value || s.suno_version || 'v45';
+    const geschlecht = document.getElementById('suno_geschlecht')?.value || s.suno_geschlecht || 'auto';
+    const lyricsMode = document.getElementById('suno_lyrics_mode')?.value || s.suno_lyrics_mode || 'handbuch';
+    const weird = document.getElementById('suno_seltsamkeit')?.value || s.suno_seltsamkeit || 50;
+    const stilinfl = document.getElementById('suno_stileinfluss')?.value || s.suno_stileinfluss || 75;
+    const titel = document.getElementById('suno_titel')?.value || s.suno_titel || s.name || '';
+    const stile = document.getElementById('suno_stile')?.value || s.suno_stile || '';
+    const geschlechtLabels = {'maennlich':'Männlich','weiblich':'Weiblich','auto':'Auto'};
+    const modiLabels = {'einfach':'Einfach','fortschrittlich':'Fortschrittlich','geraeusche':'Geräusche'};
+    ovSuno.innerHTML = [
+      ['Modus', modiLabels[modus]||modus],
+      ['Version', versionLabels[version]||version],
+      ['Stile', stile],
+      ['Geschlecht', geschlechtLabels[geschlecht]||geschlecht],
+      ['Lyrics Mode', lyricsMode==='handbuch'?'Handbuch':'Auto'],
+      ['Seltsamkeit', weird+'%'],
+      ['Stileinfluss', stilinfl+'%'],
+      ['Songtitel', titel],
+    ].filter(r=>r[1]).map(r => `
+      <div class="ov-row">
+        <div class="ov-label">${r[0]}</div>
+        <div class="ov-value">${escHtml(r[1])}</div>
+      </div>`).join('');
+  }
+  // Progress
+  const ovProgress = document.getElementById('ov_progress');
+  if (ovProgress) {
+    const chklist = s.p4_checklist || {};
+    const done = CHECKLIST_KEYS.filter(k => chklist[k]).length;
+    const total = CHECKLIST_KEYS.length;
+    const pct = Math.round((done/total)*100);
+    ovProgress.innerHTML = `
+      <div style="font-size:22px;font-weight:700;color:var(--text);">${pct}%</div>
+      <div class="ov-prog-bar-bg"><div class="ov-prog-bar" style="width:${pct}%"></div></div>
+      <div style="font-size:12px;color:var(--text-muted);">${done} / ${total} Schritte abgeschlossen</div>`;
+  }
+  // Stile Prompt (for copy)
+  const ovStylePrompt = document.getElementById('ov_style_prompt');
+  if (ovStylePrompt) {
+    const stile = document.getElementById('suno_stile')?.value || s.suno_stile || [s.p3_stil, s.p3_mood, s.p3_instrumente].filter(Boolean).join(', ');
+    const bpm = s.p3_bpm ? s.p3_bpm+' bpm' : '';
+    const key = s.p3_key || '';
+    const gender = document.getElementById('suno_geschlecht')?.value || s.suno_geschlecht || 'auto';
+    const parts = [stile, bpm, key].filter(Boolean);
+    if (gender === 'maennlich') parts.push('male vocals');
+    if (gender === 'weiblich') parts.push('female vocals');
+    ovStylePrompt.textContent = parts.join(', ') || '–';
+  }
+  // Lyrics
+  const ovLyrics = document.getElementById('ov_lyrics_prompt');
+  if (ovLyrics) {
+    ovLyrics.textContent = s.p2_lyrics || '– Noch keine Lyrics (Phase 2) –';
+  }
+  // Materials
+  const ovMats = document.getElementById('ov_materials');
+  if (ovMats) {
+    const mats = s.materials || [];
+    if (!mats.length) { ovMats.innerHTML = '<span style="color:var(--text-muted);font-size:12px;">Keine Materialien</span>'; }
+    else {
+      const icons = {audio:'🎤',video:'🎬',bild:'🖼️',dokument:'📄'};
+      ovMats.innerHTML = '<div class="ov-tags">'+mats.map(m => `<span class="ov-tag">${icons[m.type]||'📁'} ${escHtml(m.note||m.fileName||m.type)}</span>`).join('')+'</div>';
+    }
+  }
+}
+function copyOvField(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent.trim()).then(() => showToast('Kopiert!', 'success'));
+}
+function copyEl(id) {
+  copyOvField(id);
 }
 </script>
 </body>
