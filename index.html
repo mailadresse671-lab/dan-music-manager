@@ -1192,6 +1192,32 @@
   .bio-toggle-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:4px 0; }
   .bio-toggle-btn:hover { color:var(--purple-light); }
 
+  /* ===== SONG FORMAT TOGGLE ===== */
+  .song-format-toggle { display:flex; gap:8px; margin-top:4px; }
+  .sfmt-btn { flex:1; padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); color:var(--text-muted); font-size:12px; cursor:pointer; transition:all 0.2s; font-weight:500; }
+  .sfmt-btn.active { background:rgba(124,58,237,0.2); border-color:rgba(124,58,237,0.5); color:var(--purple-light); }
+  .sfmt-btn:hover:not(.active) { background:rgba(255,255,255,0.08); color:var(--text); }
+
+  /* ===== BEZIEHUNGS-MODUL ===== */
+  .bez-module-grid { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .bez-mod-btn { padding:5px 12px; border-radius:20px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); color:var(--text-muted); font-size:12px; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .bez-mod-btn.active { background:rgba(124,58,237,0.2); border-color:rgba(124,58,237,0.5); color:var(--purple-light); font-weight:600; }
+  .bez-mod-btn:hover:not(.active) { background:rgba(255,255,255,0.08); color:var(--text); }
+  .bez-modul-detail { background:rgba(124,58,237,0.06); border:1px solid rgba(124,58,237,0.2); border-radius:10px; padding:14px 16px; margin-top:8px; }
+  .bez-modul-detail .bmd-title { font-size:13px; font-weight:700; color:var(--purple-light); margin-bottom:10px; }
+  .bez-modul-sides { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .bez-side { padding:10px; border-radius:8px; }
+  .bez-side.licht { background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); }
+  .bez-side.schatten { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); }
+  .bez-side-label { font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; margin-bottom:4px; }
+  .bez-side.licht .bez-side-label { color:#10b981; }
+  .bez-side.schatten .bez-side-label { color:#ef4444; }
+  .bez-side-emo { font-size:12px; color:var(--text); margin-bottom:4px; }
+  .bez-side-tech { font-size:11px; color:var(--text-muted); font-style:italic; }
+  .bez-modul-meta { display:flex; gap:12px; margin-top:10px; flex-wrap:wrap; }
+  .bez-meta-tag { font-size:11px; padding:3px 8px; border-radius:4px; background:rgba(255,255,255,0.06); color:var(--text-muted); border:1px solid rgba(255,255,255,0.08); }
+  @media(max-width:600px){ .bez-modul-sides{grid-template-columns:1fr;} .song-format-toggle{flex-direction:column;} }
+
   /* ===== VOICE PERSONA BUTTON ===== */
   .btn-voice { padding:6px 14px; border-radius:6px; border:1px solid rgba(124,58,237,0.4); background:rgba(124,58,237,0.1); color:var(--purple-light); font-size:12px; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
   .btn-voice:hover { border-color:var(--purple); background:rgba(124,58,237,0.2); }
@@ -1732,16 +1758,72 @@
             </div>
           </div>
         </div>
+
+        <!-- BEZIEHUNGS-MODUL -->
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label>Beziehungs-Modul <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(optionaler Kontext — füllt Beat &amp; Emotion vor)</span></label>
+            <div class="bez-module-grid" id="bezModuleGrid">
+              <button class="bez-mod-btn" data-mod="" onclick="selectBezModul(this,'')">— Kein Modul</button>
+              <button class="bez-mod-btn" data-mod="1" onclick="selectBezModul(this,'1')">💫 1 · Kennenlernen</button>
+              <button class="bez-mod-btn" data-mod="2" onclick="selectBezModul(this,'2')">❤️ 2 · Beziehungskern</button>
+              <button class="bez-mod-btn" data-mod="3" onclick="selectBezModul(this,'3')">👶 3 · Elternschaft</button>
+              <button class="bez-mod-btn" data-mod="4" onclick="selectBezModul(this,'4')">🤝 4 · Einheit</button>
+              <button class="bez-mod-btn" data-mod="5" onclick="selectBezModul(this,'5')">🏠 5 · Alltag</button>
+              <button class="bez-mod-btn" data-mod="6" onclick="selectBezModul(this,'6')">⚡ 6 · Kampf &amp; Einsicht</button>
+              <button class="bez-mod-btn" data-mod="7" onclick="selectBezModul(this,'7')">🌅 7 · Das Danach</button>
+            </div>
+            <input type="hidden" id="p1_bez_modul" value="">
+          </div>
+        </div>
+        <!-- Modul Detail (klappt auf) -->
+        <div id="bezModulDetail" class="bez-modul-detail" style="display:none;"></div>
+        <!-- SONG FORMAT -->
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label>Song-Format</label>
+            <div class="song-format-toggle" id="songFormatToggle">
+              <button class="sfmt-btn active" data-fmt="solo" onclick="setSongFormat('solo')">🎤 Solo — Nur DaN</button>
+              <button class="sfmt-btn" data-fmt="duett" onclick="setSongFormat('duett')">🎤🎙️ Duett — DaN + Frau</button>
+            </div>
+            <input type="hidden" id="p1_song_format" value="solo">
+          </div>
+        </div>
+        <!-- DUETT OPTIONS (nur sichtbar wenn Duett) -->
+        <div id="duettOptions" style="display:none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Frauenstimme — Charakter</label>
+              <select id="p1_female_voice" onchange="autoSave()">
+                <option value="">-- Wählen... --</option>
+                <option value="Sanft-emotional">Sanft &amp; emotional (Kontrast zu DaN)</option>
+                <option value="Stark-selbstbewusst">Stark &amp; selbstbewusst (auf Augenhöhe)</option>
+                <option value="Verletzlich-leise">Verletzlich &amp; leise (intim)</option>
+                <option value="Leidenschaftlich">Leidenschaftlich &amp; intensiv</option>
+                <option value="Kalt-distanziert">Kalt &amp; distanziert (Rosenkrieg)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Aufteilung</label>
+              <select id="p1_duett_split" onchange="autoSave()">
+                <option value="">-- Wählen... --</option>
+                <option value="Verse DaN / Hook Frau">Verse DaN · Hook Frau</option>
+                <option value="Verse DaN / Hook gemeinsam">Verse DaN · Hook gemeinsam</option>
+                <option value="Abwechselnd Verse">Abwechselnd Verse (DaN / Frau)</option>
+                <option value="DaN Rap / Frau singt Hook">DaN rappt · Frau singt Hook</option>
+                <option value="Intro Frau / Rest DaN">Intro Frau · Rest DaN</option>
+              </select>
+            </div>
+          </div>
+        </div>
         <div class="form-row">
           <div class="form-group">
             <label>Sprache<span class="required-mark">*</span></label>
-            <select id="p1_sprache" onchange="autoSave();updateNavLocks()">
+            <select id="p1_sprache" onchange="onSpracheChange()">
               <option value="">-- Wählen... --</option>
               <option value="Deutsch">Deutsch</option>
-              <option value="Englisch">Englisch</option>
-              <option value="Spanisch">Spanisch</option>
-              <option value="Französisch">Französisch</option>
-              <option value="Andere">Andere</option>
+              <option value="Italiano">Italiano</option>
+              <option value="Deutsch+Italiano">Deutsch + Italiano (gemischt)</option>
             </select>
           </div>
           <div class="form-group">
@@ -1749,6 +1831,22 @@
             <div class="select-with-add">
               <select id="p1_tonalitaet" onchange="onSelChange('p1_tonalitaet','tonalitaet')"></select>
               <button class="btn-add-opt" onclick="addCustomOpt('p1_tonalitaet','tonalitaet')" title="Eigene Option hinzufügen">+</button>
+            </div>
+          </div>
+        </div>
+        <!-- SPRACHAUFTEILUNG (nur bei gemischt) -->
+        <div id="sprachMixOptions" style="display:none;">
+          <div class="form-row">
+            <div class="form-group" style="flex:1;">
+              <label>Sprachaufteilung</label>
+              <select id="p1_sprache_split" onchange="autoSave()">
+                <option value="">-- Wählen... --</option>
+                <option value="Verse Deutsch / Hook Italiano">Verse Deutsch · Hook Italiano</option>
+                <option value="Verse Italiano / Hook Deutsch">Verse Italiano · Hook Deutsch</option>
+                <option value="Strophe 1 Deutsch / Strophe 2 Italiano">Strophe 1 Deutsch · Strophe 2 Italiano</option>
+                <option value="Beide durchgemischt">Beide Sprachen durchgemischt</option>
+                <option value="Bridge Italiano / Rest Deutsch">Bridge Italiano · Rest Deutsch</option>
+              </select>
             </div>
           </div>
         </div>
@@ -3219,10 +3317,25 @@ const YT_CHANNEL_ID = 'UCc72jjvyE5AGgY4It7uLn-Q';
 // OPTION PRESETS (A-Z)
 // ===========================
 const OPTION_PRESETS = {
-  emotion: ['Aggressiv','Aufbruch','Bittersüß','Dankbarkeit','Depression','Einsamkeit','Entschlossenheit','Euphorie','Freude','Hoffnung','Hunger','Kraft','Melancholie','Nostalgie','Schmerz','Sehnsucht','Stolz','Trauer','Verlorenheit','Verzweiflung','Wut','Zuversicht'],
+  emotion: [
+    // Basis
+    'Aggressiv','Aufbruch','Bittersüß','Dankbarkeit','Depression','Einsamkeit','Entschlossenheit','Euphorie','Freude','Hoffnung','Hunger','Kraft','Melancholie','Nostalgie','Schmerz','Sehnsucht','Stolz','Trauer','Verlorenheit','Verzweiflung','Wut','Zuversicht',
+    // Kennenlernen & Liebe
+    'Herzrasen','Magie des ersten Moments','Unsicherheit','Maskentragen','Intimität','Vertrauen','Eifersucht','Co-Abhängigkeit',
+    // Elternschaft & Familie
+    'Väterlicher Stolz','Schutzinstinkt','Löwenmutter-Energie','Postpartale Leere','Existenzdruck','Vatersehnsucht','Wochenend-Papa-Schmerz',
+    // Alltag & Beziehung
+    'Vertraute Ruhe','Schweigendes Verständnis','Routine-Erschöpfung','Einsamkeit zu zweit','Unsichtbare Arbeit','Stiller Versorger',
+    // Konflikt & Einsicht
+    'Kampfgeist','Vergebung','Loslassen','Reue','Demut','Bittersüße Erleichterung',
+    // Rosenkrieg & Danach
+    'Kalte Distanz','Rosenkrieg','Respektvolle Elternschaft','Neuanfang','Traurige Erleichterung'
+  ],
   stil: [
     // Genres / Stile
     '187 Strassenbande Stil','Afro Trap','Aggressive','Atmosphärisch','Boombap','Cloud Rap','Drill','Emo Rap','Gangsta Rap','German Trap','Hamburgrap','Hardcore Rap','Lo-Fi Hip Hop','Melodic Rap','OG Rap','Oldschool','Phonk','Pluggnb','Punchline Rap','Storytelling','Underground',
+    // Deutschrap Subgenres (2024/2025)
+    'Melodischer Herzschmerz-Rap','Aggressiver Drill DE','Sommer Afro-Trap DE','Post-Punk Synth-Pop DE','Modern Acoustic Pop DE','Techno-Rap / Rave-Pop','Urban Soul R&B DE','Chill-out Nachtfahrt','Conscious Rap DE',
     // Deutsche Rapper
     'Afrob','AK Ausserkontrolle','B-Tight','Bonez MC','Bushido','Capo','Capital Bra','Celo & Abdi','Chakuza','Curse','Eko Fresh','Farid Bang','Fard','Fler','Genetikk','Haftbefehl','KC Rebell','Kollegah','Kool Savas','LX','Manuellsen','Massiv','Maxwell','MC Bogy','MoTrip','Nimo','Olexesh','PA Sports','Samy Deluxe','Sido','Shindy','Ssio','Summer Cem','Ufo361',
     // US Rapper 90er
@@ -3618,6 +3731,42 @@ function showResult(resultBoxId, contentId, text) {
 // PHASE GENERATION FUNCTIONS
 // =============================
 
+// Builds context string about song format, language, and module for AI prompts
+function getSongFormatContext() {
+  const s = (currentSongId && songs[currentSongId]) || {};
+  const fmt = s.p1_song_format || 'solo';
+  const sprache = s.p1_sprache || 'Deutsch';
+  const bezMod = s.p1_bez_modul || '';
+  let ctx = '';
+
+  // Language
+  if (sprache === 'Deutsch+Italiano') {
+    const split = s.p1_sprache_split || 'Beide Sprachen durchgemischt';
+    ctx += `\nSprache: Deutsch und Italiano gemischt (${split}). DaN rappt/singt auf Deutsch, Italienische Passagen fließen natürlich ein. Kein Muttersprachler-Perfekt nötig, authentischer Akzent ist Teil des Stils.`;
+  } else if (sprache === 'Italiano') {
+    ctx += `\nSprache: Italiano. Lyrics vollständig auf Italienisch, DaN's authentischer Stil bleibt erhalten.`;
+  } else {
+    ctx += `\nSprache: Deutsch.`;
+  }
+
+  // Song format
+  if (fmt === 'duett') {
+    const femVoice = s.p1_female_voice || 'Sanft-emotional';
+    const split = s.p1_duett_split || 'Verse DaN / Hook Frau';
+    ctx += `\nSong-Format: DUETT (DaN + Frauenstimme). DaN ist immer die Hauptstimme und führt alle Verse. Die Frauenstimme (${femVoice}) übernimmt: ${split}. DaN's Perspective/Stimme ist dominant und ausschlaggebend — die Frauenstimme ist Kontrast oder Ergänzung, nie Hauptfokus.`;
+  } else {
+    ctx += `\nSong-Format: SOLO — ausschließlich DaN's Stimme.`;
+  }
+
+  // Beziehungs-Modul
+  if (bezMod && BEZ_MODULE[bezMod]) {
+    const m = BEZ_MODULE[bezMod];
+    ctx += `\nBeziehungs-Kontext: ${m.title}. Emotionale Lichtseite: ${m.licht.emo}. Schattenseite: ${m.schatten.emo}.`;
+  }
+
+  return ctx;
+}
+
 // Phase 1
 async function generatePhase1() {
   const thema = document.getElementById('p1_thema').value.trim();
@@ -3631,7 +3780,8 @@ async function generatePhase1() {
 
   if (!thema && !emotion) { showToast('Bitte mindestens Thema und Emotion ausfüllen!', 'error'); return; }
 
-  const prompt = `Du bist ein erfahrener Musikproduzent und A&R für deutschen Rap. Entwickle ein detailliertes Song-Konzept für @DaN_90_rap basierend auf: Thema: ${thema || 'offen'}, Emotion: ${emotion || 'offen'}, Zielgruppe: ${zielgruppe || 'allgemein'}, Stil/Einflüsse: ${stil || 'Deutscher Rap'}.${matCtx}\n\nErstelle: 3 Titel-Vorschläge, eine Storyline (3-4 Sätze), die emotionale Botschaft, Stimmungsbeschreibung, und konkrete Bild/Metapher-Vorschläge für die Lyrics.`;
+  const fmtCtx = getSongFormatContext();
+  const prompt = `Du bist ein erfahrener Musikproduzent und A&R für deutschen Rap. Entwickle ein detailliertes Song-Konzept für @DaN_90_rap basierend auf: Thema: ${thema || 'offen'}, Emotion: ${emotion || 'offen'}, Zielgruppe: ${zielgruppe || 'allgemein'}, Stil/Einflüsse: ${stil || 'Deutscher Rap'}.${matCtx}${fmtCtx}\n\nErstelle: 3 Titel-Vorschläge, eine Storyline (3-4 Sätze), die emotionale Botschaft, Stimmungsbeschreibung, und konkrete Bild/Metapher-Vorschläge für die Lyrics.`;
 
   setLoading('p1_spinner_icon', 'p1_btn_text', true, '✨', 'Mit KI generieren');
   try {
@@ -3651,7 +3801,27 @@ async function generatePhase2() {
   const konzept = document.getElementById('p2_konzept').value.trim();
   if (!konzept) { showToast('Bitte Konzept/Briefing eingeben!', 'error'); return; }
 
-  const prompt = `Du bist ein professioneller Texter für deutschen Rap. Schreibe komplette Song-Lyrics für @DaN_90_rap. Konzept: ${konzept}. Schreibe: Intro (4 Zeilen), Verse 1 (16 Zeilen, 16er Flow), Hook (8 Zeilen, catchy und eingängig), Verse 2 (16 Zeilen), Bridge (8 Zeilen), Outro (4 Zeilen). Deutscher Rap-Stil, Reime, authentisch, keine Klischees.`;
+  const fmtCtx = getSongFormatContext();
+  const s = (currentSongId && songs[currentSongId]) || {};
+  const fmt = s.p1_song_format || 'solo';
+  const isDuett = fmt === 'duett';
+  const duettSplit = s.p1_duett_split || 'Verse DaN / Hook Frau';
+  const sprache = s.p1_sprache || 'Deutsch';
+
+  let structureNote = 'Schreibe: Intro (4 Zeilen), Verse 1 (16 Zeilen, 16er Flow), Hook (8 Zeilen, catchy und eingängig), Verse 2 (16 Zeilen), Bridge (8 Zeilen), Outro (4 Zeilen).';
+  if (isDuett) {
+    structureNote += ` DUETT-STRUKTUR: ${duettSplit}. Markiere DaN-Passagen mit [DaN] und Frauen-Passagen mit [Frau]. DaN rappt immer die Hauptverse. Die Frauenstimme singt/rappt ihren Teil — klare Abgrenzung im Text.`;
+  }
+
+  let sprachNote = 'Deutscher Rap-Stil, Reime, authentisch, keine Klischees.';
+  if (sprache === 'Deutsch+Italiano') {
+    const sprSplit = s.p1_sprache_split || 'Beide Sprachen durchgemischt';
+    sprachNote = `Sprachaufteilung: ${sprSplit}. Deutsche Rap-Zeilen fließen natürlich in italienische Passagen über. Authentischer Stil, keine erzwungenen Übergänge. Reime funktionieren jeweils in der eigenen Sprache.`;
+  } else if (sprache === 'Italiano') {
+    sprachNote = 'Lyrics vollständig auf Italienisch. DaNs authentischer Rap-Stil, echte Reime auf Italienisch, keine deutschen Einschübe.';
+  }
+
+  const prompt = `Du bist ein professioneller Texter für deutschen Rap. Schreibe komplette Song-Lyrics für @DaN_90_rap. Konzept: ${konzept}.${fmtCtx}\n\n${structureNote} ${sprachNote}`;
 
   setLoading('p2_spinner_icon', 'p2_btn_text', true, '✨', 'Mit KI generieren');
   try {
@@ -3810,7 +3980,14 @@ async function generatePhase3() {
   const konzeptCtx = song.p1_ai_result ? `\n\nSong-Konzept (Phase 1):\n${song.p1_ai_result}` : '';
   const lyricsCtx = song.p2_lyrics ? `\n\nLyrics (Phase 2):\n${song.p2_lyrics}` : '';
 
-  const prompt = `Create a detailed Suno AI music prompt in English for a German rap song. Style: ${stil || 'German Trap'}, BPM: ${bpm}, Key: ${key}, Mood: ${mood || 'dark'}, Instruments: ${instrumente || '808s, hi-hats, piano'}.${konzeptCtx}${lyricsCtx}\n\nInclude: genre tags, mood descriptors, instrument specifications, production style, vocal style guidance. Use the song concept and lyrics as context for maximum accuracy. Format it as a ready-to-paste Suno prompt.`;
+  const fmtCtx = getSongFormatContext();
+  const fmt = song.p1_song_format || 'solo';
+  const isDuett = fmt === 'duett';
+  const sprache = song.p1_sprache || 'Deutsch';
+  const langNote = sprache === 'Deutsch+Italiano' ? 'german-italian mixed language rap' : sprache === 'Italiano' ? 'italian rap' : 'german rap';
+  const duettNote = isDuett ? `, featuring contrasting female voice (${song.p1_female_voice || 'soft emotional'}) — DaN leads all verses, female voice on hooks/bridge only` : ', solo male vocals only';
+
+  const prompt = `Create a detailed Suno AI music prompt in English for a ${langNote} song${duettNote}. Style: ${stil || 'German Trap'}, BPM: ${bpm}, Key: ${key}, Mood: ${mood || 'dark'}, Instruments: ${instrumente || '808s, hi-hats, piano'}.${konzeptCtx}${lyricsCtx}${fmtCtx}\n\nInclude: genre tags, mood descriptors, instrument specifications, production style, vocal style guidance for DaN as lead voice${isDuett ? ' and female counterpart role' : ''}. Format it as a ready-to-paste Suno prompt.`;
 
   setLoading('p3_spinner_icon', 'p3_btn_text', true, '✨', 'Suno Prompt generieren');
   try {
@@ -4333,6 +4510,7 @@ function confirmNewSong() {
     id, name,
     createdAt: new Date().toISOString(),
     p1_thema: '', p1_emotion: '', p1_sprache: '', p1_tonalitaet: '', p1_zielgruppe: '', p1_stil: '', p1_ai_result: '',
+    p1_song_format: 'solo', p1_female_voice: '', p1_duett_split: '', p1_sprache_split: '', p1_bez_modul: '',
     p2_konzept: '', p2_lyrics: '',
     p3_bpm: 140, p3_key: 'G minor', p3_stil: '', p3_mood: '', p3_instrumente: '', p3_ai_result: '', p3_suno_link: '', p3_feedback: '', p3_versions: [],
     p4_checklist: {}, p4_ai_result: '',
@@ -4453,6 +4631,132 @@ function updateNavLocks() {
     if (ph === 3 && !p2ok) el.classList.add('locked');
   });
 }
+// =============================
+// SONG FORMAT
+// =============================
+function setSongFormat(fmt, silent) {
+  document.querySelectorAll('.sfmt-btn').forEach(b => b.classList.toggle('active', b.dataset.fmt === fmt));
+  const fmtEl = document.getElementById('p1_song_format');
+  if (fmtEl) fmtEl.value = fmt;
+  const duettOpts = document.getElementById('duettOptions');
+  if (duettOpts) duettOpts.style.display = fmt === 'duett' ? '' : 'none';
+  if (!silent) autoSave();
+}
+
+// =============================
+// SPRACHE CHANGE
+// =============================
+function onSpracheChange(silent) {
+  const val = document.getElementById('p1_sprache')?.value || '';
+  const mixOpts = document.getElementById('sprachMixOptions');
+  if (mixOpts) mixOpts.style.display = val === 'Deutsch+Italiano' ? '' : 'none';
+  if (!silent) { autoSave(); updateNavLocks(); }
+}
+
+// =============================
+// BEZIEHUNGS-MODUL
+// =============================
+const BEZ_MODULE = {
+  '1': {
+    title: '💫 Modul 1 · Kennenlernen & Rausch',
+    licht: { label: 'Euphorie (Magie)', emo: 'Herzrasen, Schlaflosigkeit, alles ist neu', tech: '124–128 BPM · helle Synth-Arpeggios · viel Reverb auf Vocals' },
+    schatten: { label: 'Unsicherheit (Masken)', emo: 'Angst vor Ablehnung, sich verstellen', tech: 'Repetitiver Basslauf · trockene Drums · Delay-Echos' },
+    bpm: 126, instrumente: ['Synthesizer','Hi-Hats','Pad Sounds'], mood: 'Energetic'
+  },
+  '2': {
+    title: '❤️ Modul 2 · Beziehungskern & Verschmelzung',
+    licht: { label: 'Absolute Intimität', emo: '\"Wir gegen die Welt\", blindes Vertrauen', tech: '75–90 BPM · warme Rhodes-Pianos · organischer Sinus-Bass' },
+    schatten: { label: 'Co-Abhängigkeit', emo: 'Eifersucht, Klammern, Identitätsverlust', tech: 'Cloud-Rap-Vibe · stark verzerrte 808s · neblige Atmosphäre' },
+    bpm: 82, instrumente: ['Piano','808s','Pad Sounds'], mood: 'Deep'
+  },
+  '3': {
+    title: '👶 Modul 3 · Elternschaft & Verantwortung',
+    licht: { label: 'Stolzer Beschützer / Löwenmutter', emo: 'Bedingungslose Liebe, Schutzinstinkt, Kraft', tech: 'Monumentale Pauken · tiefe Celli (Mann) · Tribal-Drums (Frau)' },
+    schatten: { label: 'Postpartale Not & Überforderung', emo: 'Taubheit (Frau), Existenzdruck (Mann), Isolation', tech: 'Heartbeat-Kicks · verstimmte Spieluhr · viel Reverb/Leere' },
+    bpm: 90, instrumente: ['Strings','Timpani','Piano','808s'], mood: 'Cinematic'
+  },
+  '4': {
+    title: '🤝 Modul 4 · Einheit & gemeinsamer Strang',
+    licht: { label: 'Die unbesiegbare Front', emo: 'Maximale Sicherheit, Einigkeit in der Erziehung', tech: 'Marsch-Rhythmus · Unisono-Bass · massive Kick auf 1 und 3' },
+    schatten: { label: 'Zerren in zwei Richtungen', emo: 'Erziehungskonflikt, Kind wird hin-/hergerissen', tech: 'Polyrhythmik · Panning (Stimmen hart L/R) · Tempowechsel' },
+    bpm: 100, instrumente: ['Drums','808s','Brass','Strings'], mood: 'Dramatic'
+  },
+  '5': {
+    title: '🏠 Modul 5 · Alltag & Routine',
+    licht: { label: 'Vertraute Ruhe (Ankommen)', emo: 'Wortloses Verständnis, tiefe Wurzeln', tech: 'Akustik-Gitarre · echtes Klavier · keine digitalen Effekte' },
+    schatten: { label: 'Die graue Wand (Erosion)', emo: 'Einsamkeit zu zweit, Frust, Verstummen', tech: 'Lo-Fi-Knistern · hohle Snare · offene Melodien ohne Auflösung' },
+    bpm: 78, instrumente: ['Akustik-Gitarre','Piano','Shakers'], mood: 'Melancholic'
+  },
+  '6': {
+    title: '⚡ Modul 6 · Kampf, Einsicht & Entschuldigung',
+    licht: { label: '\"Es lohnt sich\" (Rettung)', emo: 'Hoffnung, Vergebung, Loyalität', tech: 'Crescendo · warme Streicher-Flächen · treibender Puls' },
+    schatten: { label: 'Die Sackgasse (Bruch)', emo: 'Masken fallen lassen, Trennungsmoment', tech: 'Beat-Stop · nackte Stimme · Wechsel von Moll zu Dur' },
+    bpm: 95, instrumente: ['Strings','Piano','Drums'], mood: 'Emotional'
+  },
+  '7': {
+    title: '🌅 Modul 7 · Das Danach (Post-Beziehung)',
+    licht: { label: 'Respektvolles Miteinander', emo: 'Freundschaft trotz Trennung, Kind im Zentrum', tech: 'Akustik-Duo · heller Shaker · Terz-Harmonien' },
+    schatten: { label: 'Der Rosenkrieg (Hass)', emo: 'Rache, Giftigkeit, Kind als Druckmittel', tech: 'Industrielle Sounds · verzerrte 808s · Megaphon-Filter' },
+    bpm: 108, instrumente: ['Akustik-Gitarre','808s','Synth Bass'], mood: 'Raw'
+  }
+};
+
+function selectBezModul(btn, mod) {
+  document.querySelectorAll('.bez-mod-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const el = document.getElementById('p1_bez_modul');
+  if (el) el.value = mod;
+  if (mod) {
+    renderBezModulDetail(mod);
+    applyBezModulPreset(mod);
+  } else {
+    document.getElementById('bezModulDetail').style.display = 'none';
+  }
+  autoSave();
+}
+
+function renderBezModulDetail(mod) {
+  const m = BEZ_MODULE[mod];
+  if (!m) return;
+  const detail = document.getElementById('bezModulDetail');
+  detail.style.display = '';
+  detail.innerHTML = `
+    <div class="bmd-title">${m.title}</div>
+    <div class="bez-modul-sides">
+      <div class="bez-side licht">
+        <div class="bez-side-label">☀️ Lichtseite</div>
+        <div class="bez-side-emo"><strong>${m.licht.label}</strong></div>
+        <div class="bez-side-emo" style="margin-top:3px;">${m.licht.emo}</div>
+        <div class="bez-side-tech">${m.licht.tech}</div>
+      </div>
+      <div class="bez-side schatten">
+        <div class="bez-side-label">🌑 Schattenseite</div>
+        <div class="bez-side-emo"><strong>${m.schatten.label}</strong></div>
+        <div class="bez-side-emo" style="margin-top:3px;">${m.schatten.emo}</div>
+        <div class="bez-side-tech">${m.schatten.tech}</div>
+      </div>
+    </div>
+    <div class="bez-modul-meta">
+      <span class="bez-meta-tag">🎚️ ~${m.bpm} BPM</span>
+      ${m.instrumente.map(i => `<span class="bez-meta-tag">${i}</span>`).join('')}
+      <span class="bez-meta-tag">Mood: ${m.mood}</span>
+    </div>`;
+}
+
+function applyBezModulPreset(mod) {
+  const m = BEZ_MODULE[mod];
+  if (!m) return;
+  // BPM in Phase 3 vorausfüllen (wenn noch leer oder default)
+  const bpmEl = document.getElementById('p3_bpm');
+  if (bpmEl && (!bpmEl.value || bpmEl.value == 140)) bpmEl.value = m.bpm;
+  // Mood in Phase 3
+  const moodEl = document.getElementById('p3_mood');
+  if (moodEl) {
+    const cur = moodEl.value || '';
+    if (!cur) { moodEl.value = m.mood; }
+  }
+}
+
 function switchPhase(num) {
   if (num === 0) { updateDashboard(); updateSunoCockpit(); }
   if (num === 3) { setTimeout(() => { initSunoPersonaPicker(); initBeatStudio(); updateBsBpm(); }, 0); }
@@ -4524,6 +4828,17 @@ function loadSongData(id) {
   buildSelect('p1_stil','stil', s.p1_stil||'');
   if (s.p1_ai_result) { showResult('p1_result', 'p1_result_content', s.p1_ai_result); }
   else { hideResult('p1_result'); }
+  // Phase 1 – neue Felder
+  setSongFormat(s.p1_song_format || 'solo', true);
+  setVal('p1_female_voice', s.p1_female_voice || '');
+  setVal('p1_duett_split', s.p1_duett_split || '');
+  setVal('p1_sprache_split', s.p1_sprache_split || '');
+  onSpracheChange(true);
+  // Beziehungs-Modul
+  const bzm = s.p1_bez_modul || '';
+  document.getElementById('p1_bez_modul').value = bzm;
+  document.querySelectorAll('.bez-mod-btn').forEach(b => b.classList.toggle('active', b.dataset.mod === bzm));
+  if (bzm) renderBezModulDetail(bzm); else document.getElementById('bezModulDetail').style.display = 'none';
 
   // Phase 2
   setVal('p2_konzept', s.p2_konzept);
@@ -4659,6 +4974,12 @@ function autoSave() {
   s.p1_tonalitaet = document.getElementById('p1_tonalitaet')?.value || '';
   s.p1_zielgruppe = document.getElementById('p1_zielgruppe')?.value || '';
   s.p1_stil = document.getElementById('p1_stil')?.value || '';
+  // neue Felder
+  s.p1_song_format = getVal('p1_song_format') || 'solo';
+  s.p1_female_voice = getVal('p1_female_voice');
+  s.p1_duett_split = getVal('p1_duett_split');
+  s.p1_sprache_split = getVal('p1_sprache_split');
+  s.p1_bez_modul = getVal('p1_bez_modul');
 
   s.p2_konzept = getVal('p2_konzept');
   s.p2_lyrics = getVal('p2_lyrics');
@@ -6229,7 +6550,8 @@ const SUNO_PERSONAS = [
     url: 'https://suno.com/persona/30a6a4aa-c2e5-49f1-9089-bf92e634c196',
     prompt: `emotional german rap, intimate whispered delivery, breathy vocals, vulnerable tone, deep warm male vocals, minimal production, soft piano undertone, 82 BPM, melancholic strings, sparse drums, intimate storytelling, authentic pain, high-fidelity studio recording, spacious reverb on vocals, cinematic but intimate, personal confession style
 
-EXCLUDE: comedy, children music, upbeat pop, fast tempo, autotune heavy, aggressive rap, drill, female vocals, generic loops, overproduced, lo-fi, trap hi-hats`
+EXCLUDE: comedy, children music, upbeat pop, fast tempo, autotune heavy, aggressive rap, drill, female vocals, generic loops, overproduced, lo-fi, trap hi-hats`,
+    duett: `DUETT-ERWEITERUNG: soft gentle female voice as emotional counterpart, breathy and tender, high warm soprano, enters on hooks only — DaN leads all verses, female voice answers and harmonizes, never dominates, creates emotional dialogue between male pain and female empathy, terz-harmonies on chorus`
   },
   {
     id: 'kraftvoll', name: 'DaN_KRAFTVOLL', emoji: '💪', bpm: 95,
@@ -6237,7 +6559,8 @@ EXCLUDE: comedy, children music, upbeat pop, fast tempo, autotune heavy, aggress
     url: 'https://suno.com/persona/eb209082-390c-43b0-b9a3-97ac2a52d41a',
     prompt: `powerful german rap, resonant baritone vocals, determined delivery, resilient tone, deep chest voice, 808 bass, punchy drums, cinematic strings, building intensity, anthemic hip hop ballad, strong conviction, unwavering confidence, mid-tempo 95 BPM, polished studio mix, high-fidelity, motivational undercurrent, overcome-struggle narrative, steady rhythm, powerful hook delivery
 
-EXCLUDE: comedy, children music, upbeat pop, lo-fi, trap hi-hats, generic loops, overproduced, female vocals, drill, fast tempo, autotune heavy`
+EXCLUDE: comedy, children music, upbeat pop, lo-fi, trap hi-hats, generic loops, overproduced, female vocals, drill, fast tempo, autotune heavy`,
+    duett: `DUETT-ERWEITERUNG: strong confident female voice, stands her ground, equal energy to DaN but higher register, powerful chest voice, female rapper or singer on hook — DaN raps verses with full authority, shared hook creates unstoppable unified front, no weakness, both voices push forward`
   },
   {
     id: 'aggressiv', name: 'DaN_AGGRESSIV', emoji: '🔥', bpm: 130,
@@ -6245,7 +6568,8 @@ EXCLUDE: comedy, children music, upbeat pop, lo-fi, trap hi-hats, generic loops,
     url: 'https://suno.com/persona/477c5ba4-c710-49d8-adac-e4125aa57592',
     prompt: `aggressive german rap, harsh gritty vocals, dominant delivery, hard-hitting 808 bass, trap drums with heavy kick, dark cinematic beat, 130 BPM, minor key, street anthem energy, powerful confident tone, commanding presence, raw emotion, intense build, no-filter honesty, brutal storytelling, spacious high-fidelity mix, dangerous vibe
 
-EXCLUDE: comedy, children music, upbeat pop, soft vocals, lo-fi, generic loops, female vocals, slow tempo, autotune heavy, drill (keep aggressive rap)`
+EXCLUDE: comedy, children music, upbeat pop, soft vocals, lo-fi, generic loops, female vocals, slow tempo, autotune heavy, drill (keep aggressive rap)`,
+    duett: `DUETT-ERWEITERUNG: cold distant female voice, icy and restrained, sharp contrast to DaN's aggression — she sings the hook with controlled intensity, no warmth, represents the opposing force or the reason for the anger, dissonant echo effect on her vocals, she never matches his aggression but cuts deeper with calmness`
   },
   {
     id: 'hoffnungsvoll', name: 'DaN_HOFFNUNGSVOLL', emoji: '🌅', bpm: 110,
@@ -6253,7 +6577,8 @@ EXCLUDE: comedy, children music, upbeat pop, soft vocals, lo-fi, generic loops, 
     url: 'https://suno.com/persona/c9187840-631b-4a9f-ab7b-685caeca47ce',
     prompt: `uplifting german rap, warm inspiring vocals, hopeful delivery, bright undertone, mid-range tenor voice, major key progression, 110 BPM, uplifting strings, positive energy without being fake, authentic optimism, motivational message, cinematic production, building crescendo, powerful chorus, light but substantial, high-fidelity studio recording, warm reverb, inspiring but grounded
 
-EXCLUDE: comedy, children music, generic pop, autotune heavy, drill, female vocals, aggressive rap, fast tempo, lo-fi, trap hi-hats`
+EXCLUDE: comedy, children music, generic pop, autotune heavy, drill, female vocals, aggressive rap, fast tempo, lo-fi, trap hi-hats`,
+    duett: `DUETT-ERWEITERUNG: warm uplifting female voice, bright and clear, gospel-influenced tone, adds light to DaN's message — she sings the chorus as an emotional peak, harmonizes in thirds, voice radiates safety and shared optimism, no autotune, natural vibrato, they build something together`
   },
   {
     id: 'melancholisch', name: 'DaN_MELANCHOLISCH', emoji: '🌧️', bpm: 75,
@@ -6261,7 +6586,8 @@ EXCLUDE: comedy, children music, generic pop, autotune heavy, drill, female voca
     url: '',
     prompt: `melancholic german rap, sad introspective vocals, slow-tempo 75 BPM, deep emotional male vocals, bittersweet tone, dark piano, cinematic strings, minor key, reflective delivery, thoughtful pacing, atmospheric production, vinyl crackle intro, sparse drums, intimate whispered moments, nostalgia and pain mixed, authentic sadness, high-fidelity, spacious mix, story-driven narrative
 
-EXCLUDE: comedy, children music, upbeat pop, fast tempo, aggressive rap, autotune heavy, drill, female vocals, generic loops, lo-fi, trap hi-hats`
+EXCLUDE: comedy, children music, upbeat pop, fast tempo, aggressive rap, autotune heavy, drill, female vocals, generic loops, lo-fi, trap hi-hats`,
+    duett: `DUETT-ERWEITERUNG: melancholic female voice, fragile and broken, slight breathiness, enters only on bridge and final chorus — she represents the other side of the same pain, mirror to DaN's sadness, they don't sing together but after each other, call-and-response of shared grief, much reverb on her voice, almost ghost-like presence`
   },
   {
     id: 'kuehl', name: 'DaN_KÜHL', emoji: '🧊', bpm: 100,
@@ -6269,7 +6595,8 @@ EXCLUDE: comedy, children music, upbeat pop, fast tempo, aggressive rap, autotun
     url: '',
     prompt: `detached german rap, narrative-focused vocals, clear diction, cool delivery, mid-range tenor, factual storytelling without over-emotion, 100 BPM, minimal production, sparse instrumentation, direct communication style, authentic but restrained, cinematic but understated, high-fidelity studio, tight drums, focused bass, no reverb excess, professional documentary vibe, substance over style, street-smart intelligence
 
-EXCLUDE: comedy, children music, upbeat pop, autotune heavy, drill, female vocals, aggressive rap, fast tempo, lo-fi, trap hi-hats, overly emotional`
+EXCLUDE: comedy, children music, upbeat pop, autotune heavy, drill, female vocals, aggressive rap, fast tempo, lo-fi, trap hi-hats, overly emotional`,
+    duett: `DUETT-ERWEITERUNG: neutral observing female voice, matter-of-fact delivery, speaks or sings with calm authority, not emotional — she provides a second perspective or commentary to DaN's narrative, equal distance from emotion, clean vocal with no effects, journalistic presence, minimal harmonies`
   },
   {
     id: 'stolz', name: 'DaN_STOLZ', emoji: '👑', bpm: 115,
@@ -6277,7 +6604,8 @@ EXCLUDE: comedy, children music, upbeat pop, autotune heavy, drill, female vocal
     url: '',
     prompt: `confident german rap, proud commanding vocals, strong dominant delivery, deep resonant voice, assertive tone, 115 BPM, powerful 808 bass, cinematic orchestral strings, major key, self-assured flow, unwavering conviction, street-smart intelligence, earned respect vibe, substantial bars, high-fidelity production, punchy drums, powerful presence, no arrogance just strength, authentic self-belief, inspiring through confidence
 
-EXCLUDE: comedy, children music, upbeat pop, autotune heavy, drill, female vocals, weak vocals, fast tempo, lo-fi, trap hi-hats, self-doubt vibes`
+EXCLUDE: comedy, children music, upbeat pop, autotune heavy, drill, female vocals, weak vocals, fast tempo, lo-fi, trap hi-hats, self-doubt vibes`,
+    duett: `DUETT-ERWEITERUNG: proud powerful female voice, strong and regal, she matches DaN's confidence from her own position — sings the hook as a celebration, never subordinate, represents the woman who stands beside a strong man with equal strength, rich mezzo-soprano, orchestral feel on her vocals`
   },
   {
     id: 'wuetend', name: 'DaN_WÜTEND', emoji: '⚡', bpm: 140,
@@ -6285,7 +6613,8 @@ EXCLUDE: comedy, children music, upbeat pop, autotune heavy, drill, female vocal
     url: '',
     prompt: `raw intense german rap, explosive powerful vocals, intense aggressive delivery, harsh gritty tone, 140 BPM, heavy hard-hitting 808 bass, aggressive trap drums, dark cinematic beat, no filter raw emotion, brutal honesty, fighting spirit, dangerous edge without cartoon villainy, authentic anger not performed, high-fidelity raw mix, intense strings, minor key, explosive potential, street credibility, real pain not fake rage
 
-EXCLUDE: comedy, children music, upbeat pop, soft vocals, lo-fi, generic loops, female vocals, autotune, slow tempo, drill, trap hi-hats`
+EXCLUDE: comedy, children music, upbeat pop, soft vocals, lo-fi, generic loops, female vocals, autotune, slow tempo, drill, trap hi-hats`,
+    duett: `DUETT-ERWEITERUNG: fierce sharp female voice, her calmness amplifies the danger — she delivers a single bridge or spoken word section, controlled anger, low register for a woman, no screaming, the contrast between her control and DaN's explosion creates maximum tension, she is the eye of the storm`
   }
 ];
 
@@ -6338,8 +6667,13 @@ function renderSpDetail(id) {
   if (!detail) return;
   detail.style.display = '';
   detail.style.setProperty('--sp-color', persona.color);
-  document.getElementById('spDetailTitle').textContent = persona.emoji + '  ' + persona.name + '  ·  ' + persona.bpm + ' BPM';
-  document.getElementById('spPromptBox').textContent = persona.prompt;
+  const fmt = (currentSongId && songs[currentSongId]?.p1_song_format) || 'solo';
+  const isDuett = fmt === 'duett';
+  document.getElementById('spDetailTitle').textContent = persona.emoji + '  ' + persona.name + '  ·  ' + persona.bpm + ' BPM' + (isDuett ? '  🎙️ DUETT' : '');
+  const fullPrompt = isDuett && persona.duett
+    ? persona.prompt + '\n\n' + persona.duett
+    : persona.prompt;
+  document.getElementById('spPromptBox').textContent = fullPrompt;
   const linkEl = document.getElementById('spSunoLink');
   if (linkEl) {
     linkEl.innerHTML = persona.url
