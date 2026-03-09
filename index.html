@@ -917,10 +917,129 @@
     background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.2);
     border-radius:8px; margin-bottom:12px;
   }
+
+  /* ===== INTRO SCREEN ===== */
+  #intro-screen {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:#000; z-index:9999;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    overflow:hidden; cursor:default;
+  }
+  #intro-screen.fade-out { animation:introFadeOut 0.9s ease-out forwards; }
+  @keyframes introFadeOut { to { opacity:0; pointer-events:none; } }
+  .intro-scanlines {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.08) 3px,rgba(0,0,0,0.08) 4px);
+    pointer-events:none; z-index:1;
+  }
+  .intro-rec {
+    position:absolute; top:28px; right:32px;
+    display:flex; align-items:center; gap:8px;
+    font-size:11px; letter-spacing:3px; color:#ef4444; text-transform:uppercase;
+    z-index:2; animation:recBlink 1.2s ease-in-out infinite;
+  }
+  .intro-rec-dot { width:9px; height:9px; border-radius:50%; background:#ef4444; }
+  @keyframes recBlink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .intro-vu {
+    display:flex; align-items:flex-end; gap:5px;
+    height:70px; margin-bottom:36px; z-index:2;
+  }
+  .intro-vu-bar {
+    width:7px; border-radius:2px 2px 0 0;
+    animation:vuPulse var(--dur,0.7s) ease-in-out infinite alternate;
+  }
+  @keyframes vuPulse {
+    from { height:var(--lo,8px); background:#7c3aed; opacity:0.7; }
+    to   { height:var(--hi,60px); background:#9d5ff3; opacity:1; }
+  }
+  .intro-content { z-index:2; text-align:center; }
+  .intro-logo { font-size:18px; letter-spacing:8px; color:#7c3aed; margin-bottom:16px; text-transform:uppercase; }
+  .intro-title {
+    font-size:80px; font-weight:900; letter-spacing:18px; color:#e2e8f0;
+    text-transform:uppercase; line-height:1; margin-bottom:10px;
+    animation:glitchTitle 5s infinite;
+  }
+  @keyframes glitchTitle {
+    0%,92%,100% { text-shadow:none; transform:none; }
+    93%  { text-shadow:3px 0 #7c3aed,-3px 0 #3b82f6; transform:skewX(1.5deg); }
+    94%  { text-shadow:-3px 0 #7c3aed,3px 0 #3b82f6; transform:skewX(-1.5deg); }
+    95%  { text-shadow:none; transform:none; }
+  }
+  .intro-subtitle { font-size:13px; letter-spacing:7px; color:#94a3b8; text-transform:uppercase; margin-bottom:14px; }
+  .intro-quote {
+    font-size:13px; color:#64748b; font-style:italic; max-width:380px;
+    margin:0 auto 48px; line-height:1.6; letter-spacing:0.5px;
+    animation:quoteFadeIn 2s ease-out 0.5s both;
+  }
+  @keyframes quoteFadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+  .intro-enter-btn {
+    padding:14px 48px; border:1px solid #7c3aed; background:transparent;
+    color:#9d5ff3; font-size:12px; letter-spacing:5px; text-transform:uppercase;
+    cursor:pointer; border-radius:2px; transition:all 0.3s;
+    animation:btnPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes btnPulse {
+    0%,100% { box-shadow:0 0 0 0 rgba(124,58,237,0); }
+    50%      { box-shadow:0 0 22px 6px rgba(124,58,237,0.25); }
+  }
+  .intro-enter-btn:hover {
+    background:#7c3aed; color:#fff;
+    box-shadow:0 0 35px rgba(124,58,237,0.6);
+    letter-spacing:7px;
+  }
+
+  /* ===== ARTIST BIOGRAPHY CARD ===== */
+  .bio-card { margin-bottom:12px; }
+  .bio-display { display:flex; flex-direction:column; gap:10px; }
+  .bio-display-name { font-size:22px; font-weight:700; color:var(--text); }
+  .bio-display-tag  { font-size:12px; color:var(--purple-light); letter-spacing:2px; text-transform:uppercase; margin-top:-6px; }
+  .bio-display-text { font-size:13px; color:var(--text-muted); line-height:1.6; white-space:pre-wrap; }
+  .bio-display-section { display:flex; flex-direction:column; gap:4px; }
+  .bio-display-label { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--purple-light); font-weight:600; }
+  .bio-edit-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media(max-width:640px){ .bio-edit-grid { grid-template-columns:1fr; } }
+  .bio-edit-textarea { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:6px; padding:8px 10px; color:var(--text); font-size:13px; resize:vertical; min-height:70px; font-family:inherit; }
+  .bio-edit-textarea:focus { outline:none; border-color:var(--purple); }
+  .bio-edit-input { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:6px; padding:8px 10px; color:var(--text); font-size:13px; }
+  .bio-edit-input:focus { outline:none; border-color:var(--purple); }
+  .bio-toggle-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:4px 0; }
+  .bio-toggle-btn:hover { color:var(--purple-light); }
+
+  /* ===== VOICE PERSONA BUTTON ===== */
+  .btn-voice { padding:6px 14px; border-radius:6px; border:1px solid rgba(124,58,237,0.4); background:rgba(124,58,237,0.1); color:var(--purple-light); font-size:12px; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .btn-voice:hover { border-color:var(--purple); background:rgba(124,58,237,0.2); }
+  /* ===== VOICE PERSONA MODAL ===== */
+  .voice-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; display:none; align-items:center; justify-content:center; }
+  .voice-modal-overlay.open { display:flex; }
+  .voice-modal { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; width:520px; max-width:95vw; max-height:85vh; overflow-y:auto; }
+  .voice-modal-title { font-size:16px; font-weight:700; margin-bottom:4px; }
+  .voice-modal-sub { font-size:12px; color:var(--text-muted); margin-bottom:20px; }
+  .voice-emotion-grid { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .voice-emotion-btn { padding:5px 12px; border-radius:5px; border:1px solid var(--border); background:var(--card2); color:var(--text-muted); font-size:12px; cursor:pointer; transition:all 0.2s; }
+  .voice-emotion-btn.sel { border-color:var(--purple); color:var(--purple-light); background:rgba(124,58,237,0.12); }
+  .voice-persona-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.25); border-radius:4px; padding:3px 8px; font-size:11px; color:var(--purple-light); }
 </style>
 
 </head>
 <body>
+
+<!-- ===== INTRO SCREEN ===== -->
+<div id="intro-screen">
+  <div class="intro-scanlines"></div>
+  <div class="intro-rec"><div class="intro-rec-dot"></div>REC</div>
+
+  <!-- VU Meter Bars -->
+  <div class="intro-vu" id="introVU"></div>
+
+  <!-- Content -->
+  <div class="intro-content">
+    <div class="intro-logo">🎙 DaN Music Manager</div>
+    <div class="intro-title">DaN</div>
+    <div class="intro-subtitle">Recording Studio</div>
+    <div class="intro-quote">"Jeder Verse ein Statement. Jede Session ein Schritt nach oben.<br>Du bist hier, weil du es ernst meinst."</div>
+    <button class="intro-enter-btn" onclick="enterStudio()">Studio betreten</button>
+  </div>
+</div>
 
 <!-- TOP BAR -->
 <div class="topbar">
@@ -942,7 +1061,44 @@
     <button class="btn-api" onclick="exportSongs()" title="Songs als JSON exportieren">⬇ Export</button>
     <label class="btn-api" style="cursor:pointer;" title="Songs aus JSON importieren">⬆ Import<input type="file" accept=".json" onchange="importSongs(event)" style="display:none"></label>
     <button class="btn-tavily" onclick="openTavilyModal()" title="Tavily Web-Suche Key">🌐 Web-Suche</button>
+    <button class="btn-voice" onclick="openVoiceModal()" title="Voice Persona – deine Stimme & Tonlage">🎤 Voice Persona</button>
     <button class="btn-api" onclick="openApiModal()">API Key</button>
+  </div>
+</div>
+
+<!-- ===== VOICE PERSONA MODAL ===== -->
+<div class="voice-modal-overlay" id="voiceModalOverlay">
+  <div class="voice-modal">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px;">
+      <div class="voice-modal-title">🎤 Voice Persona</div>
+      <button onclick="closeVoiceModal()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
+    </div>
+    <div class="voice-modal-sub">Deine Persönlichkeit bleibt immer gleich – nur die Emotion variiert je nach Song.</div>
+
+    <div class="form-group" style="margin-bottom:14px;">
+      <label style="font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block;">Künstlername / Alias</label>
+      <input type="text" id="vp_name" class="bio-edit-input" placeholder="z.B. DaN, @DaN_90_rap">
+    </div>
+
+    <div class="form-group" style="margin-bottom:14px;">
+      <label style="font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block;">Deine Stimme – Charakter (immer gleich)</label>
+      <textarea id="vp_charakter" class="bio-edit-textarea" rows="3" placeholder="z.B. Authentisch, direkt, streetwise. Keine Showmanship – echte Wörter. 90er Flow trifft auf heutigen Trap-Punch."></textarea>
+    </div>
+
+    <div class="form-group" style="margin-bottom:14px;">
+      <label style="font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block;">Sprachstil & Flow (immer gleich)</label>
+      <textarea id="vp_flow" class="bio-edit-textarea" rows="2" placeholder="z.B. Harter 16er mit internen Reimen, gelegentlich Slang, immer Substanz hinter den Bars."></textarea>
+    </div>
+
+    <div class="form-group" style="margin-bottom:6px;">
+      <label style="font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block;">Standard-Emotion (überschreibbar pro Song in Phase 1)</label>
+      <div class="voice-emotion-grid" id="vpEmotionGrid"></div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px;">
+      <button onclick="closeVoiceModal()" style="padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--text-muted);cursor:pointer;font-size:13px;">Abbrechen</button>
+      <button onclick="saveVoicePersona()" class="btn-ai" style="padding:8px 20px;font-size:13px;">✅ Speichern</button>
+    </div>
   </div>
 </div>
 
@@ -1022,6 +1178,47 @@
         <div>
           <div class="phase-title">Übersicht & Suno-Cockpit</div>
           <div class="phase-subtitle">Alle Einstellungen auf einen Blick – direkt kopierbar</div>
+        </div>
+      </div>
+
+      <!-- Artist Biography Card -->
+      <div class="card bio-card" id="bioCard">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="card-title" style="margin-bottom:0;">🎤 Artist Profil</div>
+          <button class="bio-toggle-btn" id="bioToggleBtn" onclick="toggleBioEdit()">✏️ Bearbeiten</button>
+        </div>
+        <!-- Display Mode -->
+        <div id="bioDisplay" class="bio-display"></div>
+        <!-- Edit Mode (hidden by default) -->
+        <div id="bioEdit" style="display:none;">
+          <div class="bio-edit-grid">
+            <div class="form-group">
+              <label style="font-size:11px;color:var(--text-muted);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:0.5px;">Künstlername</label>
+              <input type="text" id="bio_name" class="bio-edit-input" placeholder="DaN / @DaN_90_rap">
+            </div>
+            <div class="form-group">
+              <label style="font-size:11px;color:var(--text-muted);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:0.5px;">Herkunft / City</label>
+              <input type="text" id="bio_herkunft" class="bio-edit-input" placeholder="z.B. Berlin, Hamburg...">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:10px;">
+            <label style="font-size:11px;color:var(--text-muted);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:0.5px;">Über mich – Biographie</label>
+            <textarea id="bio_text" class="bio-edit-textarea" rows="4" placeholder="Schreib über dich – wer du bist, wo du herkommst, was dich antreibt..."></textarea>
+          </div>
+          <div class="bio-edit-grid" style="margin-top:10px;">
+            <div class="form-group">
+              <label style="font-size:11px;color:var(--text-muted);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:0.5px;">Ziele / Vision</label>
+              <textarea id="bio_ziele" class="bio-edit-textarea" rows="3" placeholder="Was willst du erreichen? Wo siehst du dich in 2 Jahren?"></textarea>
+            </div>
+            <div class="form-group">
+              <label style="font-size:11px;color:var(--text-muted);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:0.5px;">Stil & Sound</label>
+              <textarea id="bio_stil" class="bio-edit-textarea" rows="3" placeholder="Dein Sound, deine Einflüsse, was dich von anderen unterscheidet..."></textarea>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;">
+            <button onclick="toggleBioEdit()" style="padding:7px 14px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--text-muted);cursor:pointer;font-size:12px;">Abbrechen</button>
+            <button onclick="saveBioProfile()" class="btn-ai" style="padding:7px 18px;font-size:12px;">✅ Speichern</button>
+          </div>
         </div>
       </div>
 
@@ -2693,8 +2890,26 @@ async function callClaude(prompt, systemPrompt = null) {
     throw new Error('Kein API Key vorhanden');
   }
 
+  // Inject Voice Persona into every AI call
+  const baseSystem = systemPrompt || PRODUCER_SYSTEM_PROMPT;
+  const vp = loadVoicePersona();
+  let fullSystem = baseSystem;
+  if (vp.charakter || vp.flow || vp.name) {
+    const songEmotion = (currentSongId && songs[currentSongId]?.p1_emotion) || vp.defaultEmotion || '';
+    const vpBlock = [
+      `\n\n---\n🎤 ARTIST VOICE PERSONA (IMMER BEIBEHALTEN):`,
+      vp.name       ? `Künstler: ${vp.name}` : '',
+      vp.charakter  ? `Charakter: ${vp.charakter}` : '',
+      vp.flow       ? `Sprachstil: ${vp.flow}` : '',
+      songEmotion   ? `Aktuelle Emotion / Tonlage: ${songEmotion}` : '',
+      `Die Persönlichkeit bleibt IMMER gleich. Nur die Emotionsebene variiert je nach Song.`,
+      `---`
+    ].filter(Boolean).join('\n');
+    fullSystem = baseSystem + vpBlock;
+  }
+
   const messages = [
-    { role: 'system', content: systemPrompt || PRODUCER_SYSTEM_PROMPT },
+    { role: 'system', content: fullSystem },
     { role: 'user', content: prompt }
   ];
 
@@ -4905,6 +5120,165 @@ function copyOvField(id) {
 function copyEl(id) {
   copyOvField(id);
 }
+
+// =============================
+// INTRO SCREEN
+// =============================
+(function buildVU() {
+  const configs = [
+    {lo:'12px',hi:'30px',dur:'0.9s'},{lo:'20px',hi:'58px',dur:'0.6s'},
+    {lo:'8px', hi:'45px',dur:'0.75s'},{lo:'25px',hi:'65px',dur:'0.5s'},
+    {lo:'14px',hi:'50px',dur:'0.8s'},{lo:'6px', hi:'38px',dur:'0.65s'},
+    {lo:'30px',hi:'68px',dur:'0.55s'},{lo:'10px',hi:'42px',dur:'0.7s'},
+    {lo:'22px',hi:'60px',dur:'0.85s'},{lo:'8px', hi:'35px',dur:'0.6s'},
+    {lo:'18px',hi:'55px',dur:'0.72s'},{lo:'28px',hi:'70px',dur:'0.48s'},
+    {lo:'12px',hi:'44px',dur:'0.9s'},{lo:'16px',hi:'52px',dur:'0.63s'},
+    {lo:'24px',hi:'63px',dur:'0.78s'},{lo:'9px', hi:'40px',dur:'0.58s'}
+  ];
+  const colors = [
+    '#10b981','#10b981','#f59e0b','#f59e0b','#ef4444',
+    '#7c3aed','#7c3aed','#3b82f6','#3b82f6','#9d5ff3',
+    '#f59e0b','#10b981','#ef4444','#7c3aed','#3b82f6','#9d5ff3'
+  ];
+  window.addEventListener('DOMContentLoaded', () => {
+    const vu = document.getElementById('introVU');
+    if (!vu) return;
+    configs.forEach((c, i) => {
+      const bar = document.createElement('div');
+      bar.className = 'intro-vu-bar';
+      bar.style.cssText = `--lo:${c.lo};--hi:${c.hi};--dur:${c.dur};height:${c.lo};background:${colors[i]};animation-delay:${(i*0.04).toFixed(2)}s`;
+      vu.appendChild(bar);
+    });
+  });
+})();
+
+function enterStudio() {
+  const screen = document.getElementById('intro-screen');
+  if (!screen) return;
+  screen.classList.add('fade-out');
+  setTimeout(() => { screen.style.display = 'none'; }, 900);
+}
+
+// =============================
+// ARTIST BIOGRAPHY
+// =============================
+function loadBioProfile() {
+  try { return JSON.parse(localStorage.getItem('dan_bio_profile') || '{}'); }
+  catch(e) { return {}; }
+}
+function saveBioProfile() {
+  const bio = {
+    name:     document.getElementById('bio_name')?.value.trim() || '',
+    herkunft: document.getElementById('bio_herkunft')?.value.trim() || '',
+    text:     document.getElementById('bio_text')?.value.trim() || '',
+    ziele:    document.getElementById('bio_ziele')?.value.trim() || '',
+    stil:     document.getElementById('bio_stil')?.value.trim() || ''
+  };
+  localStorage.setItem('dan_bio_profile', JSON.stringify(bio));
+  renderBioDisplay(bio);
+  toggleBioEdit(true); // close edit mode
+  showToast('Profil gespeichert!', 'success');
+}
+function renderBioDisplay(bio) {
+  const el = document.getElementById('bioDisplay');
+  if (!el) return;
+  if (!bio.name && !bio.text && !bio.ziele && !bio.stil) {
+    el.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:4px 0;">Noch kein Profil angelegt – klicke auf ✏️ Bearbeiten.</div>`;
+    return;
+  }
+  el.innerHTML = `
+    ${bio.name ? `<div class="bio-display-name">${escHtml(bio.name)}${bio.herkunft ? ` <span style="font-size:14px;color:var(--text-muted);font-weight:400;">aus ${escHtml(bio.herkunft)}</span>`:''}</div>` : ''}
+    ${bio.text ? `<div class="bio-display-text">${escHtml(bio.text)}</div>` : ''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
+      ${bio.ziele ? `<div class="bio-display-section"><div class="bio-display-label">🎯 Ziele / Vision</div><div class="bio-display-text" style="font-size:12px;">${escHtml(bio.ziele)}</div></div>` : ''}
+      ${bio.stil  ? `<div class="bio-display-section"><div class="bio-display-label">🎵 Stil & Sound</div><div class="bio-display-text" style="font-size:12px;">${escHtml(bio.stil)}</div></div>` : ''}
+    </div>`;
+}
+function toggleBioEdit(forceClose) {
+  const editEl = document.getElementById('bioEdit');
+  const dispEl = document.getElementById('bioDisplay');
+  const btn    = document.getElementById('bioToggleBtn');
+  const isEdit = editEl.style.display !== 'none';
+  if (forceClose || isEdit) {
+    editEl.style.display = 'none';
+    dispEl.style.display = '';
+    if(btn) btn.textContent = '✏️ Bearbeiten';
+  } else {
+    const bio = loadBioProfile();
+    document.getElementById('bio_name').value     = bio.name     || '';
+    document.getElementById('bio_herkunft').value = bio.herkunft || '';
+    document.getElementById('bio_text').value     = bio.text     || '';
+    document.getElementById('bio_ziele').value    = bio.ziele    || '';
+    document.getElementById('bio_stil').value     = bio.stil     || '';
+    editEl.style.display = '';
+    dispEl.style.display = 'none';
+    if(btn) btn.textContent = '✕ Schließen';
+  }
+}
+function initBioCard() {
+  renderBioDisplay(loadBioProfile());
+}
+
+// =============================
+// VOICE PERSONA
+// =============================
+const VOICE_EMOTIONS = ['Sentimental','Melancholisch','Nachdenklich','Verletzlich','Hoffnungsvoll','Motivierend','Stolz','Kraftvoll','Kämpferisch','Entschlossen','Aggressiv','Wütend','Kalt','Drohend','Brutal'];
+
+function loadVoicePersona() {
+  try { return JSON.parse(localStorage.getItem('dan_voice_persona') || '{}'); }
+  catch(e) { return {}; }
+}
+function openVoiceModal() {
+  const vp = loadVoicePersona();
+  document.getElementById('vp_name').value      = vp.name      || '';
+  document.getElementById('vp_charakter').value = vp.charakter || '';
+  document.getElementById('vp_flow').value      = vp.flow      || '';
+  buildVpEmotionGrid(vp.defaultEmotion || '');
+  document.getElementById('voiceModalOverlay').classList.add('open');
+}
+function closeVoiceModal() {
+  document.getElementById('voiceModalOverlay').classList.remove('open');
+}
+function buildVpEmotionGrid(selected) {
+  const grid = document.getElementById('vpEmotionGrid');
+  if (!grid) return;
+  grid.innerHTML = VOICE_EMOTIONS.map(e =>
+    `<button class="voice-emotion-btn${e===selected?' sel':''}" onclick="selectVpEmotion(this,'${e}')">${e}</button>`
+  ).join('');
+}
+function selectVpEmotion(btn, emotion) {
+  document.querySelectorAll('#vpEmotionGrid .voice-emotion-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+function saveVoicePersona() {
+  const selBtn = document.querySelector('#vpEmotionGrid .voice-emotion-btn.sel');
+  const vp = {
+    name:          document.getElementById('vp_name').value.trim(),
+    charakter:     document.getElementById('vp_charakter').value.trim(),
+    flow:          document.getElementById('vp_flow').value.trim(),
+    defaultEmotion: selBtn ? selBtn.textContent.trim() : ''
+  };
+  localStorage.setItem('dan_voice_persona', JSON.stringify(vp));
+  closeVoiceModal();
+  updateVoicePersonaBadge();
+  showToast('Voice Persona gespeichert!', 'success');
+}
+function updateVoicePersonaBadge() {
+  const vp = loadVoicePersona();
+  // Update topbar button label to show active persona
+  const btn = document.querySelector('.btn-voice');
+  if (btn) {
+    btn.textContent = vp.name ? `🎤 ${vp.name}` : '🎤 Voice Persona';
+  }
+}
+
+// =============================
+// INIT
+// =============================
+window.addEventListener('DOMContentLoaded', () => {
+  initBioCard();
+  updateVoicePersonaBadge();
+});
 </script>
 </body>
 </html>
