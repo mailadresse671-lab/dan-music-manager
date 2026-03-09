@@ -5280,6 +5280,7 @@ function copyEl(id) {
 function enterStudio() {
   const screen = document.getElementById('intro-screen');
   if (!screen) return;
+  playStudioSound();
   screen.classList.add('fade-out');
   setTimeout(() => { screen.style.display = 'none'; }, 900);
 }
@@ -5547,6 +5548,68 @@ function applySpToBeat() {
   }
   autoSave();
   showToast(`BPM auf ${persona.bpm} gesetzt!`, 'success');
+}
+
+// =============================
+// STUDIO INTRO SOUND
+// =============================
+function playStudioSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const play = (freq, startT, dur, vol = 0.18, type = 'sine', detune = 0) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = type; osc.frequency.value = freq; osc.detune.value = detune;
+      gain.gain.setValueAtTime(0, ctx.currentTime + startT);
+      gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + startT + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startT + dur);
+      osc.start(ctx.currentTime + startT);
+      osc.stop(ctx.currentTime + startT + dur + 0.05);
+    };
+
+    // Deep 808-style kick hit
+    const kick = (t) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(160, ctx.currentTime + t);
+      osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + t + 0.25);
+      gain.gain.setValueAtTime(0.6, ctx.currentTime + t);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.4);
+      osc.start(ctx.currentTime + t);
+      osc.stop(ctx.currentTime + t + 0.5);
+    };
+
+    // Rising synth chord: C minor pentatonic (C Eb G Bb)
+    const chord = [130.81, 155.56, 196.00, 233.08];
+    chord.forEach((f, i) => play(f, 0.05 + i * 0.08, 2.0, 0.10, 'triangle', 0));
+
+    // Bright piano-like lead melody (rising motivating lick)
+    const melody = [392, 440, 523.25, 587.33, 659.25, 783.99];
+    melody.forEach((f, i) => play(f, 0.6 + i * 0.13, 0.5, 0.12, 'triangle', -5));
+
+    // Two 808 kicks for feel
+    kick(0.05); kick(0.55);
+
+    // Subtle noise burst (snare-like) at 0.55s
+    const bufSize = ctx.sampleRate * 0.08;
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const snareGain = ctx.createGain(); snareGain.gain.value = 0.15;
+    src.connect(snareGain); snareGain.connect(ctx.destination);
+    src.start(ctx.currentTime + 0.55);
+
+    // High bell ding at the end – "you're in"
+    play(1318.51, 2.0, 1.2, 0.08, 'sine');
+    play(1567.98, 2.15, 1.0, 0.06, 'sine');
+
+  } catch(e) { /* Audio not supported – silent fail */ }
 }
 
 // =============================
