@@ -894,6 +894,38 @@
   .ov-progress-content { margin-top:4px; }
   .ov-prog-bar-bg { background:var(--border); border-radius:4px; height:8px; margin:6px 0 8px; }
   .ov-prog-bar { background:var(--success); border-radius:4px; height:8px; transition:width 0.3s; }
+  /* ===== SUNO TAG TOOLBAR (Lyrics) ===== */
+  .suno-tag-toolbar { margin-bottom:8px; }
+  .suno-tag-section { margin-bottom:6px; }
+  .suno-tag-section-label { font-size:9px; font-weight:700; color:rgba(148,163,184,0.5); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .suno-tag-row { display:flex; flex-wrap:wrap; gap:4px; }
+  .suno-tag-btn {
+    padding:3px 8px; border-radius:4px; border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.04); color:var(--text-muted); cursor:pointer;
+    font-size:11px; font-family:'Courier New',monospace; transition:all 0.15s;
+    white-space:nowrap;
+  }
+  .suno-tag-btn:hover { background:rgba(124,58,237,0.2); border-color:rgba(124,58,237,0.5); color:var(--purple-light); }
+  .suno-tag-btn.tag-voice:hover { background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.4); color:#10b981; }
+  .suno-tag-btn.tag-energy:hover { background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.4); color:#f59e0b; }
+  .suno-char-counter { font-size:11px; text-align:right; margin-top:4px; color:var(--text-muted); }
+  .suno-char-counter.warn { color:#f59e0b; }
+  .suno-char-counter.over { color:#ef4444; }
+
+  /* ===== SONG STRUKTUR PLANER ===== */
+  .sskp-section-list { display:flex; flex-wrap:wrap; gap:6px; min-height:42px; margin:10px 0; padding:8px; background:rgba(0,0,0,0.2); border-radius:8px; border:1px dashed rgba(255,255,255,0.1); align-items:center; }
+  .sskp-section-chip {
+    display:flex; align-items:center; gap:4px; padding:4px 10px;
+    border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;
+    border:1px solid rgba(255,255,255,0.15); background:rgba(124,58,237,0.15);
+    color:var(--purple-light); transition:all 0.2s; user-select:none;
+  }
+  .sskp-section-chip:hover { background:rgba(239,68,68,0.2); border-color:rgba(239,68,68,0.4); color:#f87171; }
+  .sskp-section-chip:hover::after { content:' ✕'; font-size:9px; }
+  .sskp-add-btn { padding:3px 10px; border-radius:4px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:var(--text-muted); cursor:pointer; font-size:11px; transition:all 0.15s; }
+  .sskp-add-btn:hover { border-color:rgba(124,58,237,0.5); color:var(--purple-light); background:rgba(124,58,237,0.1); }
+  .sskp-add-btn.active { border-color:var(--purple); color:var(--purple-light); background:rgba(124,58,237,0.2); }
+
   /* ===== SUNO COCKPIT ===== */
   .suno-cockpit-card {}
   .suno-toggle-row { display:flex; gap:6px; flex-wrap:wrap; }
@@ -1953,10 +1985,71 @@
         </div>
       </div>
       <div class="card">
-        <div class="card-title">Lyrics Editor</div>
-        <textarea id="p2_lyrics" rows="30" placeholder="Deine Lyrics erscheinen hier. Du kannst sie direkt bearbeiten..." oninput="autoSave();updateNavLocks()" style="font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8;"></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div class="card-title" style="margin-bottom:0;">Lyrics Editor</div>
+          <span style="font-size:11px;color:var(--text-muted);">Suno Lyrics-Feld · max. 3000 Zeichen</span>
+        </div>
+
+        <!-- SUNO TAG TOOLBAR -->
+        <div class="suno-tag-toolbar">
+          <div class="suno-tag-section">
+            <div class="suno-tag-section-label">Struktur-Tags (in Lyrics einfügen)</div>
+            <div class="suno-tag-row">
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Intro]')">[Intro]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Verse]')">[Verse]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Verse 1]')">[Verse 1]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Verse 2]')">[Verse 2]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Pre-Chorus]')">[Pre-Chorus]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Chorus]')">[Chorus]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Hook]')">[Hook]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Bridge]')">[Bridge]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Breakdown]')">[Breakdown]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Build-Up]')">[Build-Up]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Drop]')">[Drop]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Instrumental]')">[Instrumental]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Guitar Solo]')">[Guitar Solo]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Final Chorus]')">[Final Chorus]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Big Finish]')">[Big Finish]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Outro]')">[Outro]</button>
+              <button class="suno-tag-btn" onclick="insertLyricsTag('[Fade Out]')">[Fade Out]</button>
+            </div>
+          </div>
+          <div class="suno-tag-section">
+            <div class="suno-tag-section-label">Stimm-Tags</div>
+            <div class="suno-tag-row">
+              <button class="suno-tag-btn tag-voice" onclick="insertLyricsTag('[Male Vocal]')">[Male Vocal]</button>
+              <button class="suno-tag-btn tag-voice" onclick="insertLyricsTag('[Female Vocal]')">[Female Vocal]</button>
+              <button class="suno-tag-btn tag-voice" onclick="insertLyricsTag('[Whispered]')">[Whispered]</button>
+              <button class="suno-tag-btn tag-voice" onclick="insertLyricsTag('[Belted]')">[Belted]</button>
+              <button class="suno-tag-btn tag-voice" onclick="insertLyricsTag('[Harmonized Chorus]')">[Harmonized Chorus]</button>
+              <button class="suno-tag-btn tag-voice" onclick="insertLyricsTag('[Choir Vocals]')">[Choir Vocals]</button>
+              <button class="suno-tag-btn tag-voice" onclick="insertLyricsTag('[Backup Vocals]')">[Backup Vocals]</button>
+              <button class="suno-tag-btn tag-voice" onclick="insertLyricsTag('[Echoing Vocals]')">[Echoing Vocals]</button>
+              <button class="suno-tag-btn tag-voice" onclick="insertLyricsTag('[Reverb]')">[Reverb]</button>
+              <button class="suno-tag-btn tag-voice" onclick="insertLyricsTag('[Robotic Vocals]')">[Robotic Vocals]</button>
+              <button class="suno-tag-btn tag-voice" onclick="insertLyricsTag('[Call-and-Response Vocals]')">[Call-and-Response Vocals]</button>
+            </div>
+          </div>
+          <div class="suno-tag-section">
+            <div class="suno-tag-section-label">Energie & Mood</div>
+            <div class="suno-tag-row">
+              <button class="suno-tag-btn tag-energy" onclick="insertLyricsTag('[Energy: High]')">[Energy: High]</button>
+              <button class="suno-tag-btn tag-energy" onclick="insertLyricsTag('[Energy: Medium]')">[Energy: Medium]</button>
+              <button class="suno-tag-btn tag-energy" onclick="insertLyricsTag('[Energy: Low]')">[Energy: Low]</button>
+              <button class="suno-tag-btn tag-energy" onclick="insertLyricsTag('[Mood: Focused]')">[Mood: Focused]</button>
+              <button class="suno-tag-btn tag-energy" onclick="insertLyricsTag('[Mood: Calm]')">[Mood: Calm]</button>
+              <button class="suno-tag-btn tag-energy" onclick="insertLyricsTag('[Mood: Uplifting]')">[Mood: Uplifting]</button>
+              <button class="suno-tag-btn tag-energy" onclick="insertLyricsTag('[Mood: Dark]')">[Mood: Dark]</button>
+              <button class="suno-tag-btn tag-energy" onclick="insertLyricsTag('[Mood: Intense]')">[Mood: Intense]</button>
+            </div>
+          </div>
+        </div>
+
+        <textarea id="p2_lyrics" rows="30" placeholder="Deine Lyrics erscheinen hier. Du kannst sie direkt bearbeiten..." oninput="autoSave();updateNavLocks();updateLyricsCounter()" style="font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8;"></textarea>
+        <div class="suno-char-counter" id="p2_char_counter">0 / 3000 Zeichen</div>
         <div class="btn-row">
           <button class="btn-secondary" onclick="copyText('p2_lyrics')">📋 Lyrics kopieren</button>
+          <button class="btn-secondary" onclick="insertSunoStructure()" title="Komplette Song-Struktur als Suno-Tags einfügen">🏗️ Struktur einfügen</button>
         </div>
       </div>
 
@@ -2040,6 +2133,45 @@
           <button class="bs-genre-btn" style="color:#94a3b8;border-color:#94a3b844;background:#94a3b811;" onclick="setBsGenre(this,'Cloud Rap')">Cloud</button>
           <button class="bs-genre-btn" style="color:#06b6d4;border-color:#06b6d444;background:#06b6d411;" onclick="setBsGenre(this,'Afro Rap')">Afro</button>
         </div>
+      </div>
+
+      <!-- SONG STRUKTUR PLANER -->
+      <div class="card" style="margin-bottom:12px;border-color:rgba(124,58,237,0.2);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div class="card-title" style="margin-bottom:0;">🏗️ Song-Struktur Planer</div>
+          <span style="font-size:11px;color:var(--text-muted);">Klicke Sektionen an · Ziehe in Lyrics-Reihenfolge</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">Sektionen hinzufügen (Klick = hinzufügen/entfernen aus Plan):</div>
+        <div class="suno-tag-row" id="sskpAddRow">
+          <button class="sskp-add-btn" onclick="sskpToggle('[Intro]',this)">[Intro]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Verse 1]',this)">[Verse 1]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Verse 2]',this)">[Verse 2]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Pre-Chorus]',this)">[Pre-Chorus]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Chorus]',this)">[Chorus]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Hook]',this)">[Hook]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Bridge]',this)">[Bridge]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Breakdown]',this)">[Breakdown]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Build-Up]',this)">[Build-Up]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Drop]',this)">[Drop]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Instrumental]',this)">[Instrumental]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Guitar Solo]',this)">[Guitar Solo]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Final Chorus]',this)">[Final Chorus]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Big Finish]',this)">[Big Finish]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Outro]',this)">[Outro]</button>
+          <button class="sskp-add-btn" onclick="sskpToggle('[Fade Out]',this)">[Fade Out]</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin:10px 0 4px;">Dein Song-Plan (Klick auf Chip = entfernen):</div>
+        <div class="sskp-section-list" id="sskpPlan">
+          <span style="font-size:12px;color:rgba(148,163,184,0.3);padding:4px;">Noch keine Sektionen gewählt...</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+          <button class="btn-secondary" onclick="sskpApplyToLyrics()" style="font-size:12px;">📝 Struktur in Lyrics einfügen</button>
+          <button class="btn-secondary" onclick="sskpReset()" style="font-size:12px;">↺ Zurücksetzen</button>
+          <button class="btn-secondary" onclick="sskpPreset('standard')" style="font-size:12px;">⚡ Standard Rap</button>
+          <button class="btn-secondary" onclick="sskpPreset('extended')" style="font-size:12px;">⚡ Extended</button>
+          <button class="btn-secondary" onclick="sskpPreset('duet')" style="font-size:12px;">⚡ Duett</button>
+        </div>
+        <div style="font-size:11px;color:rgba(148,163,184,0.4);margin-top:8px;">Tipp: Tags werden als neue Zeilen mit Leerzeile in die Lyrics eingefügt (Phase 2).</div>
       </div>
 
       <!-- SUNO PERSONA PICKER -->
@@ -2184,9 +2316,10 @@
           <div class="form-group">
             <label>Version</label>
             <select id="suno_version" onchange="autoSave();updateSunoCockpit();" style="font-size:13px;">
-              <option value="v5pro">V5 Pro – Authentischer Gesang</option>
+              <option value="v5">V5 – Studio-Qualität · Authentische Vocals · 44.1kHz</option>
+              <option value="v5pro">V5 Pro – Höchste Fidelity · Beste Instrument-Trennung</option>
               <option value="v45plus">Version 4.5+ Pro – Erweiterte Erstellung</option>
-              <option value="v45" selected>Version 4.5 Pro – Intelligente Prompts</option>
+              <option value="v45" selected>Version 4.5 Pro – Intelligente Prompts · 8 Min · 1200+ Genres</option>
               <option value="v45all">v4.5-all – Bestes kostenloses Modell</option>
               <option value="v4pro">V4 Pro – Verbesserte Klangqualität</option>
               <option value="v35">Version 3.5</option>
@@ -2264,47 +2397,67 @@
           <div class="suno-live-box" id="suno_live_stile">–</div>
         </div>
 
-        <!-- Post-Generation Reference -->
-        <details style="margin-top:12px;">
-          <summary style="cursor:pointer;font-size:13px;color:var(--text-muted);padding:8px 0;user-select:none;">
-            📋 Nach dem Generieren – verfügbare Optionen
+        <!-- Post-Generation Workflow Guide -->
+        <details style="margin-top:12px;" id="postGenDetails">
+          <summary style="cursor:pointer;font-size:13px;color:#10b981;font-weight:600;padding:8px 0;user-select:none;">
+            🚀 Nach dem Generieren – Suno Workflow
           </summary>
-          <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <div class="suno-ref-group">
-              <div class="suno-ref-title">🎛️ Remix / Edit</div>
-              <div class="suno-ref-item">Im Studio öffnen <span class="suno-badge">Neu</span></div>
-              <div class="suno-ref-item">Im Editor öffnen <span class="suno-badge pro">Pro</span></div>
-              <div class="suno-ref-item">Abdeckung</div>
-              <div class="suno-ref-item">Verlängern</div>
-              <div class="suno-ref-item">Vermanschen</div>
-              <div class="suno-ref-item">Hörprobe <span class="suno-badge">Beta</span></div>
-              <div class="suno-ref-item">Als Inspiration nutzen <span class="suno-badge pro">Pro</span></div>
-              <div class="suno-ref-item">Geschwindigkeit anpassen</div>
-              <div class="suno-ref-item">Stile und Texte verwenden</div>
-              <div class="suno-ref-item">Ernte <span class="suno-badge pro">Pro</span></div>
-              <div class="suno-ref-item">Abschnitt ersetzen <span class="suno-badge pro">Pro</span></div>
+          <div style="margin-top:12px;">
+            <!-- Two version results note -->
+            <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--text-muted);">
+              💡 Suno generiert immer <strong style="color:var(--text);">2 Versionen</strong> gleichzeitig. Höre beide an und wähle die beste aus.
+              Generation dauert ~30–60 Sekunden.
             </div>
-            <div>
-              <div class="suno-ref-group">
-                <div class="suno-ref-title">✨ Erstellen</div>
+            <!-- Workflow steps -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
+                <div class="suno-ref-title" style="color:#60a5fa;">➕ Extend</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Song verlängern – Genre wechseln, neue Sektion anhängen.</div>
+                <div class="suno-ref-item">Klicke "Extend" bei einem bestimmten Timestamp</div>
+                <div class="suno-ref-item">Gib neuen Prompt ein (z.B. "switch to trap, heavy bass")</div>
+                <div class="suno-ref-item">Ideal für Genre-Wechsel mitten im Song</div>
+              </div>
+              <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
+                <div class="suno-ref-title" style="color:#ec4899;">🔁 Remix / Cover</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Remix = Cover + Extend + Reuse + Speed ändern.</div>
+                <div class="suno-ref-item">Cover – andere Stimme / Stil</div>
+                <div class="suno-ref-item">Reuse – Style &amp; Lyrics übernehmen</div>
+                <div class="suno-ref-item">Speed – Geschwindigkeit anpassen</div>
+              </div>
+              <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
+                <div class="suno-ref-title" style="color:#f59e0b;">✨ Remaster</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Subtile Audio-Verbesserung ohne neue Generation.</div>
+                <div class="suno-ref-item">Schärft Audio: Bass tighter, Höhen klarer</div>
+                <div class="suno-ref-item">Funktioniert auch auf frischen Songs</div>
+                <div class="suno-ref-item">Kostenloser Qualitäts-Boost <span class="suno-badge pro">Pro</span></div>
+              </div>
+              <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
+                <div class="suno-ref-title" style="color:#10b981;">🎚️ Stems holen</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Einzelne Spuren isolieren für Pro-Mixing.</div>
+                <div class="suno-ref-item">Bis zu 8 Stems (ab Juni 2025) <span class="suno-badge pro">Pro</span></div>
+                <div class="suno-ref-item">Vocals, Drums, Bass, Instrumente separat</div>
+                <div class="suno-ref-item">Export als WAV → Ableton / Logic</div>
+              </div>
+            </div>
+            <!-- Create options -->
+            <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div>
+                <div class="suno-ref-title" style="margin-top:0;">✨ Weitere Erstellungs-Optionen</div>
                 <div class="suno-ref-item">Persona erstellen <span class="suno-badge pro">Pro</span></div>
-                <div class="suno-ref-item">Remaster <span class="suno-badge pro">Pro</span></div>
-                <div class="suno-ref-item">Song Radio</div>
-                <div class="suno-ref-item">Stängel holen <span class="suno-badge pro">Pro</span></div>
+                <div class="suno-ref-item">Song Radio – Ähnliche Songs</div>
+                <div class="suno-ref-item">Im Studio öffnen <span class="suno-badge">Neu</span></div>
+                <div class="suno-ref-item">Im Editor öffnen <span class="suno-badge pro">Pro</span></div>
+                <div class="suno-ref-item">Abschnitt ersetzen <span class="suno-badge pro">Pro</span></div>
               </div>
-              <div class="suno-ref-group" style="margin-top:8px;">
-                <div class="suno-ref-title">⚙️ Verwalten</div>
-                <div class="suno-ref-item">Zur Warteschlange</div>
-                <div class="suno-ref-item">Zur Playlist</div>
-                <div class="suno-ref-item">Zum Arbeitsbereich</div>
-                <div class="suno-ref-item">Veröffentlichen</div>
+              <div>
+                <div class="suno-ref-title" style="margin-top:0;">⬇️ Download-Optionen</div>
+                <div class="suno-ref-item">MP3-Audio – immer verfügbar</div>
+                <div class="suno-ref-item">WAV-Audio (44.1 kHz) <span class="suno-badge pro">Pro</span></div>
+                <div class="suno-ref-item">Video (mit Visualizer) <span class="suno-badge pro">Pro</span></div>
+                <div class="suno-ref-title" style="margin-top:8px;">⚙️ Verwalten</div>
+                <div class="suno-ref-item">Zur Playlist / Workspace</div>
+                <div class="suno-ref-item">Veröffentlichen / Teilen</div>
                 <div class="suno-ref-item">Cover generieren</div>
-              </div>
-              <div class="suno-ref-group" style="margin-top:8px;">
-                <div class="suno-ref-title">⬇️ Download</div>
-                <div class="suno-ref-item">MP3-Audio</div>
-                <div class="suno-ref-item">WAV-Audio <span class="suno-badge pro">Pro</span></div>
-                <div class="suno-ref-item">Video <span class="suno-badge pro">Pro</span></div>
               </div>
             </div>
           </div>
@@ -3828,6 +3981,7 @@ async function generatePhase2() {
     const result = await callClaude(prompt);
     document.getElementById('p2_lyrics').value = result;
     autoSave();
+    updateLyricsCounter();
     showToast('Lyrics generiert!', 'success');
   } catch(e) {
     showToast('Fehler: ' + e.message, 'error');
@@ -3854,6 +4008,7 @@ async function addVerse() {
     const lyrics = document.getElementById('p2_lyrics');
     lyrics.value = existingLyrics + '\n\n' + result;
     autoSave();
+    updateLyricsCounter();
     showToast('Strophe hinzugefügt!', 'success');
   } catch(e) {
     showToast('Fehler: ' + e.message, 'error');
@@ -4843,6 +4998,7 @@ function loadSongData(id) {
   // Phase 2
   setVal('p2_konzept', s.p2_konzept);
   setVal('p2_lyrics', s.p2_lyrics);
+  updateLyricsCounter();
 
   // Phase 3 – custom selects
   const bpm = s.p3_bpm || 140;
@@ -6073,6 +6229,148 @@ function debouncedCloudSync() {
       pushSongToCloud(songs[currentSongId]);
     }
   }, 2000);
+}
+
+// =============================
+// SUNO LYRICS TAG TOOLBAR
+// =============================
+function insertLyricsTag(tag) {
+  const ta = document.getElementById('p2_lyrics');
+  if (!ta) return;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const before = ta.value.substring(0, start);
+  const after = ta.value.substring(end);
+  // Insert tag on its own line
+  const needsNewlineBefore = before.length > 0 && !before.endsWith('\n');
+  const needsNewlineAfter = after.length > 0 && !after.startsWith('\n');
+  const insert = (needsNewlineBefore ? '\n' : '') + tag + (needsNewlineAfter ? '\n' : '');
+  ta.value = before + insert + after;
+  const newPos = start + insert.length;
+  ta.setSelectionRange(newPos, newPos);
+  ta.focus();
+  autoSave();
+  updateNavLocks();
+  updateLyricsCounter();
+}
+
+function updateLyricsCounter() {
+  const ta = document.getElementById('p2_lyrics');
+  const counter = document.getElementById('p2_char_counter');
+  if (!ta || !counter) return;
+  const len = ta.value.length;
+  counter.textContent = len + ' / 3000 Zeichen';
+  counter.className = 'suno-char-counter' + (len > 3000 ? ' over' : len > 2500 ? ' warn' : '');
+}
+
+function insertSunoStructure() {
+  const ta = document.getElementById('p2_lyrics');
+  if (!ta) return;
+  const existing = ta.value.trim();
+  const template = '[Intro]\n\n[Verse 1]\n\n[Pre-Chorus]\n\n[Chorus]\n\n[Verse 2]\n\n[Pre-Chorus]\n\n[Chorus]\n\n[Bridge]\n\n[Final Chorus]\n\n[Outro]';
+  if (existing && !confirm('Bestehende Lyrics behalten und Struktur anhängen? OK = anhängen, Abbrechen = ersetzen')) {
+    ta.value = template;
+  } else if (existing) {
+    ta.value = existing + '\n\n' + template;
+  } else {
+    ta.value = template;
+  }
+  autoSave();
+  updateNavLocks();
+  updateLyricsCounter();
+  showToast('Song-Struktur eingefügt!', 'success');
+}
+
+// =============================
+// SONG STRUKTUR PLANER (Phase 3)
+// =============================
+let sskpSections = [];
+
+function sskpToggle(tag, btn) {
+  const idx = sskpSections.indexOf(tag);
+  if (idx === -1) {
+    sskpSections.push(tag);
+    btn.classList.add('active');
+  } else {
+    sskpSections.splice(idx, 1);
+    btn.classList.remove('active');
+  }
+  sskpRender();
+}
+
+function sskpRender() {
+  const plan = document.getElementById('sskpPlan');
+  if (!plan) return;
+  if (sskpSections.length === 0) {
+    plan.innerHTML = '<span style="font-size:12px;color:rgba(148,163,184,0.3);padding:4px;">Noch keine Sektionen gewählt...</span>';
+    return;
+  }
+  plan.innerHTML = sskpSections.map((tag, i) =>
+    `<div class="sskp-section-chip" onclick="sskpRemove(${i})">${tag}</div>`
+  ).join('');
+}
+
+function sskpRemove(idx) {
+  const tag = sskpSections[idx];
+  sskpSections.splice(idx, 1);
+  // Deactivate the add button
+  const addRow = document.getElementById('sskpAddRow');
+  if (addRow) {
+    addRow.querySelectorAll('.sskp-add-btn').forEach(b => {
+      if (b.textContent.trim() === tag) b.classList.remove('active');
+    });
+  }
+  sskpRender();
+}
+
+function sskpReset() {
+  sskpSections = [];
+  const addRow = document.getElementById('sskpAddRow');
+  if (addRow) addRow.querySelectorAll('.sskp-add-btn').forEach(b => b.classList.remove('active'));
+  sskpRender();
+}
+
+function sskpPreset(type) {
+  sskpReset();
+  let sections = [];
+  if (type === 'standard') {
+    sections = ['[Intro]','[Verse 1]','[Pre-Chorus]','[Chorus]','[Verse 2]','[Pre-Chorus]','[Chorus]','[Bridge]','[Final Chorus]','[Outro]'];
+  } else if (type === 'extended') {
+    sections = ['[Intro]','[Verse 1]','[Pre-Chorus]','[Chorus]','[Verse 2]','[Pre-Chorus]','[Chorus]','[Bridge]','[Breakdown]','[Build-Up]','[Final Chorus]','[Big Finish]','[Outro]'];
+  } else if (type === 'duet') {
+    sections = ['[Intro]','[Verse 1]','[Chorus]','[Verse 2]','[Chorus]','[Bridge]','[Final Chorus]','[Outro]'];
+  }
+  sskpSections = sections;
+  // Mark active buttons
+  const addRow = document.getElementById('sskpAddRow');
+  if (addRow) {
+    addRow.querySelectorAll('.sskp-add-btn').forEach(b => {
+      b.classList.toggle('active', sections.includes(b.textContent.trim()));
+    });
+  }
+  sskpRender();
+  showToast('Preset geladen!', 'success');
+}
+
+function sskpApplyToLyrics() {
+  if (sskpSections.length === 0) { showToast('Keine Sektionen im Plan!', 'error'); return; }
+  const ta = document.getElementById('p2_lyrics');
+  if (!ta) { showToast('Lyrics-Editor nicht gefunden (Phase 2)', 'error'); return; }
+  const existing = ta.value.trim();
+  const structure = sskpSections.join('\n\n');
+  if (existing) {
+    if (!confirm('Bestehende Lyrics behalten? OK = Struktur anhängen, Abbrechen = ersetzen')) {
+      ta.value = structure;
+    } else {
+      ta.value = existing + '\n\n' + structure;
+    }
+  } else {
+    ta.value = structure;
+  }
+  autoSave();
+  updateNavLocks();
+  updateLyricsCounter();
+  showToast('Struktur in Lyrics eingefügt! (Phase 2)', 'success');
 }
 
 // =============================
