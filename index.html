@@ -1642,7 +1642,7 @@
     </div>
 
     <button class="intro-enter-btn" onclick="enterStudio()">▶ &nbsp;Studio betreten</button>
-    <div class="intro-hint">Klicke zum Betreten</div>
+    <div class="intro-hint">🔊 Klick · Sound · Enter</div>
   </div>
 
   <!-- VU Right -->
@@ -7115,41 +7115,40 @@ function initLetterGlow() {
   });
 }
 
-// ===== INTRO BEAT (looping ambient sound) =====
-let _introCtx = null;
-let _introDrone = null;
-let _introMaster = null;
-let _introComp = null;
-let _introNextBar = 0;
-let _introLoopId = null;
+// ===== INTRO BEAT – Cinematic Gangster Rap (Dark Movie Intro Style) =====
+let _introCtx        = null;
+let _introMaster     = null;
+let _introComp       = null;
+let _introNextBar    = 0;
+let _introLoopId     = null;
 let _introBeatStarted = false;
-let _lettersSpoken = false;
+let _lettersSpoken   = false;
 
-// Deep voice for D-A-N letters synchronized with drop animation
+// ── Voice: Deep gangster rapper – slow, low, menacing ──
 function speakIntroLetters() {
   if (_lettersSpoken || !window.speechSynthesis) return;
   _lettersSpoken = true;
-  // Letter timing matches animation-delay: D=0.7s, A=1.25s, N=1.8s
-  const LETTERS = [
-    { text: 'D', delay: 700 },
-    { text: 'A', delay: 1250 },
-    { text: 'N', delay: 1800 }
-  ];
   const doSpeak = () => {
     const voices = speechSynthesis.getVoices();
-    // Pick deepest available male voice (prefer German, fall back to any deep male)
+    // Deepest available male voice
     const deepVoice =
       voices.find(v => /male/i.test(v.name) && v.lang.startsWith('de')) ||
-      voices.find(v => /(google deutsch|microsoft stefan|microsoft markus)/i.test(v.name)) ||
+      voices.find(v => /(microsoft stefan|microsoft markus|google deutsch)/i.test(v.name)) ||
       voices.find(v => /male/i.test(v.name)) ||
       voices.find(v => /(georg|david|fred|james|daniel|alex)/i.test(v.name)) ||
       null;
-    LETTERS.forEach(({ text, delay }) => {
+    // Speak each letter like a gangster calling out his name – slow and heavy
+    // "dee... ay... en..." with long dramatic pauses between
+    [
+      { text: 'dee', delay: 1000 },
+      { text: 'ay',  delay: 2800 },
+      { text: 'en',  delay: 4600 },
+    ].forEach(({ text, delay }) => {
       setTimeout(() => {
         try {
           const u = new SpeechSynthesisUtterance(text);
-          u.pitch  = 0;    // deepest possible
-          u.rate   = 0.55; // slow, heavy
+          u.pitch  = 0;     // floor-level bass – as deep as the browser goes
+          u.rate   = 0.28;  // extremely slow – deliberate gangster delivery
           u.volume = 1.0;
           if (deepVoice) u.voice = deepVoice;
           speechSynthesis.speak(u);
@@ -7161,10 +7160,11 @@ function speakIntroLetters() {
     doSpeak();
   } else {
     speechSynthesis.addEventListener('voiceschanged', doSpeak, { once: true });
-    setTimeout(doSpeak, 400); // fallback
+    setTimeout(doSpeak, 500);
   }
 }
 
+// ── Cinematic Gangster Beat Engine ──
 function tryStartIntroBeat() {
   if (_introBeatStarted) return;
   _introBeatStarted = true;
@@ -7176,127 +7176,221 @@ function tryStartIntroBeat() {
     _introMaster = _introCtx.createGain();
     _introMaster.gain.value = 0;
 
-    // Hard compressor for punch/loudness
+    // Compressor for punch without clipping
     _introComp = _introCtx.createDynamicsCompressor();
-    _introComp.threshold.value = -14;
+    _introComp.threshold.value = -12;
     _introComp.knee.value      = 3;
-    _introComp.ratio.value     = 12;
-    _introComp.attack.value    = 0.0005;
-    _introComp.release.value   = 0.07;
+    _introComp.ratio.value     = 10;
+    _introComp.attack.value    = 0.001;
+    _introComp.release.value   = 0.08;
     _introMaster.connect(_introComp);
     _introComp.connect(_introCtx.destination);
 
-    // Fade in fast
-    _introMaster.gain.linearRampToValueAtTime(0.85, _introCtx.currentTime + 0.8);
+    // Cinematic slow fade-in (1.5s of tension before full volume)
+    _introMaster.gain.linearRampToValueAtTime(0.80, _introCtx.currentTime + 1.5);
 
-    // ── DRONE: detuned dual-osc for thick, dark sub ──
-    const droneOut = _introCtx.createGain(); droneOut.gain.value = 0.055;
-    droneOut.connect(_introMaster);
-    const lp = _introCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=200; lp.Q.value=4;
-    lp.connect(droneOut);
-    [55, 54.8].forEach(freq => {
+    // ── Dark A-minor string pad (orchestral cinema layer) ──
+    const padGain = _introCtx.createGain(); padGain.gain.value = 0;
+    const padLP   = _introCtx.createBiquadFilter();
+    padLP.type = 'lowpass'; padLP.frequency.value = 1100; padLP.Q.value = 0.8;
+    padLP.connect(padGain); padGain.connect(_introMaster);
+    // A minor chord: A2(110), E3(164.8), A3(220), C4(261.6) – all detuned for haunting feel
+    [
+      [110.0,  0], [110.0, +4], [110.0, -3],
+      [164.8, +2], [164.8, -2],
+      [220.0,  0], [220.0, +3],
+      [261.6, -2],
+    ].forEach(([freq, cents]) => {
       const o = _introCtx.createOscillator();
-      o.type = 'sawtooth'; o.frequency.value = freq;
-      o.connect(lp); o.start();
-      if (!_introDrone) _introDrone = o; // keep ref for stop
+      o.type = 'sawtooth';
+      o.frequency.value = freq * Math.pow(2, cents / 1200);
+      o.connect(padLP);
+      o.start();
     });
-    // Slow LFO tremolo
-    const lfo = _introCtx.createOscillator(); lfo.frequency.value = 0.25;
-    const lfoG = _introCtx.createGain(); lfoG.gain.value = 0.025;
-    lfo.connect(lfoG); lfoG.connect(droneOut.gain); lfo.start();
+    // Pad swells in slowly – 2.8s attack = true cinematic string swell
+    padGain.gain.setValueAtTime(0, _introCtx.currentTime);
+    padGain.gain.linearRampToValueAtTime(0.042, _introCtx.currentTime + 2.8);
 
-    // Schedule beat loop
-    _introNextBar = _introCtx.currentTime + 0.15;
-    scheduleIntroBar();
+    // ── Sub drone A1 (55 Hz) – the foundation beneath everything ──
+    const subOsc = _introCtx.createOscillator();
+    const subLP  = _introCtx.createBiquadFilter();
+    const subG   = _introCtx.createGain();
+    subLP.type = 'lowpass'; subLP.frequency.value = 75;
+    subOsc.type = 'sine'; subOsc.frequency.value = 55; // A1
+    subG.gain.value = 0.06;
+    subOsc.connect(subLP); subLP.connect(subG); subG.connect(_introMaster);
+    subOsc.start();
+
+    // Schedule the beat
+    _introNextBar = _introCtx.currentTime + 0.2;
+    scheduleIntroBar(0);
   } catch(e) { /* silent */ }
 }
 
-function scheduleIntroBar() {
+function scheduleIntroBar(barIdx) {
   if (!_introCtx || !_introMaster) return;
-  const BPS = 95 / 60; // 95 BPM
-  const T   = _introNextBar;
-  const out = _introMaster;
+  const BPM  = 68;          // Slow and heavy – real gangster tempo
+  const BEAT = 60 / BPM;   // 0.882 seconds per beat
+  const T    = _introNextBar;
+  const out  = _introMaster;
 
-  // ── Fat 808 Kick with distortion + click transient ──
-  const kick808 = (t, vol=0.9, decay=0.7) => {
-    // Distortion shaper
+  // ── Deep 808 Kick: 90 Hz → 20 Hz, long 1.4s decay ──
+  // Lower and longer than anything you've heard – pure cinema
+  const kick808 = (t, vol = 1.0, decay = 1.4) => {
     const dist = _introCtx.createWaveShaper();
-    const cv = new Float32Array(512);
-    for (let i=0;i<512;i++){const x=(i*2/512)-1; cv[i]=x<0?-Math.pow(-x,0.45):Math.pow(x,0.45);}
+    const cv = new Float32Array(256);
+    for (let i = 0; i < 256; i++) {
+      const x = (i * 2 / 256) - 1;
+      cv[i] = x < 0 ? -Math.pow(-x, 0.48) : Math.pow(x, 0.48);
+    }
     dist.curve = cv;
-    // Sub oscillator
+    // The big sub drop
     const o = _introCtx.createOscillator(), g = _introCtx.createGain();
     o.type = 'sine';
-    o.frequency.setValueAtTime(160, t);
-    o.frequency.exponentialRampToValueAtTime(24, t + decay);
+    o.frequency.setValueAtTime(90, t);
+    o.frequency.exponentialRampToValueAtTime(20, t + decay); // all the way to 20 Hz
     g.gain.setValueAtTime(vol, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + decay + 0.06);
+    g.gain.exponentialRampToValueAtTime(0.001, t + decay + 0.12);
     o.connect(dist); dist.connect(g); g.connect(out);
-    o.start(t); o.stop(t + decay + 0.1);
-    // Hard click for attack punch
+    o.start(t); o.stop(t + decay + 0.18);
+    // Click transient – the punch on attack
     const oc = _introCtx.createOscillator(), gc = _introCtx.createGain();
-    oc.type='square'; oc.frequency.value=900;
-    gc.gain.setValueAtTime(0.22, t);
-    gc.gain.exponentialRampToValueAtTime(0.001, t+0.018);
+    oc.type = 'square'; oc.frequency.value = 650;
+    gc.gain.setValueAtTime(0.30, t);
+    gc.gain.exponentialRampToValueAtTime(0.001, t + 0.011);
     oc.connect(gc); gc.connect(out);
-    oc.start(t); oc.stop(t+0.022);
+    oc.start(t); oc.stop(t + 0.015);
   };
 
-  // ── Snappy Snare: noise + tone ──
-  const snare = (t) => {
-    // Noise body
-    const len = Math.ceil(_introCtx.sampleRate * 0.2);
-    const buf = _introCtx.createBuffer(1, len, _introCtx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,1.6);
-    const src = _introCtx.createBufferSource(); src.buffer=buf;
-    const bp = _introCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=3000; bp.Q.value=0.6;
-    const g = _introCtx.createGain(); g.gain.value=0.52;
+  // ── Cinematic Snare with gunshot reverb echo ──
+  // Sounds like a gunshot echoing in a massive hall – true gangster film sound
+  const snare = (t, vol = 1.0) => {
+    const reverbTime = 1.6; // 1.6 second echo tail
+    const totalDur   = 0.07 + reverbTime;
+    const sr         = _introCtx.sampleRate;
+    const totalLen   = Math.ceil(sr * totalDur);
+    const buf        = _introCtx.createBuffer(1, totalLen, sr);
+    const d          = buf.getChannelData(0);
+    const burstLen   = Math.ceil(sr * 0.07);
+    // Initial crack
+    for (let i = 0; i < burstLen; i++) {
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / burstLen, 0.35);
+    }
+    // Reverb tail – exponential decay of noise = realistic room reverb
+    for (let i = burstLen; i < totalLen; i++) {
+      const pos = (i - burstLen) / sr;
+      d[i] = (Math.random() * 2 - 1) * Math.exp(-pos * 3.2) * 0.45;
+    }
+    const src = _introCtx.createBufferSource(); src.buffer = buf;
+    const bp  = _introCtx.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = 2600; bp.Q.value = 0.5;
+    const g = _introCtx.createGain(); g.gain.value = vol * 0.62;
     src.connect(bp); bp.connect(g); g.connect(out);
-    src.start(t); src.stop(t+0.22);
-    // Tone snap
+    src.start(t); src.stop(t + totalDur + 0.05);
+    // Layered crack transient
     const ot = _introCtx.createOscillator(), gt = _introCtx.createGain();
-    ot.type='triangle'; ot.frequency.setValueAtTime(260,t); ot.frequency.exponentialRampToValueAtTime(160,t+0.06);
-    gt.gain.setValueAtTime(0.18,t); gt.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+    ot.type = 'triangle';
+    ot.frequency.setValueAtTime(290, t);
+    ot.frequency.exponentialRampToValueAtTime(130, t + 0.055);
+    gt.gain.setValueAtTime(vol * 0.38, t);
+    gt.gain.exponentialRampToValueAtTime(0.001, t + 0.065);
     ot.connect(gt); gt.connect(out);
-    ot.start(t); ot.stop(t+0.08);
+    ot.start(t); ot.stop(t + 0.075);
   };
 
-  // ── Hi-Hats ──
-  const hat = (t, vol=0.07, open=false) => {
-    const dur = open ? 0.18 : 0.038;
+  // ── Sparse hi-hat (placed deliberately – not busy, not everywhere) ──
+  const hat = (t, vol = 0.055, open = false) => {
+    const dur = open ? 0.20 : 0.028;
     const len = Math.ceil(_introCtx.sampleRate * dur);
     const buf = _introCtx.createBuffer(1, len, _introCtx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i=0;i<len;i++) d[i]=(Math.random()*2-1)*(1-i/len);
-    const src=_introCtx.createBufferSource(); src.buffer=buf;
-    const hp=_introCtx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=11000;
-    const g=_introCtx.createGain(); g.gain.value=vol;
+    const d   = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const src = _introCtx.createBufferSource(); src.buffer = buf;
+    const hp  = _introCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 9000;
+    const g   = _introCtx.createGain(); g.gain.value = vol;
     src.connect(hp); hp.connect(g); g.connect(out);
-    src.start(t); src.stop(t+dur+0.01);
+    src.start(t); src.stop(t + dur + 0.01);
   };
 
-  // ── Pattern (kick 1+3, snare 2+4, 16th hats) ──
-  kick808(T,          0.92, 0.72);
-  kick808(T+2/BPS,    0.75, 0.60);
-  snare(T + 1/BPS);
-  snare(T + 3/BPS);
-  // 16th-note hats with accent pattern
-  for (let i=0;i<16;i++) {
-    const v = i%4===0 ? 0.10 : i%2===0 ? 0.065 : 0.032;
-    hat(T + i*0.25/BPS, v, i===6||i===14);
+  // ── Dark piano stab (minor key – like Scarface, like Training Day) ──
+  const pianoStab = (t, freq, vol = 0.038) => {
+    const o  = _introCtx.createOscillator();
+    const g  = _introCtx.createGain();
+    const lp = _introCtx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 1800;
+    o.type = 'triangle'; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+    o.connect(lp); lp.connect(g); g.connect(out);
+    o.start(t); o.stop(t + 0.55);
+    // Harmonic overtone for depth
+    const o2 = _introCtx.createOscillator(), g2 = _introCtx.createGain();
+    o2.type = 'sine'; o2.frequency.value = freq * 2;
+    g2.gain.setValueAtTime(vol * 0.3, t);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+    o2.connect(g2); g2.connect(out);
+    o2.start(t); o2.stop(t + 0.3);
+  };
+
+  // ══════════════════════════════════════════════════════
+  // BEAT PATTERN – builds over 4 bars (cinematic tension)
+  // ══════════════════════════════════════════════════════
+  if (barIdx === 0) {
+    // Bar 1: Only the kick – pure suspense, nothing else
+    kick808(T,             1.0, 1.5);
+    kick808(T + 2 * BEAT,  0.6, 1.0);
+  } else if (barIdx === 1) {
+    // Bar 2: Kicks + snare enters – gangster just walked in the room
+    kick808(T,             1.0, 1.5);
+    snare(T + BEAT);
+    kick808(T + 2 * BEAT,  0.65, 1.0);
+    snare(T + 3 * BEAT);
+  } else {
+    // Bar 3+: Full cinematic gangster pattern
+    // Alternating A/B for groove and movement
+    if (barIdx % 2 === 0) {
+      // Variation A
+      kick808(T,               1.0, 1.5);
+      snare(T + BEAT);
+      kick808(T + BEAT * 1.5,  0.4, 0.8);   // ghost kick – subtle
+      kick808(T + BEAT * 2,    0.72, 1.1);
+      snare(T + BEAT * 3);
+      hat(T + BEAT * 1,        0.048);
+      hat(T + BEAT * 2,        0.042);
+      hat(T + BEAT * 3,        0.058, true); // open hat accent
+      pianoStab(T + BEAT * 0.5,  220.0, 0.035); // A3
+      pianoStab(T + BEAT * 2.5,  261.6, 0.028); // C4
+    } else {
+      // Variation B
+      kick808(T,               1.0, 1.5);
+      kick808(T + BEAT * 0.75, 0.28, 0.6);  // 16th-note flam before beat 2
+      snare(T + BEAT);
+      kick808(T + BEAT * 2,    0.78, 1.1);
+      kick808(T + BEAT * 2.75, 0.22, 0.5);  // ghost after beat 3
+      snare(T + BEAT * 3);
+      hat(T + BEAT * 0.5,      0.038);
+      hat(T + BEAT * 1.5,      0.035);
+      hat(T + BEAT * 2.5,      0.042);
+      hat(T + BEAT * 3.5,      0.062, true);
+      pianoStab(T + BEAT * 3.25, 164.8, 0.026); // E3
+      pianoStab(T + BEAT * 0.25, 110.0, 0.022); // A2 (deep)
+    }
   }
 
-  _introNextBar += 4/BPS;
+  _introNextBar += 4 * BEAT;
   const msUntilNext = (_introNextBar - _introCtx.currentTime - 0.15) * 1000;
-  _introLoopId = setTimeout(scheduleIntroBar, Math.max(0, msUntilNext));
+  _introLoopId = setTimeout(() => scheduleIntroBar(barIdx + 1), Math.max(0, msUntilNext));
 }
 
 function stopIntroBeat(onDone) {
   clearTimeout(_introLoopId);
   if (_introCtx && _introMaster) {
-    _introMaster.gain.linearRampToValueAtTime(0, _introCtx.currentTime + 0.4);
-    setTimeout(() => { _introCtx?.close(); _introCtx = null; _introDrone = null; _introMaster = null; if(onDone) onDone(); }, 450);
+    _introMaster.gain.linearRampToValueAtTime(0, _introCtx.currentTime + 0.35);
+    setTimeout(() => {
+      try { _introCtx.close(); } catch(e) {}
+      _introCtx = null; _introMaster = null;
+      if (onDone) onDone();
+    }, 420);
   } else {
     if (onDone) onDone();
   }
@@ -7484,33 +7578,28 @@ function playEntranceSound() {
   } catch(e) {}
 }
 
-// Startup: Sound + Voice sofort beim Laden – Fallback bei Browser-Autoplay-Sperre
+// Startup: Beat + Voice – sofort versuchen, Fallback auf erste echte Geste
 window.addEventListener('DOMContentLoaded', () => {
-  buildVUCol('introVULeft', VU_LEFT);
+  buildVUCol('introVULeft',  VU_LEFT);
   buildVUCol('introVURight', VU_RIGHT);
   initLetterGlow();
-  const screen = document.getElementById('intro-screen');
 
-  // Sofort versuchen (klappt auf Desktop oft direkt)
+  // Immediately try (works on some browsers / if user interacted before)
   tryStartIntroBeat();
-  speakIntroLetters(); // tiefe Stimme für D-A-N
+  speakIntroLetters();
 
-  if (screen) {
-    // Falls Browser Audio/Speech blockiert: bei erster Interaktion nachholen
-    const resumeOnce = () => {
-      if (_introCtx && _introCtx.state === 'suspended') {
-        _introCtx.resume().then(() => {
-          if (!_introBeatStarted) tryStartIntroBeat();
-        });
-      } else if (!_introBeatStarted) {
-        tryStartIntroBeat();
-      }
-      speakIntroLetters(); // Stimme nachholen falls nötig
-    };
-    screen.addEventListener('click',      resumeOnce, {once:true, passive:true});
-    screen.addEventListener('touchstart', resumeOnce, {once:true, passive:true});
-    screen.addEventListener('mousemove',  resumeOnce, {once:true, passive:true});
-  }
+  // Fallback: resume on FIRST valid user gesture anywhere on the page.
+  // pointerdown = covers mouse click AND touch – broadest compatibility.
+  // mousemove is NOT a valid AudioContext gesture in Chrome/Firefox, so removed.
+  const resumeOnce = () => {
+    if (_introCtx && _introCtx.state === 'suspended') {
+      _introCtx.resume();
+    }
+    if (!_introBeatStarted) tryStartIntroBeat();
+    if (!_lettersSpoken)    speakIntroLetters();
+  };
+  document.addEventListener('pointerdown', resumeOnce, { once: true, passive: true });
+  document.addEventListener('keydown',     resumeOnce, { once: true, passive: true });
 });
 
 // =============================
