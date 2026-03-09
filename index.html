@@ -2334,6 +2334,35 @@
     <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">
       💡 Du kannst deinen Key unter <a href="https://console.groq.com/keys" target="_blank" style="color:var(--blue);">console.groq.com/keys</a> finden.
     </div>
+
+    <!-- Model Selector -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:600;">🤖 KI-Modell wählen</div>
+      <div style="display:flex;flex-direction:column;gap:6px;" id="modelSelector">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card2);">
+          <input type="radio" name="groqModel" value="llama-3.3-70b-versatile" style="margin-top:2px;accent-color:var(--purple);">
+          <div>
+            <div style="font-size:13px;color:var(--text);font-weight:500;">Llama 3.3 70B <span style="font-size:10px;color:var(--warning);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:3px;padding:1px 5px;">Standard</span></div>
+            <div style="font-size:11px;color:var(--text-muted);">Beste Qualität · 100k Tokens/Tag Limit</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card2);">
+          <input type="radio" name="groqModel" value="llama-3.1-8b-instant" style="margin-top:2px;accent-color:var(--purple);">
+          <div>
+            <div style="font-size:13px;color:var(--text);font-weight:500;">Llama 3.1 8B Instant <span style="font-size:10px;color:var(--success);background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:3px;padding:1px 5px;">Empfohlen bei Limit</span></div>
+            <div style="font-size:11px;color:var(--text-muted);">Schneller · ~5× höheres Tageslimit · minimal weniger Qualität</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card2);">
+          <input type="radio" name="groqModel" value="gemma2-9b-it" style="margin-top:2px;accent-color:var(--purple);">
+          <div>
+            <div style="font-size:13px;color:var(--text);font-weight:500;">Gemma 2 9B</div>
+            <div style="font-size:11px;color:var(--text-muted);">Google-Modell · Alternative bei Rate Limits</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
     <div class="modal-btns">
       <button class="btn-primary" onclick="saveApiKey()">Speichern & Starten</button>
       <button class="btn-cancel" onclick="closeApiModal()">Abbrechen</button>
@@ -2353,8 +2382,11 @@
 
     <!-- STEP 1: Name -->
     <div id="newSongStep1">
-      <div class="modal-desc">Gib einen Namen für deinen neuen Song ein.</div>
-      <input type="text" class="modal-input" id="newSongName" placeholder="Song-Titel..." onkeydown="if(event.key==='Enter')newSongStep2()">
+      <div class="modal-desc">Gib den Song-Titel ein – <strong>D_a_N -</strong> wird automatisch vorangestellt.</div>
+      <div style="display:flex;align-items:center;gap:0;margin-bottom:12px;">
+        <span style="background:rgba(124,58,237,0.15);border:1px solid var(--border);border-right:none;border-radius:6px 0 0 6px;padding:10px 12px;font-size:13px;color:var(--purple-light);white-space:nowrap;font-weight:600;">D_a_N -</span>
+        <input type="text" class="modal-input" id="newSongName" placeholder="Songtitel..." onkeydown="if(event.key==='Enter')newSongStep2()" style="border-radius:0 6px 6px 0;margin:0;border-left:none;">
+      </div>
       <div class="modal-btns">
         <button class="btn-primary" onclick="newSongStep2()">Weiter →</button>
         <button class="btn-cancel" onclick="closeNewSongModal()">Abbrechen</button>
@@ -2826,11 +2858,20 @@ function initAllSelects() {
 // =============================
 // API
 // =============================
+function getGroqModel() {
+  return localStorage.getItem('dan_groq_model') || 'llama-3.3-70b-versatile';
+}
+
 function openApiModal() {
   document.getElementById('apiModal').classList.remove('hidden');
   const existing = sessionStorage.getItem('dan_api_key') || localStorage.getItem('dan_api_key');
   if (existing) document.getElementById('apiKeyInput').value = existing;
   document.getElementById('apiKeyPersist').checked = !!localStorage.getItem('dan_api_key');
+  // Restore saved model selection
+  const savedModel = getGroqModel();
+  const radioBtn = document.querySelector(`input[name="groqModel"][value="${savedModel}"]`);
+  if (radioBtn) radioBtn.checked = true;
+  else { const first = document.querySelector('input[name="groqModel"]'); if(first) first.checked = true; }
   document.getElementById('apiKeyInput').focus();
 }
 
@@ -2845,6 +2886,9 @@ function saveApiKey() {
     showToast('API Key Format ungültig (sollte mit gsk_ beginnen)', 'error');
     return;
   }
+  // Save selected model
+  const selectedModel = document.querySelector('input[name="groqModel"]:checked')?.value || 'llama-3.3-70b-versatile';
+  localStorage.setItem('dan_groq_model', selectedModel);
   const persist = document.getElementById('apiKeyPersist').checked;
   sessionStorage.setItem('dan_api_key', key);
   if (persist) {
@@ -2920,15 +2964,21 @@ async function callClaude(prompt, systemPrompt = null) {
       'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
+      model: getGroqModel(),
       messages,
-      max_tokens: 2000
+      max_tokens: 1100
     })
   });
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    throw new Error(err.error?.message || `API Fehler: ${response.status}`);
+    const msg = err.error?.message || `API Fehler: ${response.status}`;
+    // Parse rate limit retry time for a user-friendly hint
+    const retryMatch = msg.match(/try again in ([\d]+m[\d.]+s|[\d.]+s)/i);
+    if (retryMatch) {
+      throw new Error(`⏳ Rate Limit erreicht – bitte warte ${retryMatch[1]}.\n💡 Tipp: Wechsle im API-Menü zu "Llama 3.1 8B Instant" für ein ~5× höheres Tageslimit.`);
+    }
+    throw new Error(msg);
   }
 
   const data = await response.json();
@@ -3551,8 +3601,10 @@ function closeNewSongModal() {
 }
 
 function confirmNewSong() {
-  const name = document.getElementById('newSongName').value.trim();
-  if (!name) { showToast('Bitte Song-Namen eingeben!', 'error'); return; }
+  const raw = document.getElementById('newSongName').value.trim();
+  if (!raw) { showToast('Bitte Song-Titel eingeben!', 'error'); return; }
+  const PREFIX = 'D_a_N - ';
+  const name = raw.startsWith(PREFIX) ? raw : PREFIX + raw;
 
   // Collect materials from step 2
   const materials = [];
@@ -4915,9 +4967,15 @@ async function callClaudeChat(messages, systemPrompt) {
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: systemPrompt }, ...messages], max_tokens: 2500 })
+    body: JSON.stringify({ model: getGroqModel(), messages: [{ role: 'system', content: systemPrompt }, ...messages], max_tokens: 1200 })
   });
-  if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.error?.message||`API Fehler: ${res.status}`); }
+  if (!res.ok) {
+    const err = await res.json().catch(()=>({}));
+    const msg = err.error?.message || `API Fehler: ${res.status}`;
+    const retryMatch = msg.match(/try again in ([\d]+m[\d.]+s|[\d.]+s)/i);
+    if (retryMatch) throw new Error(`⏳ Rate Limit erreicht – bitte warte ${retryMatch[1]}.\n💡 Wechsle im API-Menü zu "Llama 3.1 8B Instant".`);
+    throw new Error(msg);
+  }
   return (await res.json()).choices[0].message.content;
 }
 
