@@ -922,70 +922,152 @@
   #intro-screen {
     position:fixed; top:0; left:0; width:100%; height:100%;
     background:#000; z-index:9999;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    overflow:hidden; cursor:default;
+    display:grid; grid-template-columns:160px 1fr 160px;
+    grid-template-rows:1fr; align-items:center;
+    overflow:hidden;
   }
-  #intro-screen.fade-out { animation:introFadeOut 0.9s ease-out forwards; }
-  @keyframes introFadeOut { to { opacity:0; pointer-events:none; } }
+  @media(max-width:600px){ #intro-screen { grid-template-columns:60px 1fr 60px; } }
+  #intro-screen.fade-out { animation:introFadeOut 1s cubic-bezier(0.4,0,1,1) forwards; }
+  @keyframes introFadeOut { to { opacity:0; transform:scale(1.03); pointer-events:none; } }
+
+  /* Grid background */
+  .intro-grid-bg {
+    position:absolute; inset:0; z-index:0;
+    background-image:
+      linear-gradient(rgba(124,58,237,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.05) 1px, transparent 1px);
+    background-size:70px 70px;
+  }
+  /* Vignette */
+  .intro-vignette {
+    position:absolute; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(ellipse at center, transparent 40%, #000 100%);
+  }
+  /* Scanlines */
   .intro-scanlines {
-    position:absolute; top:0; left:0; width:100%; height:100%;
-    background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.08) 3px,rgba(0,0,0,0.08) 4px);
-    pointer-events:none; z-index:1;
+    position:absolute; inset:0; z-index:2; pointer-events:none;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);
   }
+
+  /* REC */
   .intro-rec {
-    position:absolute; top:28px; right:32px;
-    display:flex; align-items:center; gap:8px;
-    font-size:11px; letter-spacing:3px; color:#ef4444; text-transform:uppercase;
-    z-index:2; animation:recBlink 1.2s ease-in-out infinite;
+    position:absolute; top:22px; right:24px; z-index:5;
+    display:flex; align-items:center; gap:7px;
+    font-size:10px; letter-spacing:3px; color:#ef4444;
+    text-transform:uppercase; font-weight:700;
   }
-  .intro-rec-dot { width:9px; height:9px; border-radius:50%; background:#ef4444; }
-  @keyframes recBlink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-  .intro-vu {
-    display:flex; align-items:flex-end; gap:5px;
-    height:70px; margin-bottom:36px; z-index:2;
+  .intro-rec-dot { width:8px; height:8px; border-radius:50%; background:#ef4444; animation:recBlink 1.1s ease-in-out infinite; }
+  @keyframes recBlink { 0%,100%{opacity:1;box-shadow:0 0 6px #ef4444} 50%{opacity:0.1;box-shadow:none} }
+
+  /* Corner brackets */
+  .intro-corner { position:absolute; width:28px; height:28px; z-index:4; }
+  .intro-corner.tl { top:14px; left:14px; border-top:2px solid rgba(124,58,237,0.7); border-left:2px solid rgba(124,58,237,0.7); }
+  .intro-corner.tr { top:14px; right:14px; border-top:2px solid rgba(124,58,237,0.7); border-right:2px solid rgba(124,58,237,0.7); }
+  .intro-corner.bl { bottom:14px; left:14px; border-bottom:2px solid rgba(124,58,237,0.7); border-left:2px solid rgba(124,58,237,0.7); }
+  .intro-corner.br { bottom:14px; right:14px; border-bottom:2px solid rgba(124,58,237,0.7); border-right:2px solid rgba(124,58,237,0.7); }
+
+  /* Horizontal accent lines */
+  .intro-hline { position:absolute; left:0; right:0; height:1px; z-index:3; pointer-events:none;
+    background:linear-gradient(90deg,transparent,rgba(124,58,237,0.5),rgba(124,58,237,0.3),transparent); }
+  .intro-hline.top    { top:56px; }
+  .intro-hline.bottom { bottom:56px; }
+
+  /* VU bar columns */
+  .intro-vu-col {
+    display:flex; align-items:flex-end; justify-content:center; gap:5px;
+    height:220px; z-index:3; padding:0 20px;
+    align-self:center;
   }
   .intro-vu-bar {
-    width:7px; border-radius:2px 2px 0 0;
+    width:6px; border-radius:1px 1px 0 0; flex-shrink:0;
     animation:vuPulse var(--dur,0.7s) ease-in-out infinite alternate;
+    animation-delay:var(--del,0s);
   }
   @keyframes vuPulse {
-    from { height:var(--lo,8px); background:#7c3aed; opacity:0.7; }
-    to   { height:var(--hi,60px); background:#9d5ff3; opacity:1; }
+    from { height:var(--lo,8px); opacity:0.4; filter:brightness(0.6); }
+    to   { height:var(--hi,60px); opacity:1; filter:brightness(1.3) drop-shadow(0 0 4px currentColor); }
   }
-  .intro-content { z-index:2; text-align:center; }
-  .intro-logo { font-size:18px; letter-spacing:8px; color:#7c3aed; margin-bottom:16px; text-transform:uppercase; }
-  .intro-title {
-    font-size:80px; font-weight:900; letter-spacing:18px; color:#e2e8f0;
-    text-transform:uppercase; line-height:1; margin-bottom:10px;
-    animation:glitchTitle 5s infinite;
+
+  /* Center content */
+  .intro-content {
+    z-index:3; text-align:center; display:flex; flex-direction:column;
+    align-items:center; padding:0 20px;
   }
-  @keyframes glitchTitle {
-    0%,92%,100% { text-shadow:none; transform:none; }
-    93%  { text-shadow:3px 0 #7c3aed,-3px 0 #3b82f6; transform:skewX(1.5deg); }
-    94%  { text-shadow:-3px 0 #7c3aed,3px 0 #3b82f6; transform:skewX(-1.5deg); }
-    95%  { text-shadow:none; transform:none; }
+  .intro-label-top {
+    font-size:11px; letter-spacing:9px; color:#7c3aed;
+    text-transform:uppercase; font-weight:700; margin-bottom:30px;
+    opacity:0; animation:labelSlide 0.9s ease-out 0.3s both;
   }
-  .intro-subtitle { font-size:13px; letter-spacing:7px; color:#94a3b8; text-transform:uppercase; margin-bottom:14px; }
+  @keyframes labelSlide { from{opacity:0;letter-spacing:18px} to{opacity:1;letter-spacing:9px} }
+
+  /* Letters */
+  .intro-name { display:flex; align-items:baseline; justify-content:center; margin-bottom:18px; }
+  .intro-letter {
+    font-size:clamp(80px,16vw,150px); font-weight:900; line-height:0.9;
+    color:#e2e8f0; opacity:0;
+    animation:letterDrop 0.7s cubic-bezier(0.22,1,0.36,1) forwards;
+  }
+  @keyframes letterDrop {
+    0%   { opacity:0; transform:translateY(-50px) scaleY(1.4); filter:blur(16px); color:#fff; }
+    45%  { opacity:1; filter:blur(0); color:#fff; text-shadow:0 0 80px #7c3aed, 0 0 160px rgba(124,58,237,0.5); }
+    70%  { transform:translateY(6px) scaleY(0.96); }
+    88%  { transform:translateY(-2px) scaleY(1.01); }
+    100% { opacity:1; transform:none; color:#f0f0f5; text-shadow:0 0 40px rgba(124,58,237,0.35); filter:none; }
+  }
+  /* after reveal: slow glow pulse */
+  .intro-letter.lit {
+    animation:letterDrop 0.7s cubic-bezier(0.22,1,0.36,1) forwards, glowPulse 4s ease-in-out var(--gd,1s) infinite;
+  }
+  @keyframes glowPulse {
+    0%,100% { text-shadow:0 0 30px rgba(124,58,237,0.3); }
+    50%     { text-shadow:0 0 70px rgba(124,58,237,0.65), 0 0 140px rgba(124,58,237,0.2); }
+  }
+
+  .intro-handle {
+    font-size:13px; letter-spacing:5px; color:#7c3aed; font-weight:600;
+    text-transform:uppercase; margin-bottom:4px;
+    opacity:0; animation:fadeSlideUp 0.7s ease-out 2.3s both;
+  }
+  .intro-tagline {
+    font-size:10px; letter-spacing:4px; color:#374151; text-transform:uppercase;
+    margin-bottom:28px;
+    opacity:0; animation:fadeSlideUp 0.7s ease-out 2.5s both;
+  }
+  @keyframes fadeSlideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+  .intro-divider {
+    width:100px; height:1px; margin-bottom:22px;
+    background:linear-gradient(90deg,transparent,rgba(124,58,237,0.8),transparent);
+    opacity:0; animation:fadeSlideUp 0.7s ease-out 2.7s both;
+  }
   .intro-quote {
-    font-size:13px; color:#64748b; font-style:italic; max-width:380px;
-    margin:0 auto 48px; line-height:1.6; letter-spacing:0.5px;
-    animation:quoteFadeIn 2s ease-out 0.5s both;
+    font-size:12px; color:#4b5563; font-style:italic; max-width:320px;
+    line-height:1.8; margin-bottom:38px; letter-spacing:0.2px;
+    opacity:0; animation:fadeSlideUp 0.7s ease-out 2.9s both;
   }
-  @keyframes quoteFadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+  .intro-quote em { color:#64748b; font-style:normal; }
   .intro-enter-btn {
-    padding:14px 48px; border:1px solid #7c3aed; background:transparent;
-    color:#9d5ff3; font-size:12px; letter-spacing:5px; text-transform:uppercase;
-    cursor:pointer; border-radius:2px; transition:all 0.3s;
-    animation:btnPulse 2.5s ease-in-out infinite;
+    padding:14px 46px; border:1px solid rgba(124,58,237,0.55); background:transparent;
+    color:#9d5ff3; font-size:11px; letter-spacing:6px; text-transform:uppercase;
+    cursor:pointer; transition:all 0.4s; position:relative; overflow:hidden;
+    opacity:0; animation:fadeSlideUp 0.7s ease-out 3.4s both, btnPulse 2.8s ease-in-out infinite 4s;
   }
+  .intro-enter-btn::after {
+    content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
+    background:linear-gradient(90deg, transparent, rgba(124,58,237,0.15), transparent);
+    animation:btnShimmer 2.8s ease-in-out infinite 4s;
+  }
+  @keyframes btnShimmer { 0%{left:-100%} 60%,100%{left:100%} }
   @keyframes btnPulse {
-    0%,100% { box-shadow:0 0 0 0 rgba(124,58,237,0); }
-    50%      { box-shadow:0 0 22px 6px rgba(124,58,237,0.25); }
+    0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,0),inset 0 0 0 rgba(124,58,237,0)}
+    50%    {box-shadow:0 0 24px 3px rgba(124,58,237,0.22),inset 0 0 12px rgba(124,58,237,0.05)}
   }
   .intro-enter-btn:hover {
-    background:#7c3aed; color:#fff;
-    box-shadow:0 0 35px rgba(124,58,237,0.6);
-    letter-spacing:7px;
+    background:#7c3aed; color:#fff; letter-spacing:9px;
+    box-shadow:0 0 60px rgba(124,58,237,0.7); border-color:#7c3aed;
+  }
+  .intro-hint {
+    margin-top:14px; font-size:9px; letter-spacing:3px; color:#1f2937;
+    text-transform:uppercase; opacity:0; animation:fadeSlideUp 0.7s ease-out 3.6s both;
   }
 
   /* ===== ARTIST BIOGRAPHY CARD ===== */
@@ -1060,20 +1142,51 @@
 
 <!-- ===== INTRO SCREEN ===== -->
 <div id="intro-screen">
+  <div class="intro-grid-bg"></div>
+  <div class="intro-vignette"></div>
   <div class="intro-scanlines"></div>
+
+  <!-- Corners -->
+  <div class="intro-corner tl"></div>
+  <div class="intro-corner tr"></div>
+  <div class="intro-corner bl"></div>
+  <div class="intro-corner br"></div>
+
+  <!-- Accent lines -->
+  <div class="intro-hline top"></div>
+  <div class="intro-hline bottom"></div>
+
+  <!-- REC -->
   <div class="intro-rec"><div class="intro-rec-dot"></div>REC</div>
 
-  <!-- VU Meter Bars -->
-  <div class="intro-vu" id="introVU"></div>
+  <!-- VU Left -->
+  <div class="intro-vu-col" id="introVULeft"></div>
 
-  <!-- Content -->
+  <!-- CENTER -->
   <div class="intro-content">
-    <div class="intro-logo">🎙 DaN Music Manager</div>
-    <div class="intro-title">DaN</div>
-    <div class="intro-subtitle">Recording Studio</div>
-    <div class="intro-quote">"Jeder Verse ein Statement. Jede Session ein Schritt nach oben.<br>Du bist hier, weil du es ernst meinst."</div>
-    <button class="intro-enter-btn" onclick="enterStudio()">Studio betreten</button>
+    <div class="intro-label-top">🎙 Music Manager</div>
+
+    <div class="intro-name">
+      <span class="intro-letter" id="il_D" style="animation-delay:0.7s;--gd:1.4s">D</span>
+      <span class="intro-letter" id="il_a" style="animation-delay:1.25s;--gd:1.95s">a</span>
+      <span class="intro-letter" id="il_N" style="animation-delay:1.8s;--gd:2.5s">N</span>
+    </div>
+
+    <div class="intro-handle">@DaN_90_rap</div>
+    <div class="intro-tagline">Rap Artist · Berlin</div>
+    <div class="intro-divider"></div>
+    <div class="intro-quote">
+      "Jeder Verse ein Statement.<br>
+      Jede Session ein Schritt nach oben.<br>
+      <em>Du bist hier, weil du es ernst meinst.</em>"
+    </div>
+
+    <button class="intro-enter-btn" onclick="enterStudio()">▶ &nbsp;Studio betreten</button>
+    <div class="intro-hint">Klicke zum Betreten</div>
   </div>
+
+  <!-- VU Right -->
+  <div class="intro-vu-col" id="introVURight"></div>
 </div>
 
 <!-- TOP BAR -->
@@ -5249,41 +5362,198 @@ function copyEl(id) {
 // =============================
 // INTRO SCREEN
 // =============================
-(function buildVU() {
-  const configs = [
-    {lo:'12px',hi:'30px',dur:'0.9s'},{lo:'20px',hi:'58px',dur:'0.6s'},
-    {lo:'8px', hi:'45px',dur:'0.75s'},{lo:'25px',hi:'65px',dur:'0.5s'},
-    {lo:'14px',hi:'50px',dur:'0.8s'},{lo:'6px', hi:'38px',dur:'0.65s'},
-    {lo:'30px',hi:'68px',dur:'0.55s'},{lo:'10px',hi:'42px',dur:'0.7s'},
-    {lo:'22px',hi:'60px',dur:'0.85s'},{lo:'8px', hi:'35px',dur:'0.6s'},
-    {lo:'18px',hi:'55px',dur:'0.72s'},{lo:'28px',hi:'70px',dur:'0.48s'},
-    {lo:'12px',hi:'44px',dur:'0.9s'},{lo:'16px',hi:'52px',dur:'0.63s'},
-    {lo:'24px',hi:'63px',dur:'0.78s'},{lo:'9px', hi:'40px',dur:'0.58s'}
-  ];
-  const colors = [
-    '#10b981','#10b981','#f59e0b','#f59e0b','#ef4444',
-    '#7c3aed','#7c3aed','#3b82f6','#3b82f6','#9d5ff3',
-    '#f59e0b','#10b981','#ef4444','#7c3aed','#3b82f6','#9d5ff3'
-  ];
-  window.addEventListener('DOMContentLoaded', () => {
-    const vu = document.getElementById('introVU');
-    if (!vu) return;
-    configs.forEach((c, i) => {
-      const bar = document.createElement('div');
-      bar.className = 'intro-vu-bar';
-      bar.style.cssText = `--lo:${c.lo};--hi:${c.hi};--dur:${c.dur};height:${c.lo};background:${colors[i]};animation-delay:${(i*0.04).toFixed(2)}s`;
-      vu.appendChild(bar);
-    });
+
+// VU bar data: [lo, hi, dur, color]
+const VU_LEFT = [
+  ['6px','55px','0.85s','#7c3aed'],['10px','90px','0.55s','#7c3aed'],
+  ['14px','120px','0.72s','#9d5ff3'],['8px','100px','0.48s','#7c3aed'],
+  ['20px','150px','0.63s','#9d5ff3'],['12px','80px','0.78s','#7c3aed'],
+  ['6px','60px','0.90s','#6d28d9'],['16px','110px','0.58s','#7c3aed'],
+  ['10px','90px','0.70s','#9d5ff3'],['8px','70px','0.52s','#7c3aed'],
+];
+const VU_RIGHT = [
+  ['8px','70px','0.62s','#3b82f6'],['6px','100px','0.80s','#3b82f6'],
+  ['18px','140px','0.50s','#60a5fa'],['10px','80px','0.75s','#3b82f6'],
+  ['14px','110px','0.68s','#60a5fa'],['6px','55px','0.88s','#3b82f6'],
+  ['20px','130px','0.56s','#60a5fa'],['12px','90px','0.73s','#3b82f6'],
+  ['8px','75px','0.64s','#60a5fa'],['16px','120px','0.46s','#3b82f6'],
+];
+
+function buildVUCol(containerId, data) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  data.forEach(([lo, hi, dur, color], i) => {
+    const bar = document.createElement('div');
+    bar.className = 'intro-vu-bar';
+    bar.style.cssText = `--lo:${lo};--hi:${hi};--dur:${dur};--del:${(i*0.07).toFixed(2)}s;height:${lo};color:${color};background:${color};`;
+    el.appendChild(bar);
   });
-})();
+}
+
+// Mark letters as "lit" after their animation completes (adds ongoing glow)
+function initLetterGlow() {
+  ['il_D','il_a','il_N'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const delay = parseFloat(el.style.animationDelay || '0') * 1000 + 700;
+    setTimeout(() => { el.classList.add('lit'); }, delay);
+  });
+}
+
+// ===== INTRO BEAT (looping ambient sound) =====
+let _introCtx = null;
+let _introDrone = null;
+let _introMaster = null;
+let _introNextBar = 0;
+let _introLoopId = null;
+let _introBeatStarted = false;
+
+function tryStartIntroBeat() {
+  if (_introBeatStarted) return;
+  _introBeatStarted = true;
+  try {
+    _introCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_introCtx.state === 'suspended') _introCtx.resume();
+    _introMaster = _introCtx.createGain();
+    _introMaster.gain.value = 0;
+    _introMaster.connect(_introCtx.destination);
+    // Fade in
+    _introMaster.gain.linearRampToValueAtTime(0.6, _introCtx.currentTime + 1.5);
+
+    // Atmospheric drone (filtered sawtooth pad)
+    _introDrone = _introCtx.createOscillator();
+    _introDrone.type = 'sawtooth';
+    _introDrone.frequency.value = 55; // A1 – deep and dark
+    const filt = _introCtx.createBiquadFilter();
+    filt.type = 'lowpass'; filt.frequency.value = 300; filt.Q.value = 6;
+    const droneGain = _introCtx.createGain(); droneGain.gain.value = 0.06;
+    _introDrone.connect(filt); filt.connect(droneGain); droneGain.connect(_introMaster);
+    _introDrone.start();
+
+    // LFO on drone for slow breath
+    const lfo = _introCtx.createOscillator(); lfo.frequency.value = 0.3;
+    const lfoG = _introCtx.createGain(); lfoG.gain.value = 0.03;
+    lfo.connect(lfoG); lfoG.connect(droneGain.gain); lfo.start();
+
+    // Schedule beat loop
+    _introNextBar = _introCtx.currentTime + 0.3;
+    scheduleIntroBar();
+  } catch(e) { /* silent */ }
+}
+
+function scheduleIntroBar() {
+  if (!_introCtx || !_introMaster) return;
+  const BPS = 90 / 60; // beats per second
+  const T = _introNextBar;
+
+  const kick808 = (t, vol=0.55, decay=0.5) => {
+    const o = _introCtx.createOscillator(), g = _introCtx.createGain();
+    o.connect(g); g.connect(_introMaster);
+    o.type = 'sine';
+    o.frequency.setValueAtTime(120, t);
+    o.frequency.exponentialRampToValueAtTime(22, t + decay);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + decay + 0.05);
+    o.start(t); o.stop(t + decay + 0.1);
+  };
+  const snare = (t) => {
+    const len = Math.ceil(_introCtx.sampleRate * 0.12);
+    const buf = _introCtx.createBuffer(1, len, _introCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/len,2);
+    const src = _introCtx.createBufferSource(); src.buffer = buf;
+    const filt = _introCtx.createBiquadFilter(); filt.type='bandpass'; filt.frequency.value=2200; filt.Q.value=0.8;
+    const g = _introCtx.createGain(); g.gain.value = 0.18;
+    src.connect(filt); filt.connect(g); g.connect(_introMaster);
+    src.start(t); src.stop(t + 0.15);
+  };
+  const hat = (t, vol=0.05) => {
+    const len = Math.ceil(_introCtx.sampleRate * 0.04);
+    const buf = _introCtx.createBuffer(1, len, _introCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * (1-i/len);
+    const src = _introCtx.createBufferSource(); src.buffer = buf;
+    const filt = _introCtx.createBiquadFilter(); filt.type='highpass'; filt.frequency.value=9000;
+    const g = _introCtx.createGain(); g.gain.value = vol;
+    src.connect(filt); filt.connect(g); g.connect(_introMaster);
+    src.start(t); src.stop(t + 0.06);
+  };
+
+  // Pattern: kick 1,3 – snare 2,4 – hats on every 8th
+  kick808(T,            0.55, 0.55);
+  kick808(T + 2/BPS,    0.48, 0.48);
+  snare(T + 1/BPS);
+  snare(T + 3/BPS);
+  for (let i = 0; i < 8; i++) hat(T + i * 0.5/BPS, i%2===0 ? 0.06 : 0.03);
+
+  _introNextBar += 4 / BPS;
+  const msUntilNext = (_introNextBar - _introCtx.currentTime - 0.15) * 1000;
+  _introLoopId = setTimeout(scheduleIntroBar, Math.max(0, msUntilNext));
+}
+
+function stopIntroBeat(onDone) {
+  clearTimeout(_introLoopId);
+  if (_introCtx && _introMaster) {
+    _introMaster.gain.linearRampToValueAtTime(0, _introCtx.currentTime + 0.4);
+    setTimeout(() => { _introCtx?.close(); _introCtx = null; _introDrone = null; _introMaster = null; if(onDone) onDone(); }, 450);
+  } else {
+    if (onDone) onDone();
+  }
+}
 
 function enterStudio() {
   const screen = document.getElementById('intro-screen');
   if (!screen) return;
-  playStudioSound();
+  stopIntroBeat(() => playEntranceSound());
   screen.classList.add('fade-out');
-  setTimeout(() => { screen.style.display = 'none'; }, 900);
+  setTimeout(() => { screen.style.display = 'none'; }, 1000);
 }
+
+function playEntranceSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const play = (freq, t, dur, vol, type='triangle') => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type; o.frequency.value = freq;
+      o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0, ctx.currentTime+t);
+      g.gain.linearRampToValueAtTime(vol, ctx.currentTime+t+0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+t+dur);
+      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+dur+0.05);
+    };
+    const kick = (t) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type='sine'; o.frequency.setValueAtTime(180,ctx.currentTime+t);
+      o.frequency.exponentialRampToValueAtTime(28,ctx.currentTime+t+0.35);
+      g.gain.setValueAtTime(0.7,ctx.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.5);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.6);
+    };
+    // Two punchy kicks
+    kick(0); kick(0.45);
+    // Rising chord (C minor triumphant)
+    [130.81,155.56,196,233.08,293.66].forEach((f,i) => play(f, 0.05+i*0.07, 2.2, 0.09));
+    // Soaring lead
+    [392,440,523.25,587.33,659.25,783.99,880].forEach((f,i) => play(f, 0.5+i*0.11, 0.6, 0.11));
+    // Final bell
+    play(1567.98, 2.1, 1.5, 0.07, 'sine');
+    play(2093.00, 2.25, 1.2, 0.05, 'sine');
+  } catch(e) {}
+}
+
+// Setup audio trigger on any mouse/touch activity on intro
+window.addEventListener('DOMContentLoaded', () => {
+  buildVUCol('introVULeft', VU_LEFT);
+  buildVUCol('introVURight', VU_RIGHT);
+  initLetterGlow();
+  const screen = document.getElementById('intro-screen');
+  if (screen) {
+    const startOnce = () => { tryStartIntroBeat(); screen.removeEventListener('mousemove', startOnce); screen.removeEventListener('touchstart', startOnce); };
+    screen.addEventListener('mousemove', startOnce, {passive:true});
+    screen.addEventListener('touchstart', startOnce, {passive:true, once:true});
+  }
+});
 
 // =============================
 // ARTIST BIOGRAPHY
@@ -5548,68 +5818,6 @@ function applySpToBeat() {
   }
   autoSave();
   showToast(`BPM auf ${persona.bpm} gesetzt!`, 'success');
-}
-
-// =============================
-// STUDIO INTRO SOUND
-// =============================
-function playStudioSound() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-
-    const play = (freq, startT, dur, vol = 0.18, type = 'sine', detune = 0) => {
-      const osc  = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.type = type; osc.frequency.value = freq; osc.detune.value = detune;
-      gain.gain.setValueAtTime(0, ctx.currentTime + startT);
-      gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + startT + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startT + dur);
-      osc.start(ctx.currentTime + startT);
-      osc.stop(ctx.currentTime + startT + dur + 0.05);
-    };
-
-    // Deep 808-style kick hit
-    const kick = (t) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(160, ctx.currentTime + t);
-      osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + t + 0.25);
-      gain.gain.setValueAtTime(0.6, ctx.currentTime + t);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.4);
-      osc.start(ctx.currentTime + t);
-      osc.stop(ctx.currentTime + t + 0.5);
-    };
-
-    // Rising synth chord: C minor pentatonic (C Eb G Bb)
-    const chord = [130.81, 155.56, 196.00, 233.08];
-    chord.forEach((f, i) => play(f, 0.05 + i * 0.08, 2.0, 0.10, 'triangle', 0));
-
-    // Bright piano-like lead melody (rising motivating lick)
-    const melody = [392, 440, 523.25, 587.33, 659.25, 783.99];
-    melody.forEach((f, i) => play(f, 0.6 + i * 0.13, 0.5, 0.12, 'triangle', -5));
-
-    // Two 808 kicks for feel
-    kick(0.05); kick(0.55);
-
-    // Subtle noise burst (snare-like) at 0.55s
-    const bufSize = ctx.sampleRate * 0.08;
-    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    const snareGain = ctx.createGain(); snareGain.gain.value = 0.15;
-    src.connect(snareGain); snareGain.connect(ctx.destination);
-    src.start(ctx.currentTime + 0.55);
-
-    // High bell ding at the end – "you're in"
-    play(1318.51, 2.0, 1.2, 0.08, 'sine');
-    play(1567.98, 2.15, 1.0, 0.06, 'sine');
-
-  } catch(e) { /* Audio not supported – silent fail */ }
 }
 
 // =============================
