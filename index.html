@@ -4456,6 +4456,20 @@ function updateNavLocks() {
 function switchPhase(num) {
   if (num === 0) { updateDashboard(); updateSunoCockpit(); }
   if (num === 3) { setTimeout(() => { initSunoPersonaPicker(); initBeatStudio(); updateBsBpm(); }, 0); }
+  if (num === 10) { loadYtReleases(); renderYtReleases(); }
+  if (num === 11) { loadAlbums(); renderDiscography(); }
+
+  // Phases 10/11 work without a song selected
+  if (num === 10 || num === 11) {
+    currentPhase = num;
+    document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('phase' + num);
+    if (panel) panel.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', parseInt(el.dataset.phase) === num));
+    if (window.innerWidth <= 600) closeSidebar();
+    return;
+  }
+
   if (!currentSongId) return;
 
   // Phase-Sperre: Phase 2 nur wenn Phase 1 vollständig
@@ -6612,20 +6626,6 @@ function renderDiscList() {
 }
 
 // Hook Phase 10/11 init into switchPhase
-const _origSwitchPhase = switchPhase;
-function switchPhase(num) {
-  _origSwitchPhase(num);
-  if (num === 10) { loadYtReleases(); renderYtReleases(); }
-  if (num === 11) { loadAlbums(); renderDiscography(); }
-  // Allow phase 10/11 even without a song
-  if (num === 10 || num === 11) {
-    document.querySelectorAll('.phase-panel').forEach(p=>p.classList.remove('active'));
-    const panel = document.getElementById('phase'+num);
-    if (panel) panel.classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', parseInt(el.dataset.phase)===num));
-  }
-}
-
 // =============================
 // INIT
 // =============================
