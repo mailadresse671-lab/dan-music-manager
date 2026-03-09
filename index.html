@@ -1038,7 +1038,7 @@
   }
   .intro-tagline {
     font-size:10px; letter-spacing:4px; color:#374151; text-transform:uppercase;
-    margin-bottom:28px;
+    margin-bottom:14px;
     opacity:0; animation:fadeSlideUp 0.7s ease-out 2.5s both;
   }
   @keyframes fadeSlideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
@@ -1077,6 +1077,46 @@
     margin-top:14px; font-size:9px; letter-spacing:3px; color:#1f2937;
     text-transform:uppercase; opacity:0; animation:fadeSlideUp 0.7s ease-out 3.6s both;
   }
+
+  /* ===== NOVATION LAUNCHPAD MINI MK3 ===== */
+  .intro-launchpad {
+    margin-bottom:18px;
+    opacity:0; animation:fadeSlideUp 0.8s ease-out 2.62s both;
+  }
+  .lp-device {
+    background:linear-gradient(160deg,#262626 0%,#191919 100%);
+    border-radius:13px; padding:9px 9px 7px;
+    border:1px solid rgba(255,255,255,0.05);
+    box-shadow:0 0 0 1px rgba(0,0,0,0.7),0 14px 48px rgba(0,0,0,0.95),
+               0 0 90px rgba(124,58,237,0.07),inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+  .lp-grid {
+    background:#080808; border-radius:6px; padding:6px;
+    display:grid;
+    grid-template-columns:repeat(9,17px);
+    grid-template-rows:repeat(9,17px);
+    gap:2px;
+  }
+  .lp-pad {
+    width:17px; height:17px; border-radius:2px;
+    background:#1e1e1e;
+    transition:background 0.06s ease,box-shadow 0.06s ease;
+  }
+  .lp-btn-top,.lp-btn-side {
+    width:17px; height:17px; border-radius:50%;
+    background:#161616;
+  }
+  .lp-btn-novation {
+    width:17px; height:17px; border-radius:50%;
+    background:radial-gradient(circle,#4a1a8a 0%,#1e0e3a 100%);
+    box-shadow:0 0 8px rgba(124,58,237,0.55);
+  }
+  .lp-brand {
+    text-align:center; margin-top:5px;
+    font-size:7px; letter-spacing:5px; color:rgba(124,58,237,0.35);
+    text-transform:uppercase; font-weight:700;
+  }
+  @media(max-width:500px){ .intro-launchpad { display:none; } }
 
   /* ===== KULISSE PARTICLES ===== */
   .intro-particle {
@@ -1344,6 +1384,15 @@
 
     <div class="intro-handle">@DaN_90_rap</div>
     <div class="intro-tagline">Rap Artist · Berlin</div>
+
+    <!-- Novation Launchpad Mini MK3 -->
+    <div class="intro-launchpad">
+      <div class="lp-device">
+        <div class="lp-grid" id="lpGrid"></div>
+        <div class="lp-brand">Novation · Launchpad Mini</div>
+      </div>
+    </div>
+
     <div class="intro-divider"></div>
     <div class="intro-quote">
       "Jeder Verse ein Statement.<br>
@@ -5885,6 +5934,7 @@ function stopIntroBeat(onDone) {
 function enterStudio() {
   const screen = document.getElementById('intro-screen');
   if (!screen) return;
+  stopLpAnim();
   stopIntroBeat(() => playEntranceSound());
   screen.classList.add('fade-out');
   setTimeout(() => { screen.style.display = 'none'; }, 1000);
@@ -5923,10 +5973,101 @@ function playEntranceSound() {
   } catch(e) {}
 }
 
+// =============================
+// NOVATION LAUNCHPAD MINI MK3 – Intro Animation
+// =============================
+const LP_COLORS = [
+  '#7c3aed','#8b5cf6','#6d28d9','#a78bfa',
+  '#3b82f6','#2563eb','#60a5fa',
+  '#06b6d4','#22d3ee',
+  '#ec4899','#f472b6',
+  '#ef4444','#f97316',
+  '#22c55e','#eab308'
+];
+let _lpRhythmId = null, _lpBeat = 0;
+
+function buildLaunchpad() {
+  const grid = document.getElementById('lpGrid');
+  if (!grid) return;
+  // 9×9: row 0 = top buttons, col 8 = side buttons, [0][8] = Novation logo
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const el = document.createElement('div');
+      if (r === 0 && c === 8) el.className = 'lp-btn-novation';
+      else if (r === 0)       el.className = 'lp-btn-top';
+      else if (c === 8)       el.className = 'lp-btn-side';
+      else                    el.className = 'lp-pad';
+      grid.appendChild(el);
+    }
+  }
+  setTimeout(lpCascade, 900);
+}
+
+function lpFlash(pad, color, ms) {
+  if (!pad) return;
+  pad.style.background = color;
+  pad.style.boxShadow = `0 0 7px ${color},0 0 2px ${color}`;
+  setTimeout(() => { pad.style.background = '#1e1e1e'; pad.style.boxShadow = 'none'; }, ms);
+}
+
+function lpCascade() {
+  const pads = Array.from(document.querySelectorAll('#lpGrid .lp-pad'));
+  if (!pads.length) return;
+  let i = 0;
+  const t = setInterval(() => {
+    if (i >= 64) { clearInterval(t); startLpRhythm(); return; }
+    const color = LP_COLORS[Math.floor(Math.random() * LP_COLORS.length)];
+    const p = pads[i];
+    p.style.background = color;
+    p.style.boxShadow = `0 0 5px ${color}`;
+    i++;
+  }, 26);
+}
+
+function startLpRhythm() {
+  const pads = Array.from(document.querySelectorAll('#lpGrid .lp-pad'));
+  if (!pads.length) return;
+  _lpBeat = 0;
+  // Fade down the cascade first
+  setTimeout(() => {
+    pads.forEach(p => { p.style.background = '#1e1e1e'; p.style.boxShadow = 'none'; });
+  }, 400);
+
+  // 111ms = 90 BPM 16th notes
+  _lpRhythmId = setInterval(() => {
+    _lpBeat++;
+    // Random flashes every 16th
+    const n = 2 + Math.floor(Math.random() * 3);
+    for (let k = 0; k < n; k++) {
+      const idx = Math.floor(Math.random() * 64);
+      lpFlash(pads[idx], LP_COLORS[Math.floor(Math.random() * LP_COLORS.length)], 130 + Math.random() * 220);
+    }
+    // Column sweep every 8 beats (2 bars)
+    if (_lpBeat % 8 === 1) {
+      const col = (_lpBeat / 8 | 0) % 8;
+      const c = LP_COLORS[col % LP_COLORS.length];
+      for (let r = 0; r < 8; r++) lpFlash(pads[r * 8 + col], c, 350);
+    }
+    // Row flash on every 4 beats (1 bar)
+    if (_lpBeat % 16 === 9) {
+      const row = Math.floor(Math.random() * 8);
+      const c = LP_COLORS[Math.floor(Math.random() * LP_COLORS.length)];
+      for (let cc = 0; cc < 8; cc++) lpFlash(pads[row * 8 + cc], c, 450);
+    }
+  }, 111);
+}
+
+function stopLpAnim() {
+  if (_lpRhythmId) { clearInterval(_lpRhythmId); _lpRhythmId = null; }
+  const pads = document.querySelectorAll('#lpGrid .lp-pad');
+  pads.forEach(p => { p.style.background = '#1e1e1e'; p.style.boxShadow = 'none'; });
+}
+
 // Setup audio trigger on any mouse/touch activity on intro
 window.addEventListener('DOMContentLoaded', () => {
   buildVUCol('introVULeft', VU_LEFT);
   buildVUCol('introVURight', VU_RIGHT);
+  buildLaunchpad();
   initLetterGlow();
   const screen = document.getElementById('intro-screen');
   if (screen) {
