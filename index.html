@@ -3993,8 +3993,8 @@ function setLoading(spinnerIconId, btnTextId, loading, originalIcon = '✨', ori
 function showResult(resultBoxId, contentId, text) {
   const box = document.getElementById(resultBoxId);
   const content = document.getElementById(contentId);
-  box.classList.add('visible');
-  content.textContent = text;
+  if (box) box.classList.add('visible');
+  if (content) content.textContent = text;
 }
 
 // =============================
@@ -4808,6 +4808,9 @@ function selectSong(id) {
   if (!songs[id]) return;
   currentSongId = id;
 
+  // Reset manager chat history on song switch to avoid bleeding between songs
+  Object.keys(mgrMessages).forEach(k => { mgrMessages[k] = []; });
+
   // Update song list UI
   document.querySelectorAll('.song-item').forEach(el => {
     el.classList.toggle('active', el.dataset.id === id);
@@ -5579,7 +5582,7 @@ async function saveCloudConfig() {
 async function pushSongToCloud(song) {
   if (!cloudConnected || !sbUrl || !sbKey) return;
   try {
-    await fetch(`${sbUrl}/rest/v1/dan_songs`, {
+    const res = await fetch(`${sbUrl}/rest/v1/dan_songs`, {
       method: 'POST',
       headers: getSbHeaders(),
       body: JSON.stringify({
@@ -5589,6 +5592,10 @@ async function pushSongToCloud(song) {
         updated_at: new Date().toISOString()
       })
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.warn('Cloud push failed:', err.message || `HTTP ${res.status}`);
+    }
   } catch(e) {
     console.warn('Cloud push failed:', e.message);
   }
@@ -5790,10 +5797,11 @@ function loadAudioFile(file, saveToIdb = true) {
     songs[currentSongId].p8_audio_filename = file.name;
     saveToStorage();
     if (saveToIdb) {
-      saveAudioToIDB(currentSongId, file).then(() => showToast('Audio gespeichert! ✓', 'success'));
+      saveAudioToIDB(currentSongId, file).then(() => showToast('Audio geladen & gespeichert: ' + file.name, 'success'));
     }
+  } else if (saveToIdb) {
+    showToast('Audio geladen: ' + file.name, 'success');
   }
-  if (saveToIdb) showToast('Audio geladen: ' + file.name, 'success');
   updateMarkerList();
 }
 
@@ -5921,8 +5929,10 @@ function saveBpmManual() {
     if (currentSongId && songs[currentSongId]) {
       songs[currentSongId].p8_bpm = val;
       songs[currentSongId].p3_bpm = val;
-      document.getElementById('p3_bpm').value = val;
-      document.getElementById('p3_bpm_val').textContent = val;
+      const p3bpm = document.getElementById('p3_bpm');
+      const p3bpmVal = document.getElementById('p3_bpm_val');
+      if (p3bpm) p3bpm.value = val;
+      if (p3bpmVal) p3bpmVal.textContent = val;
       saveToStorage();
     }
   }
