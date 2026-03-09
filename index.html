@@ -2307,10 +2307,12 @@
           <div class="form-group">
             <label>Modus</label>
             <div class="suno-toggle-row" id="suno_modus_row">
-              <button class="suno-toggle-btn sel" data-val="einfach" onclick="setSunoToggle('suno_modus','einfach',this.closest('.suno-toggle-row'))">Einfach</button>
-              <button class="suno-toggle-btn" data-val="fortschrittlich" onclick="setSunoToggle('suno_modus','fortschrittlich',this.closest('.suno-toggle-row'))">Fortschrittlich</button>
-              <button class="suno-toggle-btn" data-val="geraeusche" onclick="setSunoToggle('suno_modus','geraeusche',this.closest('.suno-toggle-row'))">Geräusche</button>
+              <button class="suno-toggle-btn sel" data-val="einfach" onclick="setSunoToggle('suno_modus','einfach',this.closest('.suno-toggle-row'))" title="Text-Beschreibung → 2 Versionen">Einfach</button>
+              <button class="suno-toggle-btn" data-val="fortschrittlich" onclick="setSunoToggle('suno_modus','fortschrittlich',this.closest('.suno-toggle-row'))" title="Lyrics + Style + Exclude + Persona + Weirdness">Fortschrittlich</button>
+              <button class="suno-toggle-btn" data-val="audio" onclick="setSunoToggle('suno_modus','audio',this.closest('.suno-toggle-row'))" title="Audio 6–60s aufnehmen oder hochladen – Suno generiert inspiriert davon">Audio-Upload</button>
+              <button class="suno-toggle-btn" data-val="geraeusche" onclick="setSunoToggle('suno_modus','geraeusche',this.closest('.suno-toggle-row'))" title="Sound-Effekte & Atmosphären">Geräusche</button>
             </div>
+            <div style="font-size:11px;color:rgba(148,163,184,0.4);margin-top:5px;">10 Credits = 1 Generation = 2 Versionen (~30–60 Sek.)</div>
             <input type="hidden" id="suno_modus" value="einfach">
           </div>
           <div class="form-group">
@@ -2432,22 +2434,27 @@
                 <div class="suno-ref-item">Kostenloser Qualitäts-Boost <span class="suno-badge pro">Pro</span></div>
               </div>
               <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
-                <div class="suno-ref-title" style="color:#10b981;">🎚️ Stems holen</div>
+                <div class="suno-ref-title" style="color:#10b981;">🎚️ Stems & MIDI</div>
                 <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Einzelne Spuren isolieren für Pro-Mixing.</div>
-                <div class="suno-ref-item">Bis zu 8 Stems (ab Juni 2025) <span class="suno-badge pro">Pro</span></div>
+                <div class="suno-ref-item">Bis zu 12 Stems als WAV (44.1kHz) <span class="suno-badge pro">Pro</span></div>
                 <div class="suno-ref-item">Vocals, Drums, Bass, Instrumente separat</div>
-                <div class="suno-ref-item">Export als WAV → Ableton / Logic</div>
+                <div class="suno-ref-item">Export → Ableton / Logic / DAW</div>
+                <div class="suno-ref-item">MIDI Export (10 Credits/Stem) <span class="suno-badge" style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.3);">Premier</span></div>
               </div>
             </div>
             <!-- Create options -->
             <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
               <div>
                 <div class="suno-ref-title" style="margin-top:0;">✨ Weitere Erstellungs-Optionen</div>
-                <div class="suno-ref-item">Persona erstellen <span class="suno-badge pro">Pro</span></div>
-                <div class="suno-ref-item">Song Radio – Ähnliche Songs</div>
-                <div class="suno-ref-item">Im Studio öffnen <span class="suno-badge">Neu</span></div>
-                <div class="suno-ref-item">Im Editor öffnen <span class="suno-badge pro">Pro</span></div>
+                <div class="suno-ref-item">Persona erstellen (Vocal-Identität speichern) <span class="suno-badge pro">Pro</span></div>
+                <div class="suno-ref-item">Song Radio – Ähnliche Songs entdecken</div>
                 <div class="suno-ref-item">Abschnitt ersetzen <span class="suno-badge pro">Pro</span></div>
+                <div class="suno-ref-item" style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">
+                  <span style="color:#c084fc;font-size:11px;font-weight:700;">🎛️ Suno Studio (DAW)</span> <span class="suno-badge" style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.3);">Premier</span>
+                </div>
+                <div class="suno-ref-item">Multi-Track Timeline · BPM/Pitch pro Spur</div>
+                <div class="suno-ref-item">KI-Stems generieren (Bassline, Drums, Melody)</div>
+                <div class="suno-ref-item">Direkt aufnehmen in Studio-Timeline</div>
               </div>
               <div>
                 <div class="suno-ref-title" style="margin-top:0;">⬇️ Download-Optionen</div>
