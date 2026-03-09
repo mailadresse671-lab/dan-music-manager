@@ -1018,6 +1018,41 @@
   .voice-emotion-btn { padding:5px 12px; border-radius:5px; border:1px solid var(--border); background:var(--card2); color:var(--text-muted); font-size:12px; cursor:pointer; transition:all 0.2s; }
   .voice-emotion-btn.sel { border-color:var(--purple); color:var(--purple-light); background:rgba(124,58,237,0.12); }
   .voice-persona-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.25); border-radius:4px; padding:3px 8px; font-size:11px; color:var(--purple-light); }
+
+  /* ===== SUNO PERSONA PICKER ===== */
+  .sp-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
+  @media(max-width:800px){ .sp-grid { grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:480px){ .sp-grid { grid-template-columns:1fr 1fr; } }
+  .sp-card {
+    border:1px solid var(--border); border-radius:8px; padding:10px;
+    cursor:pointer; transition:all 0.2s; background:var(--card2);
+    display:flex; flex-direction:column; gap:4px; position:relative;
+  }
+  .sp-card:hover { border-color:var(--sp-color,var(--purple)); transform:translateY(-1px); }
+  .sp-card.selected {
+    border-color:var(--sp-color,var(--purple));
+    background:color-mix(in srgb,var(--sp-color,var(--purple)) 12%,var(--card2));
+    box-shadow:0 0 0 1px var(--sp-color,var(--purple));
+  }
+  .sp-card.selected::after {
+    content:'✓'; position:absolute; top:6px; right:8px;
+    font-size:11px; color:var(--sp-color,var(--purple)); font-weight:700;
+  }
+  .sp-card-emoji { font-size:20px; line-height:1; }
+  .sp-card-name { font-size:11px; font-weight:700; color:var(--text); letter-spacing:0.3px; }
+  .sp-card-bpm  { font-size:10px; color:var(--text-muted); }
+  .sp-card-tag  { font-size:10px; padding:2px 5px; border-radius:3px; display:inline-block; margin-top:2px; font-weight:600; border:1px solid; }
+
+  .sp-detail {
+    border-radius:8px; padding:14px; border:1px solid var(--sp-color,var(--border));
+    background:color-mix(in srgb,var(--sp-color,var(--purple)) 6%,var(--card));
+    margin-top:4px;
+  }
+  .sp-detail-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:8px; }
+  .sp-detail-title  { font-size:15px; font-weight:700; color:var(--text); }
+  .sp-detail-actions{ display:flex; gap:6px; flex-wrap:wrap; }
+  .sp-prompt-box    { background:var(--card2); border:1px solid var(--border); border-radius:6px; padding:10px; font-size:11px; color:var(--text); font-family:monospace; white-space:pre-wrap; line-height:1.6; max-height:160px; overflow-y:auto; }
+  .sp-no-url        { font-size:11px; color:var(--text-muted); font-style:italic; }
 </style>
 
 </head>
@@ -1231,6 +1266,7 @@
         <div class="card ov-card">
           <div class="card-title">🎵 Suno-Einstellungen</div>
           <div id="ov_suno" class="ov-list"></div>
+          <div id="ov_persona_badge" style="margin-top:8px;"></div>
         </div>
         <div class="card ov-card">
           <div class="card-title">✅ Fortschritt</div>
@@ -1470,6 +1506,27 @@
           <div class="phase-subtitle">Erstelle den perfekten Suno AI Prompt</div>
         </div>
       </div>
+
+      <!-- SUNO PERSONA PICKER -->
+      <div class="card" id="sunoPersonaCard" style="margin-bottom:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div class="card-title" style="margin-bottom:0;">🎙 DaN Stimm-Persona wählen</div>
+          <span id="spSelectedBadge" style="display:none;" class="voice-persona-badge"></span>
+        </div>
+        <div class="sp-grid" id="spGrid"><!-- filled by JS --></div>
+        <div id="spDetail" style="display:none;" class="sp-detail">
+          <div class="sp-detail-header">
+            <div class="sp-detail-title" id="spDetailTitle"></div>
+            <div class="sp-detail-actions">
+              <button class="btn-copy" onclick="copySpPrompt()" title="Suno-Prompt kopieren">📋 Prompt kopieren</button>
+              <button class="btn-copy" onclick="applySpToBeat()" style="background:rgba(124,58,237,0.15);border-color:rgba(124,58,237,0.4);color:var(--purple-light);" title="BPM & Mood in Beat-Params übernehmen">⚡ BPM & Mood anwenden</button>
+              <span id="spSunoLink"></span>
+            </div>
+          </div>
+          <div class="sp-prompt-box" id="spPromptBox"></div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-title">Beat-Parameter</div>
         <div class="form-group">
@@ -3749,6 +3806,7 @@ function updateNavLocks() {
 }
 function switchPhase(num) {
   if (num === 0) { updateDashboard(); updateSunoCockpit(); }
+  if (num === 3) { setTimeout(initSunoPersonaPicker, 0); }
   if (!currentSongId) return;
 
   // Phase-Sperre: Phase 2 nur wenn Phase 1 vollständig
@@ -5169,6 +5227,15 @@ function updateDashboard() {
       ovMats.innerHTML = '<div class="ov-tags">'+mats.map(m => `<span class="ov-tag">${icons[m.type]||'📁'} ${escHtml(m.note||m.fileName||m.type)}</span>`).join('')+'</div>';
     }
   }
+  // Suno Persona badge in dashboard
+  const ovPersona = document.getElementById('ov_persona_badge');
+  if (ovPersona) {
+    const pid = s.suno_persona_id;
+    const persona = pid ? SUNO_PERSONAS.find(p => p.id === pid) : null;
+    ovPersona.innerHTML = persona
+      ? `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;border:1px solid ${persona.color}33;background:${persona.color}11;margin-top:4px;"><span style="font-size:14px;">${persona.emoji}</span><div><div style="font-size:12px;font-weight:600;color:${persona.color};">${persona.name}</div><div style="font-size:10px;color:var(--text-muted);">${persona.bpm} BPM · ${persona.tag}</div></div>${persona.url?`<a href="${persona.url}" target="_blank" style="margin-left:auto;font-size:10px;color:var(--blue);text-decoration:none;padding:2px 6px;border:1px solid rgba(59,130,246,0.3);border-radius:3px;">↗ Suno</a>`:''}</div>`
+      : '<div style="font-size:11px;color:var(--text-muted);margin-top:4px;font-style:italic;">Keine Persona gewählt (Phase 3)</div>';
+  }
 }
 function copyOvField(id) {
   const el = document.getElementById(id);
@@ -5213,6 +5280,7 @@ function copyEl(id) {
 function enterStudio() {
   const screen = document.getElementById('intro-screen');
   if (!screen) return;
+  playStudioSound();
   screen.classList.add('fade-out');
   setTimeout(() => { screen.style.display = 'none'; }, 900);
 }
@@ -5328,6 +5396,220 @@ function updateVoicePersonaBadge() {
   if (btn) {
     btn.textContent = vp.name ? `🎤 ${vp.name}` : '🎤 Voice Persona';
   }
+}
+
+// =============================
+// SUNO PERSONAS
+// =============================
+const SUNO_PERSONAS = [
+  {
+    id: 'verletzlich', name: 'DaN_VERLETZLICH', emoji: '💔', bpm: 82,
+    tag: 'Verletzlich', color: '#3b82f6',
+    url: 'https://suno.com/persona/30a6a4aa-c2e5-49f1-9089-bf92e634c196',
+    prompt: `emotional german rap, intimate whispered delivery, breathy vocals, vulnerable tone, deep warm male vocals, minimal production, soft piano undertone, 82 BPM, melancholic strings, sparse drums, intimate storytelling, authentic pain, high-fidelity studio recording, spacious reverb on vocals, cinematic but intimate, personal confession style
+
+EXCLUDE: comedy, children music, upbeat pop, fast tempo, autotune heavy, aggressive rap, drill, female vocals, generic loops, overproduced, lo-fi, trap hi-hats`
+  },
+  {
+    id: 'kraftvoll', name: 'DaN_KRAFTVOLL', emoji: '💪', bpm: 95,
+    tag: 'Kraftvoll', color: '#10b981',
+    url: 'https://suno.com/persona/eb209082-390c-43b0-b9a3-97ac2a52d41a',
+    prompt: `powerful german rap, resonant baritone vocals, determined delivery, resilient tone, deep chest voice, 808 bass, punchy drums, cinematic strings, building intensity, anthemic hip hop ballad, strong conviction, unwavering confidence, mid-tempo 95 BPM, polished studio mix, high-fidelity, motivational undercurrent, overcome-struggle narrative, steady rhythm, powerful hook delivery
+
+EXCLUDE: comedy, children music, upbeat pop, lo-fi, trap hi-hats, generic loops, overproduced, female vocals, drill, fast tempo, autotune heavy`
+  },
+  {
+    id: 'aggressiv', name: 'DaN_AGGRESSIV', emoji: '🔥', bpm: 130,
+    tag: 'Aggressiv', color: '#ef4444',
+    url: 'https://suno.com/persona/477c5ba4-c710-49d8-adac-e4125aa57592',
+    prompt: `aggressive german rap, harsh gritty vocals, dominant delivery, hard-hitting 808 bass, trap drums with heavy kick, dark cinematic beat, 130 BPM, minor key, street anthem energy, powerful confident tone, commanding presence, raw emotion, intense build, no-filter honesty, brutal storytelling, spacious high-fidelity mix, dangerous vibe
+
+EXCLUDE: comedy, children music, upbeat pop, soft vocals, lo-fi, generic loops, female vocals, slow tempo, autotune heavy, drill (keep aggressive rap)`
+  },
+  {
+    id: 'hoffnungsvoll', name: 'DaN_HOFFNUNGSVOLL', emoji: '🌅', bpm: 110,
+    tag: 'Hoffnungsvoll', color: '#f59e0b',
+    url: 'https://suno.com/persona/c9187840-631b-4a9f-ab7b-685caeca47ce',
+    prompt: `uplifting german rap, warm inspiring vocals, hopeful delivery, bright undertone, mid-range tenor voice, major key progression, 110 BPM, uplifting strings, positive energy without being fake, authentic optimism, motivational message, cinematic production, building crescendo, powerful chorus, light but substantial, high-fidelity studio recording, warm reverb, inspiring but grounded
+
+EXCLUDE: comedy, children music, generic pop, autotune heavy, drill, female vocals, aggressive rap, fast tempo, lo-fi, trap hi-hats`
+  },
+  {
+    id: 'melancholisch', name: 'DaN_MELANCHOLISCH', emoji: '🌧️', bpm: 75,
+    tag: 'Melancholisch', color: '#6366f1',
+    url: '',
+    prompt: `melancholic german rap, sad introspective vocals, slow-tempo 75 BPM, deep emotional male vocals, bittersweet tone, dark piano, cinematic strings, minor key, reflective delivery, thoughtful pacing, atmospheric production, vinyl crackle intro, sparse drums, intimate whispered moments, nostalgia and pain mixed, authentic sadness, high-fidelity, spacious mix, story-driven narrative
+
+EXCLUDE: comedy, children music, upbeat pop, fast tempo, aggressive rap, autotune heavy, drill, female vocals, generic loops, lo-fi, trap hi-hats`
+  },
+  {
+    id: 'kuehl', name: 'DaN_KÜHL', emoji: '🧊', bpm: 100,
+    tag: 'Kühl', color: '#94a3b8',
+    url: '',
+    prompt: `detached german rap, narrative-focused vocals, clear diction, cool delivery, mid-range tenor, factual storytelling without over-emotion, 100 BPM, minimal production, sparse instrumentation, direct communication style, authentic but restrained, cinematic but understated, high-fidelity studio, tight drums, focused bass, no reverb excess, professional documentary vibe, substance over style, street-smart intelligence
+
+EXCLUDE: comedy, children music, upbeat pop, autotune heavy, drill, female vocals, aggressive rap, fast tempo, lo-fi, trap hi-hats, overly emotional`
+  },
+  {
+    id: 'stolz', name: 'DaN_STOLZ', emoji: '👑', bpm: 115,
+    tag: 'Stolz', color: '#eab308',
+    url: '',
+    prompt: `confident german rap, proud commanding vocals, strong dominant delivery, deep resonant voice, assertive tone, 115 BPM, powerful 808 bass, cinematic orchestral strings, major key, self-assured flow, unwavering conviction, street-smart intelligence, earned respect vibe, substantial bars, high-fidelity production, punchy drums, powerful presence, no arrogance just strength, authentic self-belief, inspiring through confidence
+
+EXCLUDE: comedy, children music, upbeat pop, autotune heavy, drill, female vocals, weak vocals, fast tempo, lo-fi, trap hi-hats, self-doubt vibes`
+  },
+  {
+    id: 'wuetend', name: 'DaN_WÜTEND', emoji: '⚡', bpm: 140,
+    tag: 'Wütend', color: '#f97316',
+    url: '',
+    prompt: `raw intense german rap, explosive powerful vocals, intense aggressive delivery, harsh gritty tone, 140 BPM, heavy hard-hitting 808 bass, aggressive trap drums, dark cinematic beat, no filter raw emotion, brutal honesty, fighting spirit, dangerous edge without cartoon villainy, authentic anger not performed, high-fidelity raw mix, intense strings, minor key, explosive potential, street credibility, real pain not fake rage
+
+EXCLUDE: comedy, children music, upbeat pop, soft vocals, lo-fi, generic loops, female vocals, autotune, slow tempo, drill, trap hi-hats`
+  }
+];
+
+let currentSpId = null; // selected persona id for current song
+
+function initSunoPersonaPicker() {
+  const grid = document.getElementById('spGrid');
+  if (!grid) return;
+  const saved = (currentSongId && songs[currentSongId]?.suno_persona_id) || null;
+  currentSpId = saved;
+  grid.innerHTML = SUNO_PERSONAS.map(p => `
+    <div class="sp-card${p.id===saved?' selected':''}" data-sp="${p.id}"
+         style="--sp-color:${p.color}"
+         onclick="selectSunoPersona('${p.id}')">
+      <div class="sp-card-emoji">${p.emoji}</div>
+      <div class="sp-card-name">${p.name.replace('DaN_','')}</div>
+      <div class="sp-card-bpm">${p.bpm} BPM</div>
+      <div class="sp-card-tag" style="color:${p.color};border-color:${p.color}44;background:${p.color}11;">${p.tag}</div>
+    </div>`).join('');
+  if (saved) renderSpDetail(saved);
+}
+
+function selectSunoPersona(id) {
+  currentSpId = id;
+  // Update card selection
+  document.querySelectorAll('.sp-card').forEach(c => c.classList.toggle('selected', c.dataset.sp === id));
+  // Save to song
+  if (currentSongId && songs[currentSongId]) {
+    songs[currentSongId].suno_persona_id = id;
+    saveToStorage();
+  }
+  renderSpDetail(id);
+  // Update badge
+  const persona = SUNO_PERSONAS.find(p => p.id === id);
+  const badge = document.getElementById('spSelectedBadge');
+  if (badge && persona) {
+    badge.textContent = persona.emoji + ' ' + persona.name;
+    badge.style.display = '';
+    badge.style.setProperty('color', persona.color);
+    badge.style.setProperty('border-color', persona.color + '44');
+    badge.style.setProperty('background', persona.color + '18');
+  }
+}
+
+function renderSpDetail(id) {
+  const persona = SUNO_PERSONAS.find(p => p.id === id);
+  if (!persona) return;
+  const detail = document.getElementById('spDetail');
+  if (!detail) return;
+  detail.style.display = '';
+  detail.style.setProperty('--sp-color', persona.color);
+  document.getElementById('spDetailTitle').textContent = persona.emoji + '  ' + persona.name + '  ·  ' + persona.bpm + ' BPM';
+  document.getElementById('spPromptBox').textContent = persona.prompt;
+  const linkEl = document.getElementById('spSunoLink');
+  if (linkEl) {
+    linkEl.innerHTML = persona.url
+      ? `<a href="${persona.url}" target="_blank" class="btn-copy" style="text-decoration:none;background:rgba(59,130,246,0.15);border-color:rgba(59,130,246,0.4);color:#60a5fa;">↗ In Suno öffnen</a>`
+      : `<span class="sp-no-url">Noch keine Suno-URL</span>`;
+  }
+}
+
+function copySpPrompt() {
+  const txt = document.getElementById('spPromptBox')?.textContent || '';
+  navigator.clipboard.writeText(txt).then(() => showToast('Persona-Prompt kopiert!', 'success')).catch(() => fallbackCopy(txt));
+}
+
+function applySpToBeat() {
+  const persona = SUNO_PERSONAS.find(p => p.id === currentSpId);
+  if (!persona) return;
+  // Apply BPM
+  const bpmEl = document.getElementById('p3_bpm');
+  const bpmValEl = document.getElementById('p3_bpm_val');
+  if (bpmEl) { bpmEl.value = persona.bpm; if(bpmValEl) bpmValEl.textContent = persona.bpm; }
+  // Apply mood tag if mood select exists
+  const moodEl = document.getElementById('p3_mood');
+  if (moodEl && persona.tag) {
+    // Try to find matching option, else leave
+    const opts = Array.from(moodEl.options);
+    const match = opts.find(o => o.value.toLowerCase().includes(persona.tag.toLowerCase()));
+    if (match) moodEl.value = match.value;
+  }
+  autoSave();
+  showToast(`BPM auf ${persona.bpm} gesetzt!`, 'success');
+}
+
+// =============================
+// STUDIO INTRO SOUND
+// =============================
+function playStudioSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const play = (freq, startT, dur, vol = 0.18, type = 'sine', detune = 0) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = type; osc.frequency.value = freq; osc.detune.value = detune;
+      gain.gain.setValueAtTime(0, ctx.currentTime + startT);
+      gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + startT + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startT + dur);
+      osc.start(ctx.currentTime + startT);
+      osc.stop(ctx.currentTime + startT + dur + 0.05);
+    };
+
+    // Deep 808-style kick hit
+    const kick = (t) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(160, ctx.currentTime + t);
+      osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + t + 0.25);
+      gain.gain.setValueAtTime(0.6, ctx.currentTime + t);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.4);
+      osc.start(ctx.currentTime + t);
+      osc.stop(ctx.currentTime + t + 0.5);
+    };
+
+    // Rising synth chord: C minor pentatonic (C Eb G Bb)
+    const chord = [130.81, 155.56, 196.00, 233.08];
+    chord.forEach((f, i) => play(f, 0.05 + i * 0.08, 2.0, 0.10, 'triangle', 0));
+
+    // Bright piano-like lead melody (rising motivating lick)
+    const melody = [392, 440, 523.25, 587.33, 659.25, 783.99];
+    melody.forEach((f, i) => play(f, 0.6 + i * 0.13, 0.5, 0.12, 'triangle', -5));
+
+    // Two 808 kicks for feel
+    kick(0.05); kick(0.55);
+
+    // Subtle noise burst (snare-like) at 0.55s
+    const bufSize = ctx.sampleRate * 0.08;
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const snareGain = ctx.createGain(); snareGain.gain.value = 0.15;
+    src.connect(snareGain); snareGain.connect(ctx.destination);
+    src.start(ctx.currentTime + 0.55);
+
+    // High bell ding at the end – "you're in"
+    play(1318.51, 2.0, 1.2, 0.08, 'sine');
+    play(1567.98, 2.15, 1.0, 0.06, 'sine');
+
+  } catch(e) { /* Audio not supported – silent fail */ }
 }
 
 // =============================
