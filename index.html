@@ -1030,6 +1030,21 @@
   .suno-version-desc { font-size:11px; color:var(--text-muted); margin-top:2px; }
   .suno-pro-badge { font-size:9px; padding:1px 5px; border-radius:3px; background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid rgba(245,158,11,0.3); font-weight:600; }
   .suno-check { color:#10b981; font-size:14px; margin-left:auto; }
+  /* Suno Structure Tag Toolbar */
+  .suno-tag-toolbar { padding-bottom:8px; }
+  .suno-tag-group-row { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:4px; }
+  .suno-struct-tag { font-size:11px; font-family:monospace; background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.28); color:#a78bfa; border-radius:4px; padding:2px 7px; cursor:pointer; transition:background 0.12s; white-space:nowrap; user-select:none; }
+  .suno-struct-tag:hover { background:rgba(124,58,237,0.26); }
+  .suno-vocal-tag { font-size:11px; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.22); color:#60a5fa; border-radius:4px; padding:2px 7px; cursor:pointer; transition:background 0.12s; white-space:nowrap; user-select:none; }
+  .suno-vocal-tag:hover { background:rgba(59,130,246,0.2); }
+  .suno-lyrics-bottom-row { display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
+  .suno-char-counter-sm { font-size:10px; color:rgba(148,163,184,0.45); }
+  .suno-char-counter-sm.warn { color:var(--warning); }
+  .suno-char-counter-sm.over { color:var(--danger); font-weight:700; }
+  .suno-stile-edit-input { width:100%; background:transparent; border:none; color:var(--text-muted); font-size:13px; outline:none; font-family:inherit; margin-bottom:2px; }
+  .suno-stile-edit-input::placeholder { color:rgba(148,163,184,0.35); }
+  .suno-prompt-copy-btn { display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:8px; border:1px solid rgba(124,58,237,0.4); background:rgba(124,58,237,0.12); color:#a78bfa; font-size:12px; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+  .suno-prompt-copy-btn:hover { background:rgba(124,58,237,0.22); }
 
   /* SUNO PROFILE */
   .suno-profile-bar {
@@ -2448,9 +2463,9 @@
               <div class="suno-action-left" style="position:relative;">
                 <button class="suno-pill-btn" onclick="toggleSunoAudioDd(event,false)" id="suno_audio_btn">+ Audio</button>
                 <div class="suno-dropdown" id="suno_audio_dd" style="top:40px;left:0;">
-                  <div class="suno-dropdown-item" onclick="closeSunoAudioDd()">↻ &nbsp;Remix</div>
-                  <div class="suno-dropdown-item" onclick="closeSunoAudioDd()">↑ &nbsp;Hochladen</div>
-                  <div class="suno-dropdown-item" onclick="closeSunoAudioDd()">🎙 &nbsp;Aufzeichnen</div>
+                  <div class="suno-dropdown-item" onclick="closeSunoAudioDd();sunoOpenRemix()">↻ &nbsp;Remix</div>
+                  <div class="suno-dropdown-item" onclick="closeSunoAudioDd();sunoOpenUpload()">↑ &nbsp;Hochladen</div>
+                  <div class="suno-dropdown-item" onclick="closeSunoAudioDd();sunoOpenRecord()">🎙 &nbsp;Aufzeichnen</div>
                 </div>
                 <button class="suno-pill-btn" onclick="sunoAddText()">+ Text</button>
               </div>
@@ -2469,9 +2484,9 @@
           <div class="suno-adv-top-row" style="position:relative;">
             <button class="suno-adv-btn" onclick="toggleSunoAudioDd(event,true)">+ Audio</button>
             <div class="suno-dropdown" id="suno_audio_dd2" style="top:52px;left:0;z-index:150;">
-              <div class="suno-dropdown-item" onclick="closeSunoAudioDd()">↻ &nbsp;Remix</div>
-              <div class="suno-dropdown-item" onclick="closeSunoAudioDd()">↑ &nbsp;Hochladen</div>
-              <div class="suno-dropdown-item" onclick="closeSunoAudioDd()">🎙 &nbsp;Aufzeichnen</div>
+              <div class="suno-dropdown-item" onclick="closeSunoAudioDd();sunoOpenRemix()">↻ &nbsp;Remix</div>
+              <div class="suno-dropdown-item" onclick="closeSunoAudioDd();sunoOpenUpload()">↑ &nbsp;Hochladen</div>
+              <div class="suno-dropdown-item" onclick="closeSunoAudioDd();sunoOpenRecord()">🎙 &nbsp;Aufzeichnen</div>
             </div>
             <button class="suno-adv-btn" onclick="openSunoPersonaPanel()">+ Persona</button>
             <button class="suno-adv-btn" onclick="openSunoInspoPanel()">+ Inspiration</button>
@@ -2486,11 +2501,44 @@
               </div>
             </div>
             <div class="suno-section-body">
-              <textarea class="suno-lyrics-textarea" id="suno_lyrics_text" rows="4"
-                placeholder="Schreibe einen Liedtext oder eine Anregung – oder lasse die Leerzeile für Instrumentalversionen frei."
-                oninput="autoSave()"></textarea>
-              <div class="suno-lyrics-expand">
-                <button class="suno-icon-btn" onclick="sunoExpandLyrics()" title="Vergrößern">⤢</button>
+              <!-- Struktur-Tag Toolbar -->
+              <div class="suno-tag-toolbar">
+                <div class="suno-tag-group-row">
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Intro]')">[Intro]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Verse 1]')">[Verse 1]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Verse 2]')">[Verse 2]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Pre-Chorus]')">[Pre-Chorus]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Chorus]')">[Chorus]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Post-Chorus]')">[Post-Chorus]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Hook]')">[Hook]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Bridge]')">[Bridge]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Break]')">[Break]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Build Up]')">[Build Up]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Drop]')">[Drop]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Outro]')">[Outro]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[Fade Out]')">[Fade Out]</span>
+                  <span class="suno-struct-tag" onclick="insertSunoLyricsTag('[End]')">[End]</span>
+                </div>
+                <div class="suno-tag-group-row">
+                  <span class="suno-vocal-tag" onclick="insertSunoLyricsTag('[male vocal]')">♂ male vocal</span>
+                  <span class="suno-vocal-tag" onclick="insertSunoLyricsTag('[female vocal]')">♀ female vocal</span>
+                  <span class="suno-vocal-tag" onclick="insertSunoLyricsTag('[duet]')">duet</span>
+                  <span class="suno-vocal-tag" onclick="insertSunoLyricsTag('[rap]')">rap</span>
+                  <span class="suno-vocal-tag" onclick="insertSunoLyricsTag('[whisper]')">whisper</span>
+                  <span class="suno-vocal-tag" onclick="insertSunoLyricsTag('[spoken word]')">spoken word</span>
+                  <span class="suno-vocal-tag" onclick="insertSunoLyricsTag('[choir]')">choir</span>
+                  <span class="suno-vocal-tag" onclick="insertSunoLyricsTag('[adlib]')">adlib</span>
+                </div>
+              </div>
+              <textarea class="suno-lyrics-textarea" id="suno_lyrics_text" rows="5"
+                placeholder="Schreibe einen Liedtext oder eine Anregung – oder lasse leer für Instrumental."
+                oninput="autoSave();updateSunoLyricsCounter()"></textarea>
+              <div class="suno-lyrics-bottom-row">
+                <span class="suno-char-counter-sm" id="suno_lyrics_counter">0 / 3000</span>
+                <div style="display:flex;gap:4px;">
+                  <button class="suno-icon-btn" onclick="sunoInsertStructureTemplate()" title="Rap-Struktur-Template einfügen">📋</button>
+                  <button class="suno-icon-btn" onclick="sunoExpandLyrics()" title="Vergrößern">⤢</button>
+                </div>
               </div>
             </div>
           </div>
@@ -2501,12 +2549,16 @@
               <div class="suno-section-title"><span class="suno-section-arrow">▼</span> Stile</div>
             </div>
             <div class="suno-section-body">
-              <div class="suno-style-text" id="suno_stile_display">rhythmischer Fluss, gefallener Engel, Stoner Rock, tragisch</div>
+              <input class="suno-stile-edit-input" id="suno_stile"
+                placeholder="z.B. german rap, aggressive, 140 bpm, dark, male vocals, trap drums..."
+                oninput="autoSave();updateSunoCockpit()">
+              <div style="font-size:10px;color:rgba(148,163,184,0.4);margin-bottom:8px;">Komma-getrennt · max. 200 Zeichen</div>
               <div class="suno-style-tags-row" id="suno_stile_tags_row">
-                <button class="suno-style-icon-btn" title="Bibliothek">≡</button>
-                <button class="suno-style-icon-btn" onclick="sunoRefreshStyleTags()" title="Aktualisieren">↻</button>
+                <button class="suno-style-icon-btn" onclick="sunoRefreshStyleTags()" title="Stile aus Phase 3 übernehmen" style="width:auto;padding:0 10px;font-size:11px;">↻ aus Phase 3</button>
               </div>
-              <input type="text" id="suno_stile" style="display:none" oninput="autoSave();updateSunoCockpit()">
+              <div style="margin-top:10px;">
+                <input class="suno-exclude-input" id="suno_stile_exclude" placeholder="✗ Stile ausschließen: z.B. autotune, female vocals..." oninput="autoSave()">
+              </div>
             </div>
           </div>
 
@@ -2516,9 +2568,6 @@
               <div class="suno-section-title"><span class="suno-section-arrow">▼</span> Weitere Optionen</div>
             </div>
             <div class="suno-section-body" style="display:none">
-              <div style="margin-bottom:10px;">
-                <input class="suno-exclude-input" id="suno_stile_exclude" placeholder="✗  Stile ausschließen" oninput="autoSave()">
-              </div>
               <div class="suno-opt-row">
                 <div class="suno-opt-label">Stimmliches Geschlecht <span class="suno-opt-info" title="Beeinflusst die Stimmrichtung der generierten Vocals">ⓘ</span></div>
                 <div class="suno-binary-toggle">
@@ -2558,10 +2607,10 @@
             <input class="suno-title-input" id="suno_titel" placeholder="Song Title (Optional)" oninput="autoSave()">
           </div>
 
-          <!-- Save row -->
+          <!-- Prompt Copy row -->
           <div class="suno-save-row">
-            <div class="suno-save-label">📁 Speichern unter...</div>
-            <button class="suno-workspace-btn">Mein Arbeitsbereich</button>
+            <div id="suno_live_stile" style="font-size:10px;color:rgba(148,163,184,0.4);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px;"></div>
+            <button class="suno-prompt-copy-btn" onclick="copySunoPrompt()" title="Fertigen Suno-Prompt in Zwischenablage kopieren">📋 Prompt kopieren</button>
           </div>
         </div>
 
@@ -5034,7 +5083,7 @@ function applyBezModulPreset(mod) {
 
 function switchPhase(num) {
   if (num === 0) { updateDashboard(); updateSunoCockpit(); }
-  if (num === 3) { setTimeout(() => { initSunoPersonaPicker(); initBeatStudio(); updateBsBpm(); }, 0); }
+  if (num === 3) { setTimeout(() => { initSunoPersonaPicker(); initBeatStudio(); updateBsBpm(); updateSunoLyricsCounter(); updateSunoCockpit(); }, 0); }
   if (num === 10) { loadYtReleases(); renderYtReleases(); }
   if (num === 11) { loadAlbums(); renderDiscography(); }
 
@@ -5229,6 +5278,8 @@ function loadSongData(id) {
   }
 
   updateNavLocks();
+  // Update Suno lyrics counter if suno_lyrics_text is loaded
+  updateSunoLyricsCounter();
 }
 
 function hideResult(id) {
@@ -6680,8 +6731,154 @@ function renderSunoStyleTags() {
   }
 }
 
-function openSunoPersonaPanel() {}
-function openSunoInspoPanel() {}
+function openSunoPersonaPanel() {
+  // Scroll to the persona card in Phase 3
+  const card = document.getElementById('sunoPersonaCard');
+  if (card) {
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    card.style.outline = '2px solid rgba(124,58,237,0.6)';
+    setTimeout(() => { card.style.outline = ''; }, 1500);
+  }
+}
+
+function openSunoInspoPanel() {
+  // Switch to einfach mode and highlight inspiration chips
+  setSunoModus('einfach');
+  const chips = document.getElementById('suno_inspo_chips');
+  if (chips) {
+    chips.style.outline = '2px solid rgba(124,58,237,0.5)';
+    chips.style.borderRadius = '8px';
+    chips.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => { chips.style.outline = ''; }, 1500);
+  }
+}
+
+// ─── Suno Lyrics Tag Toolbar ───────────────────────────────
+function insertSunoLyricsTag(tag) {
+  const ta = document.getElementById('suno_lyrics_text');
+  if (!ta) return;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const before = ta.value.substring(0, start);
+  const after = ta.value.substring(end);
+  const needsNewlineBefore = before.length > 0 && !before.endsWith('\n');
+  const needsNewlineAfter = after.length > 0 && !after.startsWith('\n');
+  const insert = (needsNewlineBefore ? '\n' : '') + tag + (needsNewlineAfter ? '\n' : '');
+  ta.value = before + insert + after;
+  const newPos = start + insert.length;
+  ta.setSelectionRange(newPos, newPos);
+  ta.focus();
+  autoSave();
+  updateSunoLyricsCounter();
+}
+
+function updateSunoLyricsCounter() {
+  const ta = document.getElementById('suno_lyrics_text');
+  const counter = document.getElementById('suno_lyrics_counter');
+  if (!ta || !counter) return;
+  const len = ta.value.length;
+  counter.textContent = len + ' / 3000';
+  counter.className = 'suno-char-counter-sm' + (len > 3000 ? ' over' : len > 2500 ? ' warn' : '');
+}
+
+function sunoInsertStructureTemplate() {
+  const ta = document.getElementById('suno_lyrics_text');
+  if (!ta) return;
+  const template = '[Intro]\n\n[Verse 1]\n\n[Pre-Chorus]\n\n[Chorus]\n\n[Verse 2]\n\n[Pre-Chorus]\n\n[Chorus]\n\n[Bridge]\n\n[Final Chorus]\n\n[Outro]';
+  const existing = ta.value.trim();
+  if (existing && !confirm('Bestehenden Text behalten und Struktur anhängen?')) {
+    ta.value = template;
+  } else if (existing) {
+    ta.value = existing + '\n\n' + template;
+  } else {
+    ta.value = template;
+  }
+  autoSave();
+  updateSunoLyricsCounter();
+  showToast('Rap-Struktur eingefügt!', 'success');
+}
+
+// ─── Audio Dropdown Handler ────────────────────────────────
+function sunoOpenRemix() {
+  showToast('Remix: Lade zuerst deinen Beat in Phase 8 hoch. Den Suno-Prompt aus dem Cockpit kopieren und auf Suno.com als Remix-Basis nutzen.', 'info');
+}
+function sunoOpenUpload() {
+  showToast('Audio-Upload direkt auf Suno.com → "Upload Audio" nutzen. Beat aus Phase 8 exportieren und dort hochladen.', 'info');
+}
+function sunoOpenRecord() {
+  switchPhase(8);
+  showToast('Audio Studio geöffnet → hier aufnehmen oder hochladen!', 'success');
+}
+
+// ─── Suno Prompt kopieren ─────────────────────────────────
+function copySunoPrompt() {
+  const song = currentSongId ? songs[currentSongId] : null;
+  const modus = document.getElementById('suno_modus')?.value || 'fortschrittlich';
+  const version = document.getElementById('suno_version')?.value || 'v5';
+  const titel = document.getElementById('suno_titel')?.value || (song?.name) || '';
+  const stile = document.getElementById('suno_stile')?.value || '';
+  const exclude = document.getElementById('suno_stile_exclude')?.value || '';
+  const gender = document.getElementById('suno_geschlecht')?.value || 'auto';
+  const lyricsMode = document.getElementById('suno_lyrics_mode')?.value || 'handbuch';
+  const weird = document.getElementById('suno_seltsamkeit')?.value || 50;
+  const stilinfl = document.getElementById('suno_stileinfluss')?.value || 75;
+  const instrBtn = document.getElementById('suno_instr_btn');
+  const isInstrumental = instrBtn?.classList.contains('active') || false;
+
+  let lines = [];
+
+  if (titel) lines.push('Title: ' + titel);
+  if (version) lines.push('Version: ' + version);
+
+  if (modus === 'einfach') {
+    const desc = document.getElementById('suno_beschreibung')?.value || '';
+    if (desc) lines.push('\nBeschreibung:\n' + desc);
+  } else if (modus === 'geraeusche') {
+    const desc = document.getElementById('suno_geraeusch_desc')?.value || '';
+    if (desc) lines.push('\nGeräuschbeschreibung:\n' + desc);
+  } else {
+    // Fortschrittlich
+    const lyrics = document.getElementById('suno_lyrics_text')?.value || '';
+    if (lyrics && !isInstrumental) lines.push('\n[LYRICS]\n' + lyrics);
+    if (isInstrumental) lines.push('\n[Instrumental]');
+  }
+
+  if (stile) {
+    let styleStr = stile;
+    if (song?.p3_bpm) styleStr += ', ' + song.p3_bpm + ' bpm';
+    if (song?.p3_key) styleStr += ', ' + song.p3_key;
+    if (gender === 'maennlich') styleStr += ', male vocals';
+    else if (gender === 'weiblich') styleStr += ', female vocals';
+    lines.push('\nStyle: ' + styleStr);
+  }
+  if (exclude) lines.push('Exclude: ' + exclude);
+
+  // Suno Persona prompt
+  const personaId = song?.suno_persona_id;
+  if (personaId) {
+    const persona = SUNO_PERSONAS.find(p => p.id === personaId);
+    if (persona) {
+      const fmt = song?.p1_song_format || 'solo';
+      const fullPrompt = fmt === 'duett' && persona.duett
+        ? persona.prompt + '\n\n' + persona.duett
+        : persona.prompt;
+      lines.push('\n[PERSONA PROMPT]\n' + fullPrompt);
+    }
+  }
+
+  lines.push('\nSeltsamkeit: ' + weird + '% | Stileinfluss: ' + stilinfl + '%');
+  lines.push('Lyrics Mode: ' + (lyricsMode === 'auto' ? 'Auto (Suno generiert)' : 'Handbuch'));
+
+  const prompt = lines.join('\n').trim();
+  if (!prompt) { showToast('Nichts zum Kopieren – füll erst die Felder aus!', 'error'); return; }
+
+  navigator.clipboard.writeText(prompt).then(() => {
+    showToast('Suno-Prompt kopiert! ✓', 'success');
+  }).catch(() => {
+    fallbackCopy(prompt);
+    showToast('Suno-Prompt kopiert! ✓', 'success');
+  });
+}
 
 // Close suno dropdowns on outside click
 document.addEventListener('click', function() {
