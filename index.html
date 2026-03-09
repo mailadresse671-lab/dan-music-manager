@@ -20,6 +20,7 @@
     --success: #10b981;
     --danger: #ef4444;
     --warning: #f59e0b;
+    --pink: #ec4899;
   }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -943,6 +944,92 @@
   .suno-ref-item { font-size:12px; color:var(--text); padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; gap:6px; }
   .suno-badge { font-size:9px; padding:1px 5px; border-radius:3px; background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
   .suno-badge.pro { background:rgba(245,158,11,0.15); color:#f59e0b; border-color:rgba(245,158,11,0.3); }
+
+  /* ===== SUNO COCKPIT v2 (Suno.com style) ===== */
+  .suno-ui-wrap { background:#1a1a1a; border-radius:16px; overflow:visible; position:relative; }
+  .suno-topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; gap:10px; }
+  .suno-credit-pill { display:flex; align-items:center; gap:5px; padding:6px 14px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:var(--text); font-size:13px; cursor:default; }
+  .suno-mode-tabs { display:flex; align-items:center; background:rgba(255,255,255,0.06); border-radius:999px; padding:3px; gap:0; }
+  .suno-mode-tab { padding:6px 16px; border-radius:999px; border:none; background:transparent; color:var(--text-muted); cursor:pointer; font-size:13px; transition:all 0.15s; white-space:nowrap; }
+  .suno-mode-tab.active { background:rgba(255,255,255,0.12); color:var(--text); font-weight:500; }
+  .suno-version-btn { display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:var(--text); font-size:13px; cursor:pointer; transition:all 0.15s; }
+  .suno-version-btn:hover { border-color:rgba(255,255,255,0.3); }
+  .suno-mode-content { display:none; padding:0 14px 14px; }
+  .suno-mode-content.active { display:block; }
+  .suno-desc-card { background:rgba(255,255,255,0.04); border-radius:12px; padding:16px; margin-bottom:12px; }
+  .suno-desc-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .suno-desc-label { font-size:15px; font-weight:600; color:var(--text); }
+  .suno-dice-btn { width:36px; height:36px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.08); color:var(--text); cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+  .suno-dice-btn:hover { background:rgba(255,255,255,0.15); }
+  .suno-desc-textarea { width:100%; min-height:100px; background:transparent; border:none; color:var(--text-muted); font-size:14px; resize:none; outline:none; font-family:inherit; line-height:1.5; }
+  .suno-action-row { display:flex; align-items:center; justify-content:space-between; margin-top:12px; }
+  .suno-action-left { display:flex; gap:8px; }
+  .suno-pill-btn { display:flex; align-items:center; gap:5px; padding:7px 14px; border-radius:999px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:var(--text); font-size:13px; cursor:pointer; transition:all 0.15s; position:relative; }
+  .suno-pill-btn:hover { background:rgba(255,255,255,0.13); }
+  .suno-instrumental-btn { display:flex; align-items:center; gap:6px; padding:7px 16px; border-radius:999px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:var(--text-muted); font-size:13px; cursor:pointer; transition:all 0.15s; }
+  .suno-instrumental-btn.active { border-color:rgba(255,255,255,0.4); color:var(--text); background:rgba(255,255,255,0.12); }
+  .suno-instr-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.3); }
+  .suno-instrumental-btn.active .suno-instr-dot { background:#10b981; }
+  .suno-inspiration-label { font-size:13px; color:var(--text-muted); margin-bottom:8px; margin-top:4px; }
+  .suno-chips-row { display:flex; flex-wrap:wrap; gap:8px; }
+  .suno-chip { padding:6px 14px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:var(--text); font-size:13px; cursor:pointer; transition:all 0.15s; }
+  .suno-chip:hover { background:rgba(255,255,255,0.12); }
+  .suno-adv-top-row { display:grid; grid-template-columns:1fr 1fr 1fr; border-bottom:1px solid rgba(255,255,255,0.08); margin:0 -14px; margin-bottom:12px; }
+  .suno-adv-btn { display:flex; align-items:center; justify-content:center; gap:6px; padding:12px; background:transparent; border:none; color:var(--text-muted); font-size:13px; cursor:pointer; transition:all 0.15s; border-right:1px solid rgba(255,255,255,0.08); position:relative; }
+  .suno-adv-btn:last-child { border-right:none; }
+  .suno-adv-btn:hover { color:var(--text); background:rgba(255,255,255,0.04); }
+  .suno-section { border:1px solid rgba(255,255,255,0.08); border-radius:12px; margin-bottom:10px; overflow:hidden; }
+  .suno-section-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; cursor:pointer; user-select:none; }
+  .suno-section-title { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:500; color:var(--text); }
+  .suno-section-arrow { font-size:11px; color:var(--text-muted); transition:transform 0.2s; }
+  .suno-section.collapsed .suno-section-arrow { transform:rotate(-90deg); }
+  .suno-section-body { padding:12px 14px; border-top:1px solid rgba(255,255,255,0.06); }
+  .suno-section.collapsed .suno-section-body { display:none; }
+  .suno-section-actions { display:flex; gap:6px; }
+  .suno-icon-btn { width:32px; height:32px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; transition:all 0.15s; }
+  .suno-icon-btn:hover { background:rgba(255,255,255,0.1); color:var(--text); }
+  .suno-lyrics-textarea { width:100%; min-height:80px; background:transparent; border:none; color:var(--text-muted); font-size:13px; resize:none; outline:none; font-family:inherit; line-height:1.5; }
+  .suno-lyrics-expand { text-align:right; margin-top:4px; }
+  .suno-style-text { font-size:13px; color:var(--text-muted); margin-bottom:10px; }
+  .suno-style-tags-row { display:flex; align-items:center; gap:6px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px; }
+  .suno-style-tags-row::-webkit-scrollbar { display:none; }
+  .suno-style-icon-btn { flex-shrink:0; width:34px; height:34px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; transition:all 0.15s; }
+  .suno-style-icon-btn:hover { background:rgba(255,255,255,0.12); }
+  .suno-style-chip { flex-shrink:0; padding:6px 12px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:var(--text); font-size:13px; cursor:pointer; white-space:nowrap; }
+  .suno-opt-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .suno-opt-row:last-child { border-bottom:none; }
+  .suno-opt-label { font-size:13px; color:var(--text); display:flex; align-items:center; gap:5px; }
+  .suno-opt-info { font-size:11px; color:var(--text-muted); cursor:help; }
+  .suno-binary-toggle { display:flex; gap:8px; }
+  .suno-binary-btn { padding:5px 14px; border-radius:6px; border:1px solid rgba(255,255,255,0.08); background:transparent; color:var(--text-muted); font-size:13px; cursor:pointer; transition:all 0.15s; }
+  .suno-binary-btn.active { background:rgba(255,255,255,0.12); color:var(--text); border-color:rgba(255,255,255,0.2); }
+  .suno-exclude-input { width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:8px 12px; color:var(--text-muted); font-size:13px; outline:none; font-family:inherit; box-sizing:border-box; }
+  .suno-exclude-input:focus { border-color:rgba(255,255,255,0.2); }
+  .suno-slider-row { display:flex; align-items:center; gap:10px; flex:1; justify-content:flex-end; }
+  .suno-slider-pink { -webkit-appearance:none; height:3px; background:rgba(255,255,255,0.15); border-radius:2px; outline:none; width:140px; cursor:pointer; }
+  .suno-slider-pink::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; background:var(--pink,#ec4899); border-radius:50%; cursor:pointer; }
+  .suno-slider-pink::-moz-range-thumb { width:18px; height:18px; background:var(--pink,#ec4899); border-radius:50%; cursor:pointer; border:none; }
+  .suno-slider-pct { font-size:13px; color:var(--text-muted); min-width:36px; text-align:right; }
+  .suno-title-input-wrap { display:flex; align-items:center; gap:8px; padding:10px 0; border-top:1px solid rgba(255,255,255,0.06); }
+  .suno-title-icon { color:var(--text-muted); font-size:14px; }
+  .suno-title-input { flex:1; background:transparent; border:none; outline:none; color:var(--text-muted); font-size:13px; font-family:inherit; }
+  .suno-save-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-top:1px solid rgba(255,255,255,0.06); }
+  .suno-save-label { font-size:13px; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+  .suno-workspace-btn { padding:6px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.06); color:var(--text); font-size:13px; cursor:pointer; transition:all 0.15s; }
+  .suno-workspace-btn:hover { background:rgba(255,255,255,0.12); }
+  .suno-dropdown { position:absolute; background:#2a2a2a; border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:6px; z-index:100; min-width:160px; box-shadow:0 8px 32px rgba(0,0,0,0.5); display:none; }
+  .suno-dropdown.open { display:block; }
+  .suno-dropdown-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; cursor:pointer; color:var(--text); font-size:13px; transition:all 0.12s; }
+  .suno-dropdown-item:hover { background:rgba(255,255,255,0.08); }
+  .suno-version-dropdown { position:absolute; right:0; top:44px; background:#2a2a2a; border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:6px; z-index:200; min-width:280px; box-shadow:0 8px 32px rgba(0,0,0,0.5); display:none; }
+  .suno-version-dropdown.open { display:block; }
+  .suno-version-option { padding:10px 12px; border-radius:8px; cursor:pointer; transition:all 0.12s; }
+  .suno-version-option:hover { background:rgba(255,255,255,0.08); }
+  .suno-version-option.selected { background:rgba(255,255,255,0.06); }
+  .suno-version-name { font-size:13px; font-weight:500; color:var(--text); display:flex; align-items:center; gap:6px; }
+  .suno-version-desc { font-size:11px; color:var(--text-muted); margin-top:2px; }
+  .suno-pro-badge { font-size:9px; padding:1px 5px; border-radius:3px; background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid rgba(245,158,11,0.3); font-weight:600; }
+  .suno-check { color:#10b981; font-size:14px; margin-left:auto; }
 
   /* SUNO PROFILE */
   .suno-profile-bar {
@@ -2298,178 +2385,201 @@
         </div>
       </div>
 
-      <!-- SUNO-COCKPIT -->
-      <div class="card suno-cockpit-card" style="margin-top:16px;border-color:rgba(16,185,129,0.3);">
-        <div class="card-title" style="color:#10b981;">🎛️ Suno-Cockpit <span style="font-size:11px;color:var(--text-muted);font-weight:400;">– Einstellungen direkt für suno.com</span></div>
+      <!-- SUNO-COCKPIT v2 -->
+      <div class="card suno-cockpit-card suno-ui-wrap" style="margin-top:16px;padding:0;border-color:rgba(255,255,255,0.1);">
+        <!-- Hidden fields for save/load compatibility -->
+        <input type="hidden" id="suno_modus" value="einfach">
+        <input type="hidden" id="suno_geschlecht" value="maennlich">
+        <input type="hidden" id="suno_lyrics_mode" value="handbuch">
+        <input type="hidden" id="suno_version" value="v5">
 
-        <!-- Modus -->
-        <div class="form-row" style="margin-bottom:12px;">
-          <div class="form-group">
-            <label>Modus</label>
-            <div class="suno-toggle-row" id="suno_modus_row">
-              <button class="suno-toggle-btn sel" data-val="einfach" onclick="setSunoToggle('suno_modus','einfach',this.closest('.suno-toggle-row'))" title="Text-Beschreibung → 2 Versionen">Einfach</button>
-              <button class="suno-toggle-btn" data-val="fortschrittlich" onclick="setSunoToggle('suno_modus','fortschrittlich',this.closest('.suno-toggle-row'))" title="Lyrics + Style + Exclude + Persona + Weirdness">Fortschrittlich</button>
-              <button class="suno-toggle-btn" data-val="audio" onclick="setSunoToggle('suno_modus','audio',this.closest('.suno-toggle-row'))" title="Audio 6–60s aufnehmen oder hochladen – Suno generiert inspiriert davon">Audio-Upload</button>
-              <button class="suno-toggle-btn" data-val="geraeusche" onclick="setSunoToggle('suno_modus','geraeusche',this.closest('.suno-toggle-row'))" title="Sound-Effekte & Atmosphären">Geräusche</button>
-            </div>
-            <div style="font-size:11px;color:rgba(148,163,184,0.4);margin-top:5px;">10 Credits = 1 Generation = 2 Versionen (~30–60 Sek.)</div>
-            <input type="hidden" id="suno_modus" value="einfach">
+        <!-- Top Bar -->
+        <div class="suno-topbar">
+          <div class="suno-credit-pill">♪ <span id="suno_credits">869</span></div>
+          <div class="suno-mode-tabs">
+            <button class="suno-mode-tab active" data-mode="einfach" onclick="setSunoModus('einfach')">Einfach</button>
+            <button class="suno-mode-tab" data-mode="fortschrittlich" onclick="setSunoModus('fortschrittlich')">Fortschrittlich</button>
+            <button class="suno-mode-tab" data-mode="geraeusche" onclick="setSunoModus('geraeusche')">Geräusche</button>
           </div>
-          <div class="form-group">
-            <label>Version</label>
-            <select id="suno_version" onchange="autoSave();updateSunoCockpit();" style="font-size:13px;">
-              <option value="v5">V5 – Studio-Qualität · Authentische Vocals · 44.1kHz</option>
-              <option value="v5pro">V5 Pro – Höchste Fidelity · Beste Instrument-Trennung</option>
-              <option value="v45plus">Version 4.5+ Pro – Erweiterte Erstellung</option>
-              <option value="v45" selected>Version 4.5 Pro – Intelligente Prompts · 8 Min · 1200+ Genres</option>
-              <option value="v45all">v4.5-all – Bestes kostenloses Modell</option>
-              <option value="v4pro">V4 Pro – Verbesserte Klangqualität</option>
-              <option value="v35">Version 3.5</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Zusatz -->
-        <div class="form-group" style="margin-bottom:12px;">
-          <label>Zusatz</label>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="suno_add_audio" onchange="autoSave();updateSunoCockpit();" style="accent-color:var(--purple);"> + Audio</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="suno_add_persona" onchange="autoSave();updateSunoCockpit();" style="accent-color:var(--purple);"> + Persona</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="suno_add_inspo" onchange="autoSave();updateSunoCockpit();" style="accent-color:var(--purple);"> + Inspo</label>
-          </div>
-        </div>
-
-        <!-- Stile + Stile ausschließen -->
-        <div class="form-row" style="margin-bottom:12px;">
-          <div class="form-group">
-            <label>Stile <span style="font-size:11px;color:var(--text-muted);">(auto aus Phase 3)</span></label>
-            <input type="text" id="suno_stile" placeholder="Trap, dark, heavy 808s, german rap..." oninput="autoSave();updateSunoCockpit();">
-          </div>
-          <div class="form-group">
-            <label>Stile ausschließen</label>
-            <input type="text" id="suno_stile_exclude" placeholder="Pop, Country, Reggaeton..." oninput="autoSave();updateSunoCockpit();">
-          </div>
-        </div>
-
-        <!-- Geschlecht + Lyrics Mode -->
-        <div class="form-row" style="margin-bottom:12px;">
-          <div class="form-group">
-            <label>Stimmliches Geschlecht</label>
-            <div class="suno-toggle-row" id="suno_geschlecht_row">
-              <button class="suno-toggle-btn" data-val="maennlich" onclick="setSunoToggle('suno_geschlecht','maennlich',this.closest('.suno-toggle-row'))">Männlich</button>
-              <button class="suno-toggle-btn sel" data-val="auto" onclick="setSunoToggle('suno_geschlecht','auto',this.closest('.suno-toggle-row'))">Auto</button>
-              <button class="suno-toggle-btn" data-val="weiblich" onclick="setSunoToggle('suno_geschlecht','weiblich',this.closest('.suno-toggle-row'))">Weiblich</button>
-            </div>
-            <input type="hidden" id="suno_geschlecht" value="auto">
-          </div>
-          <div class="form-group">
-            <label>Lyrics Mode</label>
-            <div class="suno-toggle-row" id="suno_lyrics_mode_row">
-              <button class="suno-toggle-btn sel" data-val="handbuch" onclick="setSunoToggle('suno_lyrics_mode','handbuch',this.closest('.suno-toggle-row'))">Handbuch</button>
-              <button class="suno-toggle-btn" data-val="auto" onclick="setSunoToggle('suno_lyrics_mode','auto',this.closest('.suno-toggle-row'))">Auto</button>
-            </div>
-            <input type="hidden" id="suno_lyrics_mode" value="handbuch">
-          </div>
-        </div>
-
-        <!-- Seltsamkeit + Stileinfluss -->
-        <div class="form-row" style="margin-bottom:12px;">
-          <div class="form-group">
-            <label>Seltsamkeit <span class="suno-slider-val" id="suno_weird_val">50%</span></label>
-            <input type="range" id="suno_seltsamkeit" min="0" max="100" value="50" oninput="document.getElementById('suno_weird_val').textContent=this.value+'%';autoSave();updateSunoCockpit();">
-          </div>
-          <div class="form-group">
-            <label>Stileinfluss <span class="suno-slider-val" id="suno_stilinfl_val">75%</span></label>
-            <input type="range" id="suno_stileinfluss" min="0" max="100" value="75" oninput="document.getElementById('suno_stilinfl_val').textContent=this.value+'%';autoSave();updateSunoCockpit();">
-          </div>
-        </div>
-
-        <!-- Songtitel -->
-        <div class="form-group" style="margin-bottom:14px;">
-          <label>Songtitel (optional)</label>
-          <input type="text" id="suno_titel" placeholder="Songtitel für Suno..." oninput="autoSave();updateSunoCockpit();">
-        </div>
-
-        <!-- Live Preview -->
-        <div style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <span style="font-size:13px;font-weight:600;color:#10b981;">🎯 Suno → Stile-Feld (Live)</span>
-            <button class="btn-copy" onclick="copyEl('suno_live_stile')" style="font-size:11px;padding:4px 8px;">📋 Kopieren</button>
-          </div>
-          <div class="suno-live-box" id="suno_live_stile">–</div>
-        </div>
-
-        <!-- Post-Generation Workflow Guide -->
-        <details style="margin-top:12px;" id="postGenDetails">
-          <summary style="cursor:pointer;font-size:13px;color:#10b981;font-weight:600;padding:8px 0;user-select:none;">
-            🚀 Nach dem Generieren – Suno Workflow
-          </summary>
-          <div style="margin-top:12px;">
-            <!-- Two version results note -->
-            <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--text-muted);">
-              💡 Suno generiert immer <strong style="color:var(--text);">2 Versionen</strong> gleichzeitig. Höre beide an und wähle die beste aus.
-              Generation dauert ~30–60 Sekunden.
-            </div>
-            <!-- Workflow steps -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
-                <div class="suno-ref-title" style="color:#60a5fa;">➕ Extend</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Song verlängern – Genre wechseln, neue Sektion anhängen.</div>
-                <div class="suno-ref-item">Klicke "Extend" bei einem bestimmten Timestamp</div>
-                <div class="suno-ref-item">Gib neuen Prompt ein (z.B. "switch to trap, heavy bass")</div>
-                <div class="suno-ref-item">Ideal für Genre-Wechsel mitten im Song</div>
+          <div style="position:relative;">
+            <button class="suno-version-btn" onclick="toggleSunoVersionDd(event)">
+              <span id="suno_version_label">v5</span> <span style="font-size:10px;">▼</span>
+            </button>
+            <div class="suno-version-dropdown" id="suno_version_dd">
+              <div class="suno-version-option selected" data-val="v5" onclick="setSunoVersion('v5',this)">
+                <div class="suno-version-name">v5 <span class="suno-pro-badge">Pro</span> <span class="suno-check" id="vcheck_v5">✓</span></div>
+                <div class="suno-version-desc">Authentischer Gesang, überragende Audioqualität und Kontrolle</div>
               </div>
-              <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
-                <div class="suno-ref-title" style="color:#ec4899;">🔁 Remix / Cover</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Remix = Cover + Extend + Reuse + Speed ändern.</div>
-                <div class="suno-ref-item">Cover – andere Stimme / Stil</div>
-                <div class="suno-ref-item">Reuse – Style &amp; Lyrics übernehmen</div>
-                <div class="suno-ref-item">Speed – Geschwindigkeit anpassen</div>
+              <div class="suno-version-option" data-val="v45plus" onclick="setSunoVersion('v45plus',this)">
+                <div class="suno-version-name">Version 4.5+ <span class="suno-pro-badge">Pro</span> <span class="suno-check" id="vcheck_v45plus" style="display:none">✓</span></div>
+                <div class="suno-version-desc">Erweiterte Erstellungsmethoden</div>
               </div>
-              <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
-                <div class="suno-ref-title" style="color:#f59e0b;">✨ Remaster</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Subtile Audio-Verbesserung ohne neue Generation.</div>
-                <div class="suno-ref-item">Schärft Audio: Bass tighter, Höhen klarer</div>
-                <div class="suno-ref-item">Funktioniert auch auf frischen Songs</div>
-                <div class="suno-ref-item">Kostenloser Qualitäts-Boost <span class="suno-badge pro">Pro</span></div>
+              <div class="suno-version-option" data-val="v45" onclick="setSunoVersion('v45',this)">
+                <div class="suno-version-name">Version 4.5 <span class="suno-pro-badge">Pro</span> <span class="suno-check" id="vcheck_v45" style="display:none">✓</span></div>
+                <div class="suno-version-desc">Intelligente Eingabeaufforderungen</div>
               </div>
-              <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
-                <div class="suno-ref-title" style="color:#10b981;">🎚️ Stems & MIDI</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Einzelne Spuren isolieren für Pro-Mixing.</div>
-                <div class="suno-ref-item">Bis zu 12 Stems als WAV (44.1kHz) <span class="suno-badge pro">Pro</span></div>
-                <div class="suno-ref-item">Vocals, Drums, Bass, Instrumente separat</div>
-                <div class="suno-ref-item">Export → Ableton / Logic / DAW</div>
-                <div class="suno-ref-item">MIDI Export (10 Credits/Stem) <span class="suno-badge" style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.3);">Premier</span></div>
+              <div class="suno-version-option" data-val="v45all" onclick="setSunoVersion('v45all',this)">
+                <div class="suno-version-name">v4.5-all <span class="suno-check" id="vcheck_v45all" style="display:none">✓</span></div>
+                <div class="suno-version-desc">Bestes kostenloses Modell</div>
+              </div>
+              <div class="suno-version-option" data-val="v4pro" onclick="setSunoVersion('v4pro',this)">
+                <div class="suno-version-name">v4 <span class="suno-pro-badge">Pro</span> <span class="suno-check" id="vcheck_v4pro" style="display:none">✓</span></div>
+                <div class="suno-version-desc">Verbesserte Klangqualität</div>
+              </div>
+              <div class="suno-version-option" data-val="v35" onclick="setSunoVersion('v35',this)">
+                <div class="suno-version-name">Version 3.5 <span class="suno-check" id="vcheck_v35" style="display:none">✓</span></div>
+                <div class="suno-version-desc">Grund Songstruktur</div>
               </div>
             </div>
-            <!-- Create options -->
-            <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div>
-                <div class="suno-ref-title" style="margin-top:0;">✨ Weitere Erstellungs-Optionen</div>
-                <div class="suno-ref-item">Persona erstellen (Vocal-Identität speichern) <span class="suno-badge pro">Pro</span></div>
-                <div class="suno-ref-item">Song Radio – Ähnliche Songs entdecken</div>
-                <div class="suno-ref-item">Abschnitt ersetzen <span class="suno-badge pro">Pro</span></div>
-                <div class="suno-ref-item" style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">
-                  <span style="color:#c084fc;font-size:11px;font-weight:700;">🎛️ Suno Studio (DAW)</span> <span class="suno-badge" style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.3);">Premier</span>
+          </div>
+        </div>
+
+        <!-- EINFACH MODE -->
+        <div class="suno-mode-content active" id="suno_content_einfach">
+          <div class="suno-desc-card">
+            <div class="suno-desc-header">
+              <span class="suno-desc-label">Songbeschreibung</span>
+              <button class="suno-dice-btn" onclick="sunoRandomDesc()" title="Zufällige Beschreibung">🎲</button>
+            </div>
+            <textarea class="suno-desc-textarea" id="suno_beschreibung"
+              placeholder="Beruhigende Power-Ballade über Freundschaftsbrüche"
+              oninput="autoSave();updateSunoCockpit()"></textarea>
+            <div class="suno-action-row">
+              <div class="suno-action-left" style="position:relative;">
+                <button class="suno-pill-btn" onclick="toggleSunoAudioDd(event,false)" id="suno_audio_btn">+ Audio</button>
+                <div class="suno-dropdown" id="suno_audio_dd" style="top:40px;left:0;">
+                  <div class="suno-dropdown-item" onclick="closeSunoAudioDd()">↻ &nbsp;Remix</div>
+                  <div class="suno-dropdown-item" onclick="closeSunoAudioDd()">↑ &nbsp;Hochladen</div>
+                  <div class="suno-dropdown-item" onclick="closeSunoAudioDd()">🎙 &nbsp;Aufzeichnen</div>
                 </div>
-                <div class="suno-ref-item">Multi-Track Timeline · BPM/Pitch pro Spur</div>
-                <div class="suno-ref-item">KI-Stems generieren (Bassline, Drums, Melody)</div>
-                <div class="suno-ref-item">Direkt aufnehmen in Studio-Timeline</div>
+                <button class="suno-pill-btn" onclick="sunoAddText()">+ Text</button>
               </div>
-              <div>
-                <div class="suno-ref-title" style="margin-top:0;">⬇️ Download-Optionen</div>
-                <div class="suno-ref-item">MP3-Audio – immer verfügbar</div>
-                <div class="suno-ref-item">WAV-Audio (44.1 kHz) <span class="suno-badge pro">Pro</span></div>
-                <div class="suno-ref-item">Video (mit Visualizer) <span class="suno-badge pro">Pro</span></div>
-                <div class="suno-ref-title" style="margin-top:8px;">⚙️ Verwalten</div>
-                <div class="suno-ref-item">Zur Playlist / Workspace</div>
-                <div class="suno-ref-item">Veröffentlichen / Teilen</div>
-                <div class="suno-ref-item">Cover generieren</div>
+              <button class="suno-instrumental-btn" id="suno_instr_btn" onclick="toggleSunoInstrumental()">
+                <span class="suno-instr-dot"></span> Instrumental
+              </button>
+            </div>
+          </div>
+          <div class="suno-inspiration-label">Inspiration</div>
+          <div class="suno-chips-row" id="suno_inspo_chips"></div>
+        </div>
+
+        <!-- FORTSCHRITTLICH MODE -->
+        <div class="suno-mode-content" id="suno_content_fortschrittlich">
+          <!-- 3-button top row -->
+          <div class="suno-adv-top-row" style="position:relative;">
+            <button class="suno-adv-btn" onclick="toggleSunoAudioDd(event,true)">+ Audio</button>
+            <div class="suno-dropdown" id="suno_audio_dd2" style="top:52px;left:0;z-index:150;">
+              <div class="suno-dropdown-item" onclick="closeSunoAudioDd()">↻ &nbsp;Remix</div>
+              <div class="suno-dropdown-item" onclick="closeSunoAudioDd()">↑ &nbsp;Hochladen</div>
+              <div class="suno-dropdown-item" onclick="closeSunoAudioDd()">🎙 &nbsp;Aufzeichnen</div>
+            </div>
+            <button class="suno-adv-btn" onclick="openSunoPersonaPanel()">+ Persona</button>
+            <button class="suno-adv-btn" onclick="openSunoInspoPanel()">+ Inspiration</button>
+          </div>
+
+          <!-- Text section -->
+          <div class="suno-section" id="suno_sec_text">
+            <div class="suno-section-header" onclick="toggleSunoSection('suno_sec_text')">
+              <div class="suno-section-title"><span class="suno-section-arrow">▼</span> Text</div>
+              <div class="suno-section-actions">
+                <button class="suno-icon-btn" onclick="event.stopPropagation();sunoAiLyrics()" title="KI Lyrics generieren">✨</button>
+              </div>
+            </div>
+            <div class="suno-section-body">
+              <textarea class="suno-lyrics-textarea" id="suno_lyrics_text" rows="4"
+                placeholder="Schreibe einen Liedtext oder eine Anregung – oder lasse die Leerzeile für Instrumentalversionen frei."
+                oninput="autoSave()"></textarea>
+              <div class="suno-lyrics-expand">
+                <button class="suno-icon-btn" onclick="sunoExpandLyrics()" title="Vergrößern">⤢</button>
               </div>
             </div>
           </div>
-        </details>
+
+          <!-- Stile section -->
+          <div class="suno-section" id="suno_sec_stile">
+            <div class="suno-section-header" onclick="toggleSunoSection('suno_sec_stile')">
+              <div class="suno-section-title"><span class="suno-section-arrow">▼</span> Stile</div>
+            </div>
+            <div class="suno-section-body">
+              <div class="suno-style-text" id="suno_stile_display">rhythmischer Fluss, gefallener Engel, Stoner Rock, tragisch</div>
+              <div class="suno-style-tags-row" id="suno_stile_tags_row">
+                <button class="suno-style-icon-btn" title="Bibliothek">≡</button>
+                <button class="suno-style-icon-btn" onclick="sunoRefreshStyleTags()" title="Aktualisieren">↻</button>
+              </div>
+              <input type="text" id="suno_stile" style="display:none" oninput="autoSave();updateSunoCockpit()">
+            </div>
+          </div>
+
+          <!-- Weitere Optionen section -->
+          <div class="suno-section collapsed" id="suno_sec_optionen">
+            <div class="suno-section-header" onclick="toggleSunoSection('suno_sec_optionen')">
+              <div class="suno-section-title"><span class="suno-section-arrow">▼</span> Weitere Optionen</div>
+            </div>
+            <div class="suno-section-body" style="display:none">
+              <div style="margin-bottom:10px;">
+                <input class="suno-exclude-input" id="suno_stile_exclude" placeholder="✗  Stile ausschließen" oninput="autoSave()">
+              </div>
+              <div class="suno-opt-row">
+                <div class="suno-opt-label">Stimmliches Geschlecht <span class="suno-opt-info" title="Beeinflusst die Stimmrichtung der generierten Vocals">ⓘ</span></div>
+                <div class="suno-binary-toggle">
+                  <button class="suno-binary-btn active" data-val="maennlich" onclick="setSunoGeschlecht('maennlich')">Männlich</button>
+                  <button class="suno-binary-btn" data-val="weiblich" onclick="setSunoGeschlecht('weiblich')">Weiblich</button>
+                </div>
+              </div>
+              <div class="suno-opt-row">
+                <div class="suno-opt-label">Lyrics Mode <span class="suno-opt-info" title="Handbuch: du schreibst die Lyrics. Auto: Suno generiert Lyrics.">ⓘ</span></div>
+                <div class="suno-binary-toggle">
+                  <button class="suno-binary-btn active" data-val="handbuch" onclick="setSunoLyricsMode('handbuch')">Handbuch</button>
+                  <button class="suno-binary-btn" data-val="auto" onclick="setSunoLyricsMode('auto')">Auto</button>
+                </div>
+              </div>
+              <div class="suno-opt-row">
+                <div class="suno-opt-label">Seltsamkeit <span class="suno-opt-info" title="Wie ungewöhnlich/experimentell der Song klingen soll">ⓘ</span></div>
+                <div class="suno-slider-row">
+                  <input type="range" class="suno-slider-pink" id="suno_seltsamkeit" min="0" max="100" value="50"
+                    oninput="document.getElementById('suno_weird_val').textContent=this.value+' %';autoSave()">
+                  <span class="suno-slider-pct" id="suno_weird_val">50 %</span>
+                </div>
+              </div>
+              <div class="suno-opt-row">
+                <div class="suno-opt-label">Stileinfluss <span class="suno-opt-info" title="Wie stark der Style-Prompt den Song beeinflusst">ⓘ</span></div>
+                <div class="suno-slider-row">
+                  <input type="range" class="suno-slider-pink" id="suno_stileinfluss" min="0" max="100" value="50"
+                    oninput="document.getElementById('suno_stilinfl_val').textContent=this.value+' %';autoSave()">
+                  <span class="suno-slider-pct" id="suno_stilinfl_val">50 %</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Song Title -->
+          <div class="suno-title-input-wrap">
+            <span class="suno-title-icon">♪</span>
+            <input class="suno-title-input" id="suno_titel" placeholder="Song Title (Optional)" oninput="autoSave()">
+          </div>
+
+          <!-- Save row -->
+          <div class="suno-save-row">
+            <div class="suno-save-label">📁 Speichern unter...</div>
+            <button class="suno-workspace-btn">Mein Arbeitsbereich</button>
+          </div>
+        </div>
+
+        <!-- GERÄUSCHE MODE -->
+        <div class="suno-mode-content" id="suno_content_geraeusche">
+          <div class="suno-desc-card">
+            <div class="suno-desc-header">
+              <span class="suno-desc-label">Geräuschbeschreibung</span>
+              <button class="suno-dice-btn" onclick="sunoRandomDesc(true)" title="Zufällige Beschreibung">🎲</button>
+            </div>
+            <textarea class="suno-desc-textarea" id="suno_geraeusch_desc"
+              placeholder="z.B. Regengeräusche mit donnernden Wellen am Strand..."
+              oninput="autoSave()"></textarea>
+          </div>
+        </div>
+
       </div>
+      <!-- end SUNO-COCKPIT v2 -->
 
       <!-- BEAT-MANAGER -->
       <div class="card manager-card">
@@ -5021,29 +5131,26 @@ function loadSongData(id) {
   else { hideResult('p3_result'); }
 
   // Suno Cockpit
-  setSunoField('suno_modus', s.suno_modus||'einfach');
-  setSunoField('suno_geschlecht', s.suno_geschlecht||'auto');
-  setSunoField('suno_lyrics_mode', s.suno_lyrics_mode||'handbuch');
-  const svEl = document.getElementById('suno_version');
-  if (svEl) svEl.value = s.suno_version||'v45';
-  const sadEl = document.getElementById('suno_add_audio');
-  if (sadEl) sadEl.checked = !!s.suno_add_audio;
-  const spEl = document.getElementById('suno_add_persona');
-  if (spEl) spEl.checked = !!s.suno_add_persona;
-  const siEl = document.getElementById('suno_add_inspo');
-  if (siEl) siEl.checked = !!s.suno_add_inspo;
   setVal('suno_stile', s.suno_stile||'');
   setVal('suno_stile_exclude', s.suno_stile_exclude||'');
   const ssEl = document.getElementById('suno_seltsamkeit');
-  if (ssEl) { ssEl.value = s.suno_seltsamkeit||50; document.getElementById('suno_weird_val').textContent = (s.suno_seltsamkeit||50)+'%'; }
+  if (ssEl) { ssEl.value = s.suno_seltsamkeit||50; const wv = document.getElementById('suno_weird_val'); if(wv) wv.textContent = (s.suno_seltsamkeit||50)+' %'; }
   const siflEl = document.getElementById('suno_stileinfluss');
-  if (siflEl) { siflEl.value = s.suno_stileinfluss||75; document.getElementById('suno_stilinfl_val').textContent = (s.suno_stileinfluss||75)+'%'; }
+  if (siflEl) { siflEl.value = s.suno_stileinfluss||50; const sv = document.getElementById('suno_stilinfl_val'); if(sv) sv.textContent = (s.suno_stileinfluss||50)+' %'; }
   setVal('suno_titel', s.suno_titel||s.name||'');
+  if (s.suno_lyrics_text) setVal('suno_lyrics_text', s.suno_lyrics_text||'');
+  if (s.suno_beschreibung) setVal('suno_beschreibung', s.suno_beschreibung||'');
+  if (s.suno_geraeusch_desc) setVal('suno_geraeusch_desc', s.suno_geraeusch_desc||'');
   // Auto-populate suno_stile from Phase 3 if empty
   if (!s.suno_stile) {
     const parts = [s.p3_stil, s.p3_mood, s.p3_instrumente].filter(Boolean).join(', ');
     setVal('suno_stile', parts);
   }
+  // Sync new UI v2 controls
+  setSunoModus(s.suno_modus||'einfach');
+  setSunoGeschlecht(s.suno_geschlecht||'maennlich');
+  setSunoLyricsMode(s.suno_lyrics_mode||'handbuch');
+  setSunoVersion(s.suno_version||'v5', null);
   updateSunoCockpit();
   updateDashboard();
 
@@ -6421,7 +6528,157 @@ function updateSunoCockpit() {
   if (gender !== 'auto') parts.push(gender === 'maennlich' ? 'male vocals' : 'female vocals');
   const liveEl = document.getElementById('suno_live_stile');
   if (liveEl) liveEl.textContent = parts.join(', ') || '–';
+  renderSunoStyleTags();
 }
+
+// ── SUNO UI v2 helpers ──────────────────────────────────────
+function setSunoModus(mode) {
+  const mEl = document.getElementById('suno_modus');
+  if (mEl) mEl.value = mode;
+  document.querySelectorAll('.suno-mode-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.mode === mode));
+  document.querySelectorAll('.suno-mode-content').forEach(c =>
+    c.classList.toggle('active', c.id === 'suno_content_' + mode));
+  autoSave();
+}
+
+function toggleSunoSection(id) {
+  const sec = document.getElementById(id);
+  if (!sec) return;
+  sec.classList.toggle('collapsed');
+  const body = sec.querySelector('.suno-section-body');
+  if (body) body.style.display = sec.classList.contains('collapsed') ? 'none' : '';
+}
+
+function toggleSunoVersionDd(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('suno_version_dd');
+  if (dd) dd.classList.toggle('open');
+  closeSunoAudioDd();
+}
+
+function setSunoVersion(val, el) {
+  const vEl = document.getElementById('suno_version');
+  if (vEl) vEl.value = val;
+  const labels = {v5:'v5',v45plus:'4.5+',v45:'4.5',v45all:'v4.5-all',v4pro:'v4',v35:'3.5'};
+  const lbl = document.getElementById('suno_version_label');
+  if (lbl) lbl.textContent = labels[val] || val;
+  document.querySelectorAll('[id^="vcheck_"]').forEach(c => c.style.display = 'none');
+  const chk = document.getElementById('vcheck_' + val);
+  if (chk) chk.style.display = '';
+  document.querySelectorAll('.suno-version-option').forEach(o =>
+    o.classList.toggle('selected', o.dataset.val === val));
+  const dd = document.getElementById('suno_version_dd');
+  if (dd) dd.classList.remove('open');
+  autoSave();
+}
+
+function toggleSunoAudioDd(e, isAdv) {
+  e.stopPropagation();
+  const ddId = isAdv ? 'suno_audio_dd2' : 'suno_audio_dd';
+  const dd = document.getElementById(ddId);
+  if (dd) dd.classList.toggle('open');
+  const vdd = document.getElementById('suno_version_dd');
+  if (vdd) vdd.classList.remove('open');
+  // close the other audio dd
+  const otherId = isAdv ? 'suno_audio_dd' : 'suno_audio_dd2';
+  const other = document.getElementById(otherId);
+  if (other) other.classList.remove('open');
+}
+
+function closeSunoAudioDd() {
+  ['suno_audio_dd','suno_audio_dd2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('open');
+  });
+}
+
+function toggleSunoInstrumental() {
+  const btn = document.getElementById('suno_instr_btn');
+  if (btn) btn.classList.toggle('active');
+  autoSave();
+}
+
+function setSunoGeschlecht(val) {
+  const el = document.getElementById('suno_geschlecht');
+  if (el) el.value = val;
+  document.querySelectorAll('.suno-binary-btn[data-val="maennlich"],.suno-binary-btn[data-val="weiblich"]')
+    .forEach(b => b.classList.toggle('active', b.dataset.val === val));
+  autoSave();
+}
+
+function setSunoLyricsMode(val) {
+  const el = document.getElementById('suno_lyrics_mode');
+  if (el) el.value = val;
+  document.querySelectorAll('.suno-binary-btn[data-val="handbuch"],.suno-binary-btn[data-val="auto"]')
+    .forEach(b => b.classList.toggle('active', b.dataset.val === val));
+  autoSave();
+}
+
+function sunoRandomDesc(isGeraeusche) {
+  const descs = isGeraeusche
+    ? ['Sanfter Regen auf einem Blechdach','Knisterndes Lagerfeuer im Wald','Meereswellen am felsigen Strand']
+    : ['Beruhigende Power-Ballade über Freundschaftsbrüche','Epischer Trap-Hymne über den Aufstieg','Melancholischer Rap über Heimweh'];
+  const taId = isGeraeusche ? 'suno_geraeusch_desc' : 'suno_beschreibung';
+  const ta = document.getElementById(taId);
+  if (ta) { ta.value = descs[Math.floor(Math.random()*descs.length)]; autoSave(); }
+}
+
+function sunoAddText() {
+  setSunoModus('fortschrittlich');
+  const ta = document.getElementById('suno_lyrics_text');
+  if (ta) ta.focus();
+}
+
+function sunoAiLyrics() {
+  if (typeof generatePhase2 === 'function') generatePhase2();
+}
+
+function sunoExpandLyrics() {
+  const ta = document.getElementById('suno_lyrics_text');
+  if (ta) ta.style.minHeight = ta.style.minHeight === '300px' ? '80px' : '300px';
+}
+
+function sunoRefreshStyleTags() { renderSunoStyleTags(); }
+
+function renderSunoStyleTags() {
+  const stile = document.getElementById('suno_stile')?.value || '';
+  const display = document.getElementById('suno_stile_display');
+  if (display) display.textContent = stile || 'rhythmischer Fluss, gefallener Engel, Stoner Rock, tragisch';
+  const row = document.getElementById('suno_stile_tags_row');
+  if (row) {
+    row.querySelectorAll('.suno-style-chip').forEach(c => c.remove());
+    const tags = stile ? stile.split(',').map(s=>s.trim()).filter(Boolean) : [];
+    tags.forEach(tag => {
+      const chip = document.createElement('span');
+      chip.className = 'suno-style-chip';
+      chip.textContent = tag;
+      row.appendChild(chip);
+    });
+  }
+  const inspoRow = document.getElementById('suno_inspo_chips');
+  if (inspoRow) {
+    inspoRow.innerHTML = '';
+    const tags = stile ? stile.split(',').map(s=>s.trim()).filter(Boolean)
+                       : ['rhythmischer Fluss','gefallener Engel','Stoner Rock','tragisch'];
+    tags.forEach(tag => {
+      const chip = document.createElement('span');
+      chip.className = 'suno-chip';
+      chip.textContent = tag;
+      inspoRow.appendChild(chip);
+    });
+  }
+}
+
+function openSunoPersonaPanel() {}
+function openSunoInspoPanel() {}
+
+// Close suno dropdowns on outside click
+document.addEventListener('click', function() {
+  const vdd = document.getElementById('suno_version_dd');
+  if (vdd) vdd.classList.remove('open');
+  closeSunoAudioDd();
+});
 
 // =============================
 // OVERVIEW DASHBOARD
