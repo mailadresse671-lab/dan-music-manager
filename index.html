@@ -1038,7 +1038,7 @@
   }
   .intro-tagline {
     font-size:10px; letter-spacing:4px; color:#374151; text-transform:uppercase;
-    margin-bottom:14px;
+    margin-bottom:28px;
     opacity:0; animation:fadeSlideUp 0.7s ease-out 2.5s both;
   }
   @keyframes fadeSlideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
@@ -1077,46 +1077,6 @@
     margin-top:14px; font-size:9px; letter-spacing:3px; color:#1f2937;
     text-transform:uppercase; opacity:0; animation:fadeSlideUp 0.7s ease-out 3.6s both;
   }
-
-  /* ===== NOVATION LAUNCHPAD MINI MK3 ===== */
-  .intro-launchpad {
-    margin-bottom:18px;
-    opacity:0; animation:fadeSlideUp 0.8s ease-out 2.62s both;
-  }
-  .lp-device {
-    background:linear-gradient(160deg,#262626 0%,#191919 100%);
-    border-radius:13px; padding:9px 9px 7px;
-    border:1px solid rgba(255,255,255,0.05);
-    box-shadow:0 0 0 1px rgba(0,0,0,0.7),0 14px 48px rgba(0,0,0,0.95),
-               0 0 90px rgba(124,58,237,0.07),inset 0 1px 0 rgba(255,255,255,0.03);
-  }
-  .lp-grid {
-    background:#080808; border-radius:6px; padding:6px;
-    display:grid;
-    grid-template-columns:repeat(9,17px);
-    grid-template-rows:repeat(9,17px);
-    gap:2px;
-  }
-  .lp-pad {
-    width:17px; height:17px; border-radius:2px;
-    background:#1e1e1e;
-    transition:background 0.06s ease,box-shadow 0.06s ease;
-  }
-  .lp-btn-top,.lp-btn-side {
-    width:17px; height:17px; border-radius:50%;
-    background:#161616;
-  }
-  .lp-btn-novation {
-    width:17px; height:17px; border-radius:50%;
-    background:radial-gradient(circle,#4a1a8a 0%,#1e0e3a 100%);
-    box-shadow:0 0 8px rgba(124,58,237,0.55);
-  }
-  .lp-brand {
-    text-align:center; margin-top:5px;
-    font-size:7px; letter-spacing:5px; color:rgba(124,58,237,0.35);
-    text-transform:uppercase; font-weight:700;
-  }
-  @media(max-width:500px){ .intro-launchpad { display:none; } }
 
   /* ===== KULISSE PARTICLES ===== */
   .intro-particle {
@@ -1344,6 +1304,175 @@
   .sp-detail-actions{ display:flex; gap:6px; flex-wrap:wrap; }
   .sp-prompt-box    { background:var(--card2); border:1px solid var(--border); border-radius:6px; padding:10px; font-size:11px; color:var(--text); font-family:monospace; white-space:pre-wrap; line-height:1.6; max-height:160px; overflow-y:auto; }
   .sp-no-url        { font-size:11px; color:var(--text-muted); font-style:italic; }
+
+  /* ============================================
+     STUDIO APP REDESIGN – matching intro vibe
+     ============================================ */
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width:5px; height:5px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:rgba(124,58,237,0.35); border-radius:3px; }
+  ::-webkit-scrollbar-thumb:hover { background:rgba(124,58,237,0.6); }
+  ::selection { background:rgba(124,58,237,0.45); color:#fff; }
+
+  /* Topbar */
+  .topbar {
+    background:linear-gradient(90deg,#0a0a14,#0d0d1a);
+    border-bottom-color:rgba(124,58,237,0.18);
+    box-shadow:0 1px 0 rgba(124,58,237,0.06),0 4px 24px rgba(0,0,0,0.5);
+  }
+  .topbar-logo { box-shadow:0 0 18px rgba(124,58,237,0.45); }
+  .topbar-title { letter-spacing:0.5px; }
+
+  /* Sidebar */
+  .sidebar {
+    background:linear-gradient(180deg,#0c0c18 0%,#09090f 100%);
+    border-right:1px solid rgba(124,58,237,0.12);
+  }
+  .sidebar-section-title { color:rgba(124,58,237,0.5); letter-spacing:2px; }
+  .nav-item:hover {
+    background:rgba(124,58,237,0.08);
+    color:#c4b5fd;
+    border:1px solid rgba(124,58,237,0.1);
+  }
+  .nav-item.active {
+    background:rgba(124,58,237,0.14);
+    border:1px solid rgba(124,58,237,0.28);
+    color:#c4b5fd;
+    box-shadow:inset 3px 0 0 var(--purple),0 0 18px rgba(124,58,237,0.07);
+  }
+  .nav-item.active .phase-num { box-shadow:0 0 12px rgba(124,58,237,0.5); }
+  .song-item:hover { background:rgba(124,58,237,0.06); border-color:rgba(124,58,237,0.2); }
+  .song-item.active { box-shadow:0 0 14px rgba(124,58,237,0.12); }
+  .btn-new-song { box-shadow:0 0 18px rgba(124,58,237,0.25); letter-spacing:0.3px; }
+  .btn-new-song:hover { box-shadow:0 0 28px rgba(124,58,237,0.4); opacity:1; filter:brightness(1.08); }
+
+  /* Main content – subtle scanlines */
+  .main-content {
+    background:
+      repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(124,58,237,0.008) 3px,rgba(124,58,237,0.008) 4px),
+      var(--bg);
+  }
+
+  /* Phase icon */
+  .phase-icon {
+    border:1px solid rgba(124,58,237,0.18);
+    box-shadow:0 0 18px rgba(124,58,237,0.15);
+  }
+
+  /* Cards */
+  .card {
+    background:linear-gradient(135deg,#121220 0%,#0d0d1a 100%);
+    border-color:rgba(124,58,237,0.1);
+    box-shadow:0 2px 16px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.02);
+    position:relative; overflow:hidden;
+  }
+  .card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(124,58,237,0.25),transparent);
+    pointer-events:none;
+  }
+  .card:hover {
+    border-color:rgba(124,58,237,0.22);
+    box-shadow:0 4px 28px rgba(0,0,0,0.45),0 0 0 1px rgba(124,58,237,0.07),inset 0 1px 0 rgba(255,255,255,0.02);
+  }
+  .card-title { color:rgba(148,163,184,0.65); letter-spacing:1.2px; }
+
+  /* Inputs */
+  input[type="text"], input[type="number"], textarea, select {
+    background:#0d0d18; border-color:rgba(124,58,237,0.15);
+  }
+  input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
+    border-color:rgba(124,58,237,0.55);
+    box-shadow:0 0 0 2px rgba(124,58,237,0.1),0 0 14px rgba(124,58,237,0.07);
+  }
+
+  /* AI Button */
+  .btn-ai { box-shadow:0 0 18px rgba(124,58,237,0.18); overflow:hidden; position:relative; }
+  .btn-ai::after {
+    content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);
+    transition:left 0.45s;
+  }
+  .btn-ai:hover::after { left:100%; }
+  .btn-ai:hover { box-shadow:0 0 32px rgba(124,58,237,0.42),0 0 60px rgba(124,58,237,0.12); }
+
+  /* Phase next */
+  .btn-phase-next:hover { box-shadow:0 0 22px rgba(124,58,237,0.4); opacity:1; filter:brightness(1.08); }
+
+  /* Result boxes */
+  .result-box {
+    background:#0b0b16; border-color:rgba(124,58,237,0.12);
+    box-shadow:inset 0 2px 14px rgba(0,0,0,0.35);
+  }
+
+  /* Suno persona cards */
+  .sp-card.selected {
+    box-shadow:0 0 0 1px var(--sp-color,var(--purple)),0 0 22px color-mix(in srgb,var(--sp-color,var(--purple)) 28%,transparent);
+  }
+  .sp-card-tag { box-shadow:0 0 8px color-mix(in srgb,var(--sp-color,var(--purple)) 20%,transparent); }
+
+  /* Voice preview button on persona cards */
+  .sp-preview-btn {
+    position:absolute; bottom:7px; right:7px;
+    width:22px; height:22px; border-radius:50%;
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+    color:rgba(255,255,255,0.5); font-size:9px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:all 0.2s; padding:0;
+  }
+  .sp-preview-btn:hover { background:rgba(124,58,237,0.3); border-color:rgba(124,58,237,0.6); color:#fff; box-shadow:0 0 10px rgba(124,58,237,0.4); }
+
+  /* Beat Studio – Phase 3 section */
+  .beat-studio-card { border-color:rgba(59,130,246,0.12); }
+  .beat-studio-card::before { background:linear-gradient(90deg,transparent,rgba(59,130,246,0.2),transparent); }
+  .bs-sequencer {
+    display:grid; grid-template-rows:repeat(4,1fr); gap:4px; margin-bottom:14px;
+  }
+  .bs-row { display:flex; align-items:center; gap:4px; }
+  .bs-label { font-size:9px; letter-spacing:1.5px; color:rgba(148,163,184,0.4); text-transform:uppercase; width:36px; flex-shrink:0; font-weight:700; }
+  .bs-step {
+    width:100%; height:20px; border-radius:2px; flex:1;
+    background:#111122; border:1px solid rgba(124,58,237,0.06);
+    cursor:pointer; transition:all 0.08s; position:relative; overflow:hidden;
+  }
+  .bs-step.on { background:var(--bs-color,#7c3aed); border-color:transparent; box-shadow:0 0 6px var(--bs-color,#7c3aed); }
+  .bs-step.on::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(0deg,rgba(0,0,0,0.2),rgba(255,255,255,0.08));
+  }
+  .bs-step.active { border-color:rgba(255,255,255,0.15) !important; }
+  .bs-step.flash { animation:bsFlash 0.12s ease-out; }
+  @keyframes bsFlash { 0%{filter:brightness(2.5)} 100%{filter:brightness(1)} }
+  .bs-genre-row {
+    display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;
+  }
+  .bs-genre-btn {
+    padding:5px 12px; border-radius:20px; font-size:11px; font-weight:600;
+    border:1px solid; cursor:pointer; transition:all 0.18s; letter-spacing:0.3px;
+  }
+  .bs-genre-btn:hover, .bs-genre-btn.active {
+    filter:brightness(1.2); box-shadow:0 0 12px currentColor;
+  }
+  .bs-bpm-display {
+    display:flex; align-items:center; justify-content:center;
+    gap:12px; margin-bottom:10px;
+  }
+  .bs-bpm-num {
+    font-size:42px; font-weight:900; color:var(--purple-light); line-height:1;
+    text-shadow:0 0 30px rgba(124,58,237,0.5); letter-spacing:-1px;
+  }
+  .bs-bpm-label { font-size:10px; letter-spacing:3px; color:rgba(148,163,184,0.4); text-transform:uppercase; }
+  .bs-play-btn {
+    width:52px; height:52px; border-radius:50%;
+    background:linear-gradient(135deg,var(--purple),var(--blue));
+    border:none; color:white; font-size:18px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 24px rgba(124,58,237,0.35); transition:all 0.2s;
+  }
+  .bs-play-btn:hover { box-shadow:0 0 40px rgba(124,58,237,0.55); transform:scale(1.06); }
+  .bs-play-btn.playing { background:linear-gradient(135deg,#ef4444,#dc2626); }
 </style>
 
 </head>
@@ -1384,15 +1513,6 @@
 
     <div class="intro-handle">@DaN_90_rap</div>
     <div class="intro-tagline">Rap Artist · Berlin</div>
-
-    <!-- Novation Launchpad Mini MK3 -->
-    <div class="intro-launchpad">
-      <div class="lp-device">
-        <div class="lp-grid" id="lpGrid"></div>
-        <div class="lp-brand">Novation · Launchpad Mini</div>
-      </div>
-    </div>
-
     <div class="intro-divider"></div>
     <div class="intro-quote">
       "Jeder Verse ein Statement.<br>
@@ -1933,10 +2053,49 @@
     <!-- PHASE 3: Beat-Briefing Suno -->
     <div class="phase-panel" id="phase3">
       <div class="phase-header">
-        <div class="phase-icon">🎹</div>
+        <div class="phase-icon" style="background:rgba(59,130,246,0.2);color:#60a5fa;">🎹</div>
         <div>
-          <div class="phase-title">Beat-Briefing für Suno</div>
-          <div class="phase-subtitle">Erstelle den perfekten Suno AI Prompt</div>
+          <div class="phase-title">Beat Studio</div>
+          <div class="phase-subtitle">Beats bauen · Suno Prompts erstellen · Persona wählen</div>
+        </div>
+      </div>
+
+      <!-- BEAT STUDIO VISUAL -->
+      <div class="card beat-studio-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div class="card-title" style="margin-bottom:0;">🎛 Beat Studio</div>
+          <div style="font-size:10px;color:rgba(148,163,184,0.4);letter-spacing:1px;">LIVE SESSION</div>
+        </div>
+
+        <!-- BPM Display + Play -->
+        <div class="bs-bpm-display">
+          <div>
+            <div class="bs-bpm-num" id="bsBpmNum">140</div>
+            <div class="bs-bpm-label">BPM</div>
+          </div>
+          <button class="bs-play-btn" id="bsPlayBtn" onclick="toggleBeatStudio()" title="Beat abspielen / stoppen">▶</button>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);text-align:center;" id="bsKeyDisplay">G minor</div>
+            <div class="bs-bpm-label">KEY</div>
+          </div>
+        </div>
+
+        <!-- Step Sequencer -->
+        <div class="bs-sequencer" id="bsSequencer">
+          <!-- filled by JS -->
+        </div>
+
+        <!-- Genre Quick-Select -->
+        <div style="font-size:9px;letter-spacing:2px;color:rgba(148,163,184,0.35);text-transform:uppercase;margin-bottom:8px;font-weight:700;">Genre / Stil</div>
+        <div class="bs-genre-row" id="bsGenreRow">
+          <button class="bs-genre-btn" style="color:#7c3aed;border-color:#7c3aed44;background:#7c3aed11;" onclick="setBsGenre(this,'German Trap')">Trap</button>
+          <button class="bs-genre-btn" style="color:#ef4444;border-color:#ef444444;background:#ef444411;" onclick="setBsGenre(this,'German Drill')">Drill</button>
+          <button class="bs-genre-btn" style="color:#3b82f6;border-color:#3b82f644;background:#3b82f611;" onclick="setBsGenre(this,'Emo Rap')">Emo Rap</button>
+          <button class="bs-genre-btn" style="color:#10b981;border-color:#10b98144;background:#10b98111;" onclick="setBsGenre(this,'Conscious Rap')">Conscious</button>
+          <button class="bs-genre-btn" style="color:#f59e0b;border-color:#f59e0b44;background:#f59e0b11;" onclick="setBsGenre(this,'Melodic Rap')">Melodic</button>
+          <button class="bs-genre-btn" style="color:#ec4899;border-color:#ec489944;background:#ec489911;" onclick="setBsGenre(this,'Boom Bap')">Boom Bap</button>
+          <button class="bs-genre-btn" style="color:#94a3b8;border-color:#94a3b844;background:#94a3b811;" onclick="setBsGenre(this,'Cloud Rap')">Cloud</button>
+          <button class="bs-genre-btn" style="color:#06b6d4;border-color:#06b6d444;background:#06b6d411;" onclick="setBsGenre(this,'Afro Rap')">Afro</button>
         </div>
       </div>
 
@@ -1965,7 +2124,7 @@
         <div class="form-group">
           <label>BPM</label>
           <div class="slider-container">
-            <input type="range" id="p3_bpm" min="60" max="200" value="140" oninput="updateBpmDisplay(); autoSave()">
+            <input type="range" id="p3_bpm" min="60" max="200" value="140" oninput="updateBpmDisplay(); updateBsBpm(); autoSave()">
             <span class="slider-val" id="p3_bpm_val">140</span>
           </div>
         </div>
@@ -3688,6 +3847,108 @@ async function addVerse() {
   }
 }
 
+// =============================
+// BEAT STUDIO – Phase 3 visual sequencer
+// =============================
+const BS_ROWS = [
+  { label:'KICK', color:'#7c3aed', pattern:[1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0] },
+  { label:'SNARE',color:'#ef4444', pattern:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0] },
+  { label:'HAT',  color:'#f59e0b', pattern:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0] },
+  { label:'BASS', color:'#3b82f6', pattern:[1,0,0,1,0,0,1,0,1,0,0,0,1,0,1,0] },
+];
+let _bsPlaying = false, _bsStep = 0, _bsInterval = null;
+let _bsPatterns = BS_ROWS.map(r => [...r.pattern]);
+
+function initBeatStudio() {
+  const seq = document.getElementById('bsSequencer');
+  if (!seq) return;
+  seq.innerHTML = BS_ROWS.map((row, ri) =>
+    `<div class="bs-row">
+      <div class="bs-label">${row.label}</div>
+      ${Array.from({length:16}, (_,si) =>
+        `<div class="bs-step${_bsPatterns[ri][si]?' on':''}"
+              style="--bs-color:${row.color}"
+              data-row="${ri}" data-step="${si}"
+              onclick="toggleBsStep(this,${ri},${si})"></div>`
+      ).join('')}
+    </div>`
+  ).join('');
+}
+
+function toggleBsStep(el, ri, si) {
+  _bsPatterns[ri][si] = _bsPatterns[ri][si] ? 0 : 1;
+  el.classList.toggle('on', !!_bsPatterns[ri][si]);
+}
+
+function toggleBeatStudio() {
+  const btn = document.getElementById('bsPlayBtn');
+  if (_bsPlaying) {
+    _bsPlaying = false;
+    clearInterval(_bsInterval);
+    _bsInterval = null;
+    if (btn) { btn.textContent = '▶'; btn.classList.remove('playing'); }
+    // Clear playhead highlight
+    document.querySelectorAll('.bs-step.active').forEach(el => el.classList.remove('active'));
+  } else {
+    _bsPlaying = true;
+    _bsStep = 0;
+    if (btn) { btn.textContent = '■'; btn.classList.add('playing'); }
+    const bpm = parseInt(document.getElementById('p3_bpm')?.value || 140);
+    const ms = Math.round(60000 / bpm / 4); // 16th note
+    _bsInterval = setInterval(bsTickStep, ms);
+    bsTickStep();
+  }
+}
+
+function bsTickStep() {
+  // Remove prev highlight
+  document.querySelectorAll('.bs-step.active').forEach(el => el.classList.remove('active'));
+  // Highlight current column + flash if on
+  BS_ROWS.forEach((_, ri) => {
+    const els = document.querySelectorAll(`.bs-row:nth-child(${ri+1}) .bs-step`);
+    if (els[_bsStep]) {
+      els[_bsStep].classList.add('active');
+      if (_bsPatterns[ri][_bsStep]) els[_bsStep].classList.add('flash');
+    }
+  });
+  _bsStep = (_bsStep + 1) % 16;
+  // Sync BPM display
+  const bpmNum = document.getElementById('bsBpmNum');
+  if (bpmNum) bpmNum.textContent = document.getElementById('p3_bpm')?.value || 140;
+}
+
+function setBsGenre(btn, genre) {
+  document.querySelectorAll('.bs-genre-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Apply to p3_stil
+  const sel = document.getElementById('p3_stil');
+  if (sel) {
+    let found = false;
+    for (const opt of sel.options) { if (opt.value === genre || opt.value.toLowerCase().includes(genre.toLowerCase())) { sel.value = opt.value; found = true; break; } }
+    if (!found) {
+      const opt = document.createElement('option');
+      opt.value = genre; opt.textContent = genre; opt.selected = true;
+      sel.appendChild(opt);
+    }
+    autoSave();
+  }
+  showToast(`Genre: ${genre}`, 'success');
+}
+
+// Sync BPM display when slider changes
+function updateBsBpm() {
+  const v = document.getElementById('p3_bpm')?.value || 140;
+  const el = document.getElementById('bsBpmNum');
+  if (el) el.textContent = v;
+  const keyEl = document.getElementById('bsKeyDisplay');
+  if (keyEl) keyEl.textContent = document.getElementById('p3_key')?.value || 'G minor';
+  if (_bsPlaying) {
+    clearInterval(_bsInterval);
+    const ms = Math.round(60000 / parseInt(v) / 4);
+    _bsInterval = setInterval(bsTickStep, ms);
+  }
+}
+
 // Phase 3
 function updateBpmDisplay() {
   document.getElementById('p3_bpm_val').textContent = document.getElementById('p3_bpm').value;
@@ -4349,7 +4610,7 @@ function updateNavLocks() {
 }
 function switchPhase(num) {
   if (num === 0) { updateDashboard(); updateSunoCockpit(); }
-  if (num === 3) { setTimeout(initSunoPersonaPicker, 0); }
+  if (num === 3) { setTimeout(() => { initSunoPersonaPicker(); initBeatStudio(); updateBsBpm(); }, 0); }
   if (!currentSongId) return;
 
   // Phase-Sperre: Phase 2 nur wenn Phase 1 vollständig
@@ -5934,8 +6195,8 @@ function stopIntroBeat(onDone) {
 function enterStudio() {
   const screen = document.getElementById('intro-screen');
   if (!screen) return;
-  stopLpAnim();
   stopIntroBeat(() => playEntranceSound());
+  screen.style.pointerEvents = 'none';
   screen.classList.add('fade-out');
   setTimeout(() => { screen.style.display = 'none'; }, 1000);
 }
@@ -5973,101 +6234,10 @@ function playEntranceSound() {
   } catch(e) {}
 }
 
-// =============================
-// NOVATION LAUNCHPAD MINI MK3 – Intro Animation
-// =============================
-const LP_COLORS = [
-  '#7c3aed','#8b5cf6','#6d28d9','#a78bfa',
-  '#3b82f6','#2563eb','#60a5fa',
-  '#06b6d4','#22d3ee',
-  '#ec4899','#f472b6',
-  '#ef4444','#f97316',
-  '#22c55e','#eab308'
-];
-let _lpRhythmId = null, _lpBeat = 0;
-
-function buildLaunchpad() {
-  const grid = document.getElementById('lpGrid');
-  if (!grid) return;
-  // 9×9: row 0 = top buttons, col 8 = side buttons, [0][8] = Novation logo
-  for (let r = 0; r < 9; r++) {
-    for (let c = 0; c < 9; c++) {
-      const el = document.createElement('div');
-      if (r === 0 && c === 8) el.className = 'lp-btn-novation';
-      else if (r === 0)       el.className = 'lp-btn-top';
-      else if (c === 8)       el.className = 'lp-btn-side';
-      else                    el.className = 'lp-pad';
-      grid.appendChild(el);
-    }
-  }
-  setTimeout(lpCascade, 900);
-}
-
-function lpFlash(pad, color, ms) {
-  if (!pad) return;
-  pad.style.background = color;
-  pad.style.boxShadow = `0 0 7px ${color},0 0 2px ${color}`;
-  setTimeout(() => { pad.style.background = '#1e1e1e'; pad.style.boxShadow = 'none'; }, ms);
-}
-
-function lpCascade() {
-  const pads = Array.from(document.querySelectorAll('#lpGrid .lp-pad'));
-  if (!pads.length) return;
-  let i = 0;
-  const t = setInterval(() => {
-    if (i >= 64) { clearInterval(t); startLpRhythm(); return; }
-    const color = LP_COLORS[Math.floor(Math.random() * LP_COLORS.length)];
-    const p = pads[i];
-    p.style.background = color;
-    p.style.boxShadow = `0 0 5px ${color}`;
-    i++;
-  }, 26);
-}
-
-function startLpRhythm() {
-  const pads = Array.from(document.querySelectorAll('#lpGrid .lp-pad'));
-  if (!pads.length) return;
-  _lpBeat = 0;
-  // Fade down the cascade first
-  setTimeout(() => {
-    pads.forEach(p => { p.style.background = '#1e1e1e'; p.style.boxShadow = 'none'; });
-  }, 400);
-
-  // 111ms = 90 BPM 16th notes
-  _lpRhythmId = setInterval(() => {
-    _lpBeat++;
-    // Random flashes every 16th
-    const n = 2 + Math.floor(Math.random() * 3);
-    for (let k = 0; k < n; k++) {
-      const idx = Math.floor(Math.random() * 64);
-      lpFlash(pads[idx], LP_COLORS[Math.floor(Math.random() * LP_COLORS.length)], 130 + Math.random() * 220);
-    }
-    // Column sweep every 8 beats (2 bars)
-    if (_lpBeat % 8 === 1) {
-      const col = (_lpBeat / 8 | 0) % 8;
-      const c = LP_COLORS[col % LP_COLORS.length];
-      for (let r = 0; r < 8; r++) lpFlash(pads[r * 8 + col], c, 350);
-    }
-    // Row flash on every 4 beats (1 bar)
-    if (_lpBeat % 16 === 9) {
-      const row = Math.floor(Math.random() * 8);
-      const c = LP_COLORS[Math.floor(Math.random() * LP_COLORS.length)];
-      for (let cc = 0; cc < 8; cc++) lpFlash(pads[row * 8 + cc], c, 450);
-    }
-  }, 111);
-}
-
-function stopLpAnim() {
-  if (_lpRhythmId) { clearInterval(_lpRhythmId); _lpRhythmId = null; }
-  const pads = document.querySelectorAll('#lpGrid .lp-pad');
-  pads.forEach(p => { p.style.background = '#1e1e1e'; p.style.boxShadow = 'none'; });
-}
-
 // Setup audio trigger on any mouse/touch activity on intro
 window.addEventListener('DOMContentLoaded', () => {
   buildVUCol('introVULeft', VU_LEFT);
   buildVUCol('introVURight', VU_RIGHT);
-  buildLaunchpad();
   initLetterGlow();
   const screen = document.getElementById('intro-screen');
   if (screen) {
@@ -6275,6 +6445,7 @@ function initSunoPersonaPicker() {
       <div class="sp-card-name">${p.name.replace('DaN_','')}</div>
       <div class="sp-card-bpm">${p.bpm} BPM</div>
       <div class="sp-card-tag" style="color:${p.color};border-color:${p.color}44;background:${p.color}11;">${p.tag}</div>
+      <button class="sp-preview-btn" onclick="event.stopPropagation();previewPersonaVoice('${p.id}')" title="Stimme vorhören">▶</button>
     </div>`).join('');
   if (saved) renderSpDetail(saved);
 }
@@ -6316,6 +6487,33 @@ function renderSpDetail(id) {
       ? `<a href="${persona.url}" target="_blank" class="btn-copy" style="text-decoration:none;background:rgba(59,130,246,0.15);border-color:rgba(59,130,246,0.4);color:#60a5fa;">↗ In Suno öffnen</a>`
       : `<span class="sp-no-url">Noch keine Suno-URL</span>`;
   }
+}
+
+// Voice persona preview via Web Speech API
+const PERSONA_VOICE_LINES = {
+  verletzlich:  { pitch:0.88, rate:0.82, text:'Du weißt wie es sich anfühlt, wenn niemand zuhört. Aber ich bin hier.' },
+  kraftvoll:    { pitch:0.75, rate:0.9,  text:'Ich steh auf. Egal wie oft sie mich niederdrücken. Das ist mein Weg.' },
+  aggressiv:    { pitch:0.6,  rate:1.18, text:'Ich komme aus dem Nichts. Und ich gehe nirgendwo hin. Das ist Fakt.' },
+  hoffnungsvoll:{ pitch:0.95, rate:0.95, text:'Jeden Tag ist ein neuer Anfang. Ich glaube daran. Und ich mach weiter.' },
+  melancholisch:{ pitch:0.8,  rate:0.75, text:'Manchmal vermisst man Dinge, die man nie wirklich hatte. Das ist das Leben.' },
+  kuehl:        { pitch:0.8,  rate:1.0,  text:'Ich sage nur Fakten. Keine Emotionen. Nur die Wahrheit. Keine Spielchen.' },
+  stolz:        { pitch:0.7,  rate:0.92, text:'Ich hab mir alles erarbeitet. Kein Geschenk. Nur harte Arbeit. Nur Respekt.' },
+  wuetend:      { pitch:0.55, rate:1.25, text:'Genug geredet. Jetzt rede ich. Und alle hören zu.' }
+};
+
+function previewPersonaVoice(id) {
+  const settings = PERSONA_VOICE_LINES[id];
+  const persona = SUNO_PERSONAS.find(p => p.id === id);
+  if (!settings || !persona) return;
+  if (!window.speechSynthesis) { showToast('Sprachausgabe nicht verfügbar', 'error'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(settings.text);
+  const voices = window.speechSynthesis.getVoices();
+  const german = voices.find(v => v.lang === 'de-DE') || voices.find(v => v.lang.startsWith('de')) || voices.find(v => v.lang.startsWith('en'));
+  if (german) u.voice = german;
+  u.pitch = settings.pitch; u.rate = settings.rate; u.volume = 1; u.lang = 'de-DE';
+  window.speechSynthesis.speak(u);
+  showToast(`${persona.emoji} ${persona.name} – wird abgespielt…`, 'success');
 }
 
 function copySpPrompt() {
