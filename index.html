@@ -108,6 +108,7 @@
     flex-direction: column;
     overflow-y: auto;
     flex-shrink: 0;
+    position: relative;
   }
   .sidebar-section { padding: 16px; }
   .sidebar-section-title {
@@ -926,7 +927,11 @@
     grid-template-rows:1fr; align-items:center;
     overflow:hidden;
   }
-  @media(max-width:600px){ #intro-screen { grid-template-columns:60px 1fr 60px; } }
+  @media(max-width:600px){
+    #intro-screen { grid-template-columns:50px 1fr 50px; }
+    .intro-vu-col { padding:0 6px; gap:3px; }
+    .intro-vu-bar { width:4px; }
+  }
   #intro-screen.fade-out { animation:introFadeOut 1s cubic-bezier(0.4,0,1,1) forwards; }
   @keyframes introFadeOut { to { opacity:0; transform:scale(1.03); pointer-events:none; } }
 
@@ -1151,26 +1156,26 @@
   /* Card glow on hover */
   .card { transition:box-shadow 0.25s, border-color 0.25s; }
   .card:hover { box-shadow:0 0 0 1px rgba(124,58,237,0.12), 0 8px 32px rgba(0,0,0,0.3); }
-  /* Phase header gradient accent */
-  .phase-header::after {
-    content:''; display:block; height:1px; margin-top:16px;
-    background:linear-gradient(90deg,rgba(124,58,237,0.6),rgba(59,130,246,0.3),transparent);
+  /* Phase header gradient accent – border-image on bottom, no padding added (margin-bottom already set) */
+  .phase-header {
+    border-bottom: 1px solid transparent;
+    border-image: linear-gradient(90deg,rgba(124,58,237,0.5),rgba(59,130,246,0.25),transparent) 0 0 1 0;
   }
-  /* Nav item active glow */
-  .nav-item.active { box-shadow:inset 3px 0 0 var(--purple); background:rgba(124,58,237,0.1); }
-  /* Sidebar gradient top */
+  /* Nav item active – merge with existing, add inset shadow */
+  .nav-item.active { box-shadow:inset 3px 0 0 var(--purple); }
+  /* Sidebar gradient top – position:relative already added to .sidebar */
   .sidebar::before {
     content:''; position:absolute; top:0; left:0; right:0; height:120px;
     background:linear-gradient(180deg,rgba(124,58,237,0.06),transparent);
-    pointer-events:none;
+    pointer-events:none; z-index:0;
   }
   /* Better result boxes */
   .result-box.visible { border-color:rgba(124,58,237,0.35); box-shadow:0 0 30px rgba(124,58,237,0.06); }
-  /* Topbar gradient */
+  /* Topbar gradient – extends existing rule (no duplicate) */
   .topbar { background:linear-gradient(90deg,#0a0a0f 0%,#0d0d1a 50%,#0a0a0f 100%); border-bottom:1px solid rgba(124,58,237,0.15); }
   /* Song list item hover */
-  .song-item:hover { background:rgba(124,58,237,0.08); border-color:rgba(124,58,237,0.2); }
-  .song-item.active { background:rgba(124,58,237,0.12); border-left:2px solid var(--purple); }
+  .song-item:hover { background:rgba(124,58,237,0.08) !important; border-color:rgba(124,58,237,0.2) !important; }
+  .song-item.active { border-left:2px solid var(--purple) !important; }
 
   /* ===== YOUTUBE RELEASES PHASE ===== */
   .yt-release-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
