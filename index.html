@@ -7119,9 +7119,51 @@ function initLetterGlow() {
 let _introCtx = null;
 let _introDrone = null;
 let _introMaster = null;
+let _introComp = null;
 let _introNextBar = 0;
 let _introLoopId = null;
 let _introBeatStarted = false;
+let _lettersSpoken = false;
+
+// Deep voice for D-A-N letters synchronized with drop animation
+function speakIntroLetters() {
+  if (_lettersSpoken || !window.speechSynthesis) return;
+  _lettersSpoken = true;
+  // Letter timing matches animation-delay: D=0.7s, A=1.25s, N=1.8s
+  const LETTERS = [
+    { text: 'D', delay: 700 },
+    { text: 'A', delay: 1250 },
+    { text: 'N', delay: 1800 }
+  ];
+  const doSpeak = () => {
+    const voices = speechSynthesis.getVoices();
+    // Pick deepest available male voice (prefer German, fall back to any deep male)
+    const deepVoice =
+      voices.find(v => /male/i.test(v.name) && v.lang.startsWith('de')) ||
+      voices.find(v => /(google deutsch|microsoft stefan|microsoft markus)/i.test(v.name)) ||
+      voices.find(v => /male/i.test(v.name)) ||
+      voices.find(v => /(georg|david|fred|james|daniel|alex)/i.test(v.name)) ||
+      null;
+    LETTERS.forEach(({ text, delay }) => {
+      setTimeout(() => {
+        try {
+          const u = new SpeechSynthesisUtterance(text);
+          u.pitch  = 0;    // deepest possible
+          u.rate   = 0.55; // slow, heavy
+          u.volume = 1.0;
+          if (deepVoice) u.voice = deepVoice;
+          speechSynthesis.speak(u);
+        } catch(e) {}
+      }, delay);
+    });
+  };
+  if (speechSynthesis.getVoices().length > 0) {
+    doSpeak();
+  } else {
+    speechSynthesis.addEventListener('voiceschanged', doSpeak, { once: true });
+    setTimeout(doSpeak, 400); // fallback
+  }
+}
 
 function tryStartIntroBeat() {
   if (_introBeatStarted) return;
@@ -7129,79 +7171,123 @@ function tryStartIntroBeat() {
   try {
     _introCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (_introCtx.state === 'suspended') _introCtx.resume();
+
+    // Master gain
     _introMaster = _introCtx.createGain();
     _introMaster.gain.value = 0;
-    _introMaster.connect(_introCtx.destination);
-    // Fade in
-    _introMaster.gain.linearRampToValueAtTime(0.6, _introCtx.currentTime + 1.5);
 
-    // Atmospheric drone (filtered sawtooth pad)
-    _introDrone = _introCtx.createOscillator();
-    _introDrone.type = 'sawtooth';
-    _introDrone.frequency.value = 55; // A1 – deep and dark
-    const filt = _introCtx.createBiquadFilter();
-    filt.type = 'lowpass'; filt.frequency.value = 300; filt.Q.value = 6;
-    const droneGain = _introCtx.createGain(); droneGain.gain.value = 0.06;
-    _introDrone.connect(filt); filt.connect(droneGain); droneGain.connect(_introMaster);
-    _introDrone.start();
+    // Hard compressor for punch/loudness
+    _introComp = _introCtx.createDynamicsCompressor();
+    _introComp.threshold.value = -14;
+    _introComp.knee.value      = 3;
+    _introComp.ratio.value     = 12;
+    _introComp.attack.value    = 0.0005;
+    _introComp.release.value   = 0.07;
+    _introMaster.connect(_introComp);
+    _introComp.connect(_introCtx.destination);
 
-    // LFO on drone for slow breath
-    const lfo = _introCtx.createOscillator(); lfo.frequency.value = 0.3;
-    const lfoG = _introCtx.createGain(); lfoG.gain.value = 0.03;
-    lfo.connect(lfoG); lfoG.connect(droneGain.gain); lfo.start();
+    // Fade in fast
+    _introMaster.gain.linearRampToValueAtTime(0.85, _introCtx.currentTime + 0.8);
+
+    // ── DRONE: detuned dual-osc for thick, dark sub ──
+    const droneOut = _introCtx.createGain(); droneOut.gain.value = 0.055;
+    droneOut.connect(_introMaster);
+    const lp = _introCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=200; lp.Q.value=4;
+    lp.connect(droneOut);
+    [55, 54.8].forEach(freq => {
+      const o = _introCtx.createOscillator();
+      o.type = 'sawtooth'; o.frequency.value = freq;
+      o.connect(lp); o.start();
+      if (!_introDrone) _introDrone = o; // keep ref for stop
+    });
+    // Slow LFO tremolo
+    const lfo = _introCtx.createOscillator(); lfo.frequency.value = 0.25;
+    const lfoG = _introCtx.createGain(); lfoG.gain.value = 0.025;
+    lfo.connect(lfoG); lfoG.connect(droneOut.gain); lfo.start();
 
     // Schedule beat loop
-    _introNextBar = _introCtx.currentTime + 0.3;
+    _introNextBar = _introCtx.currentTime + 0.15;
     scheduleIntroBar();
   } catch(e) { /* silent */ }
 }
 
 function scheduleIntroBar() {
   if (!_introCtx || !_introMaster) return;
-  const BPS = 90 / 60; // beats per second
-  const T = _introNextBar;
+  const BPS = 95 / 60; // 95 BPM
+  const T   = _introNextBar;
+  const out = _introMaster;
 
-  const kick808 = (t, vol=0.55, decay=0.5) => {
+  // ── Fat 808 Kick with distortion + click transient ──
+  const kick808 = (t, vol=0.9, decay=0.7) => {
+    // Distortion shaper
+    const dist = _introCtx.createWaveShaper();
+    const cv = new Float32Array(512);
+    for (let i=0;i<512;i++){const x=(i*2/512)-1; cv[i]=x<0?-Math.pow(-x,0.45):Math.pow(x,0.45);}
+    dist.curve = cv;
+    // Sub oscillator
     const o = _introCtx.createOscillator(), g = _introCtx.createGain();
-    o.connect(g); g.connect(_introMaster);
     o.type = 'sine';
-    o.frequency.setValueAtTime(120, t);
-    o.frequency.exponentialRampToValueAtTime(22, t + decay);
+    o.frequency.setValueAtTime(160, t);
+    o.frequency.exponentialRampToValueAtTime(24, t + decay);
     g.gain.setValueAtTime(vol, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + decay + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.001, t + decay + 0.06);
+    o.connect(dist); dist.connect(g); g.connect(out);
     o.start(t); o.stop(t + decay + 0.1);
-  };
-  const snare = (t) => {
-    const len = Math.ceil(_introCtx.sampleRate * 0.12);
-    const buf = _introCtx.createBuffer(1, len, _introCtx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/len,2);
-    const src = _introCtx.createBufferSource(); src.buffer = buf;
-    const filt = _introCtx.createBiquadFilter(); filt.type='bandpass'; filt.frequency.value=2200; filt.Q.value=0.8;
-    const g = _introCtx.createGain(); g.gain.value = 0.18;
-    src.connect(filt); filt.connect(g); g.connect(_introMaster);
-    src.start(t); src.stop(t + 0.15);
-  };
-  const hat = (t, vol=0.05) => {
-    const len = Math.ceil(_introCtx.sampleRate * 0.04);
-    const buf = _introCtx.createBuffer(1, len, _introCtx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * (1-i/len);
-    const src = _introCtx.createBufferSource(); src.buffer = buf;
-    const filt = _introCtx.createBiquadFilter(); filt.type='highpass'; filt.frequency.value=9000;
-    const g = _introCtx.createGain(); g.gain.value = vol;
-    src.connect(filt); filt.connect(g); g.connect(_introMaster);
-    src.start(t); src.stop(t + 0.06);
+    // Hard click for attack punch
+    const oc = _introCtx.createOscillator(), gc = _introCtx.createGain();
+    oc.type='square'; oc.frequency.value=900;
+    gc.gain.setValueAtTime(0.22, t);
+    gc.gain.exponentialRampToValueAtTime(0.001, t+0.018);
+    oc.connect(gc); gc.connect(out);
+    oc.start(t); oc.stop(t+0.022);
   };
 
-  // Pattern: kick 1,3 – snare 2,4 – hats on every 8th
-  kick808(T,            0.55, 0.55);
-  kick808(T + 2/BPS,    0.48, 0.48);
+  // ── Snappy Snare: noise + tone ──
+  const snare = (t) => {
+    // Noise body
+    const len = Math.ceil(_introCtx.sampleRate * 0.2);
+    const buf = _introCtx.createBuffer(1, len, _introCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,1.6);
+    const src = _introCtx.createBufferSource(); src.buffer=buf;
+    const bp = _introCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=3000; bp.Q.value=0.6;
+    const g = _introCtx.createGain(); g.gain.value=0.52;
+    src.connect(bp); bp.connect(g); g.connect(out);
+    src.start(t); src.stop(t+0.22);
+    // Tone snap
+    const ot = _introCtx.createOscillator(), gt = _introCtx.createGain();
+    ot.type='triangle'; ot.frequency.setValueAtTime(260,t); ot.frequency.exponentialRampToValueAtTime(160,t+0.06);
+    gt.gain.setValueAtTime(0.18,t); gt.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+    ot.connect(gt); gt.connect(out);
+    ot.start(t); ot.stop(t+0.08);
+  };
+
+  // ── Hi-Hats ──
+  const hat = (t, vol=0.07, open=false) => {
+    const dur = open ? 0.18 : 0.038;
+    const len = Math.ceil(_introCtx.sampleRate * dur);
+    const buf = _introCtx.createBuffer(1, len, _introCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i=0;i<len;i++) d[i]=(Math.random()*2-1)*(1-i/len);
+    const src=_introCtx.createBufferSource(); src.buffer=buf;
+    const hp=_introCtx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=11000;
+    const g=_introCtx.createGain(); g.gain.value=vol;
+    src.connect(hp); hp.connect(g); g.connect(out);
+    src.start(t); src.stop(t+dur+0.01);
+  };
+
+  // ── Pattern (kick 1+3, snare 2+4, 16th hats) ──
+  kick808(T,          0.92, 0.72);
+  kick808(T+2/BPS,    0.75, 0.60);
   snare(T + 1/BPS);
   snare(T + 3/BPS);
-  for (let i = 0; i < 8; i++) hat(T + i * 0.5/BPS, i%2===0 ? 0.06 : 0.03);
+  // 16th-note hats with accent pattern
+  for (let i=0;i<16;i++) {
+    const v = i%4===0 ? 0.10 : i%2===0 ? 0.065 : 0.032;
+    hat(T + i*0.25/BPS, v, i===6||i===14);
+  }
 
-  _introNextBar += 4 / BPS;
+  _introNextBar += 4/BPS;
   const msUntilNext = (_introNextBar - _introCtx.currentTime - 0.15) * 1000;
   _introLoopId = setTimeout(scheduleIntroBar, Math.max(0, msUntilNext));
 }
@@ -7230,112 +7316,175 @@ function playEntranceSound() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const now = ctx.currentTime;
 
-    // ── Master compressor für Punch ──
+    // ── Master chain: Compressor → Limiter → Out ──
     const comp = ctx.createDynamicsCompressor();
-    comp.threshold.value = -12; comp.knee.value = 6;
-    comp.ratio.value = 8; comp.attack.value = 0.001; comp.release.value = 0.12;
-    comp.connect(ctx.destination);
+    comp.threshold.value = -10; comp.knee.value = 3;
+    comp.ratio.value = 14; comp.attack.value = 0.0003; comp.release.value = 0.06;
+    const limiter = ctx.createDynamicsCompressor();
+    limiter.threshold.value = -1; limiter.knee.value = 0;
+    limiter.ratio.value = 20; limiter.attack.value = 0.0001; limiter.release.value = 0.02;
+    comp.connect(limiter); limiter.connect(ctx.destination);
 
-    // ── MASSIVE 808 SUB-BASS KICK ──
-    const kick808 = (t, freq=180, decay=0.9, vol=0.95) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
+    // ── Simple plate reverb (pre-delay + all-pass cascade) ──
+    const makeReverb = (decaySec=1.2) => {
+      const len = Math.ceil(ctx.sampleRate * decaySec);
+      const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+      for (let ch=0;ch<2;ch++){
+        const d=buf.getChannelData(ch);
+        for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,1.2);
+      }
+      const rev = ctx.createConvolver(); rev.buffer=buf;
+      const rg = ctx.createGain(); rg.gain.value=0.22;
+      rev.connect(rg); rg.connect(comp);
+      return rev;
+    };
+    const reverb = makeReverb(1.4);
+
+    // ── MASSIVE 808 SUB-BASS KICK with layered distortion ──
+    const kick808 = (t, freq=200, decay=1.1, vol=1.0) => {
       const dist = ctx.createWaveShaper();
-      const curve = new Float32Array(256);
-      for (let i=0;i<256;i++) { const x=(i*2/256)-1; curve[i]=x < 0 ? -Math.pow(-x,0.6) : Math.pow(x,0.6); }
-      dist.curve = curve;
+      const curve = new Float32Array(512);
+      for (let i=0;i<512;i++){const x=(i*2/512)-1; curve[i]=x<0?-Math.pow(-x,0.4):Math.pow(x,0.4);}
+      dist.curve=curve;
+      // Sub sine
+      const o=ctx.createOscillator(), g=ctx.createGain();
       o.type='sine';
-      o.frequency.setValueAtTime(freq, t);
-      o.frequency.exponentialRampToValueAtTime(28, t+decay);
-      g.gain.setValueAtTime(vol, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t+decay+0.1);
+      o.frequency.setValueAtTime(freq,t);
+      o.frequency.exponentialRampToValueAtTime(26,t+decay);
+      g.gain.setValueAtTime(vol,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+decay+0.08);
       o.connect(dist); dist.connect(g); g.connect(comp);
-      o.start(t); o.stop(t+decay+0.15);
+      o.start(t); o.stop(t+decay+0.12);
+      // Hard click
+      const oc=ctx.createOscillator(),gc=ctx.createGain();
+      oc.type='square'; oc.frequency.value=1200;
+      gc.gain.setValueAtTime(0.35,t); gc.gain.exponentialRampToValueAtTime(0.001,t+0.015);
+      oc.connect(gc); gc.connect(comp);
+      oc.start(t); oc.stop(t+0.018);
+      // Noise burst on attack
+      const nlen=Math.ceil(ctx.sampleRate*0.04);
+      const nbuf=ctx.createBuffer(1,nlen,ctx.sampleRate);
+      const nd=nbuf.getChannelData(0);
+      for(let i=0;i<nlen;i++) nd[i]=(Math.random()*2-1)*(1-i/nlen);
+      const ns=ctx.createBufferSource(); ns.buffer=nbuf;
+      const nlp=ctx.createBiquadFilter(); nlp.type='lowpass'; nlp.frequency.value=200;
+      const ng=ctx.createGain(); ng.gain.value=0.4;
+      ns.connect(nlp); nlp.connect(ng); ng.connect(comp);
+      ns.start(t); ns.stop(t+0.045);
     };
 
-    // ── NOISE CRASH / RAUSCHEN ──
-    const noiseBurst = (t, dur=0.18, vol=0.35, hpFreq=3000) => {
-      const len = Math.ceil(ctx.sampleRate * dur);
-      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-      const d = buf.getChannelData(0);
-      for (let i=0;i<len;i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/len, 1.5);
-      const src = ctx.createBufferSource(); src.buffer = buf;
-      const hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value = hpFreq;
-      const g = ctx.createGain(); g.gain.value = vol;
+    // ── BIG NOISE CRASH ──
+    const noiseBurst = (t, dur=0.25, vol=0.55, hpFreq=3000) => {
+      const len=Math.ceil(ctx.sampleRate*dur);
+      const buf=ctx.createBuffer(1,len,ctx.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,1.3);
+      const src=ctx.createBufferSource(); src.buffer=buf;
+      const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=hpFreq;
+      const g=ctx.createGain(); g.gain.value=vol;
       src.connect(hp); hp.connect(g); g.connect(comp);
+      g.connect(reverb);
       src.start(t); src.stop(t+dur+0.05);
     };
 
-    // ── SUB-BASS RUMBLE (tiefer Drone) ──
-    const subRumble = (t, dur=1.8) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      const lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=80;
-      o.type='sawtooth'; o.frequency.value=38;
-      g.gain.setValueAtTime(0,t);
-      g.gain.linearRampToValueAtTime(0.5, t+0.05);
-      g.gain.exponentialRampToValueAtTime(0.001, t+dur);
-      o.connect(lp); lp.connect(g); g.connect(comp);
-      o.start(t); o.stop(t+dur+0.1);
+    // ── DEEP SUB RUMBLE ──
+    const subRumble = (t, dur=2.5) => {
+      // Two detuned saws for thickness
+      [36, 36.4].forEach(freq => {
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=90;
+        o.type='sawtooth'; o.frequency.value=freq;
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.38,t+0.04);
+        g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+        o.connect(lp); lp.connect(g); g.connect(comp);
+        o.start(t); o.stop(t+dur+0.1);
+      });
     };
 
-    // ── RISER (hochsteigendes Rauschen) ──
+    // ── RISER ──
     const riser = (t, dur=0.5) => {
-      const len = Math.ceil(ctx.sampleRate * dur);
-      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-      const d = buf.getChannelData(0);
-      for (let i=0;i<len;i++) d[i] = (Math.random()*2-1) * (i/len);
-      const src = ctx.createBufferSource(); src.buffer = buf;
-      const bp = ctx.createBiquadFilter(); bp.type='bandpass';
-      bp.frequency.setValueAtTime(400, t);
-      bp.frequency.exponentialRampToValueAtTime(8000, t+dur);
-      bp.Q.value = 0.5;
-      const g = ctx.createGain(); g.gain.value = 0.28;
+      const len=Math.ceil(ctx.sampleRate*dur);
+      const buf=ctx.createBuffer(1,len,ctx.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*(i/len);
+      const src=ctx.createBufferSource(); src.buffer=buf;
+      const bp=ctx.createBiquadFilter(); bp.type='bandpass';
+      bp.frequency.setValueAtTime(300,t);
+      bp.frequency.exponentialRampToValueAtTime(12000,t+dur);
+      bp.Q.value=0.4;
+      const g=ctx.createGain(); g.gain.value=0.5;
       src.connect(bp); bp.connect(g); g.connect(comp);
+      g.connect(reverb);
       src.start(t); src.stop(t+dur+0.05);
     };
 
-    // ── POWER CHORD (Synth Hit) ──
+    // ── DETUNED POWER CHORD (multi-oscillator for fatness) ──
     const synthHit = (freq, t, dur, vol, type='sawtooth') => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      const lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
-      o.type=type; o.frequency.value=freq;
-      g.gain.setValueAtTime(vol, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t+dur);
-      o.connect(lp); lp.connect(g); g.connect(comp);
-      o.start(t); o.stop(t+dur+0.05);
+      [-7, 0, 7].forEach(cents => {  // detune spread
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2800;
+        o.type=type; o.frequency.value=freq * Math.pow(2, cents/1200);
+        g.gain.setValueAtTime(vol/3,t);
+        g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+        o.connect(lp); lp.connect(g); g.connect(comp);
+        lp.connect(reverb);
+        o.start(t); o.stop(t+dur+0.05);
+      });
     };
 
     // ═══ ABLAUF ═══
+
+    // -0.05 bis 0: Stille / Spannung
     // 0.00: Riser baut sich auf
-    riser(now, 0.45);
+    riser(now, 0.52);
 
-    // 0.45: IMPACT – 808 + Crash + Sub
-    kick808(now+0.45, 200, 1.0, 0.95);
-    noiseBurst(now+0.45, 0.22, 0.45, 2500);
-    subRumble(now+0.45, 2.2);
+    // 0.52: MEGA IMPACT
+    kick808(now+0.52, 210, 1.3, 1.0);
+    noiseBurst(now+0.52, 0.28, 0.6, 2200);
+    subRumble(now+0.52, 2.8);
 
-    // 0.45: Power Chord Stab
-    [65.4, 98, 130.8, 174.6, 196].forEach((f,i) =>
-      synthHit(f, now+0.45, 1.8-i*0.1, 0.12)
+    // 0.52: 5-stimmiger Power-Chord-Stab (fette Detuned-Synths)
+    [41.2, 55, 82.4, 110, 138.6, 164.8].forEach((f,i) =>
+      synthHit(f, now+0.52, 2.2-i*0.12, 0.18)
     );
 
-    // 0.65: Zweiter Kick (Echo-artiger Nachschlag)
-    kick808(now+0.65, 160, 0.6, 0.55);
-    noiseBurst(now+0.65, 0.1, 0.2, 4000);
+    // 0.72: Zweiter Kick (Nachschlag-Punch)
+    kick808(now+0.72, 170, 0.7, 0.65);
+    noiseBurst(now+0.72, 0.12, 0.28, 4500);
 
-    // 0.90: Melodischer Aufstieg
-    [196, 261.6, 329.6, 392, 523.3, 659.3, 880].forEach((f,i) =>
-      synthHit(f, now+0.9+i*0.07, 0.5, 0.08, 'triangle')
+    // 0.72: Snare auf 2
+    (() => {
+      const len=Math.ceil(ctx.sampleRate*0.22);
+      const buf=ctx.createBuffer(1,len,ctx.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,1.5);
+      const src=ctx.createBufferSource(); src.buffer=buf;
+      const bp=ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=3200; bp.Q.value=0.5;
+      const g=ctx.createGain(); g.gain.value=0.65;
+      src.connect(bp); bp.connect(g); g.connect(comp);
+      bp.connect(reverb);
+      src.start(now+0.72); src.stop(now+0.72+0.25);
+    })();
+
+    // 1.10: Melodischer Aufstieg
+    [110, 146.8, 196, 261.6, 349.2, 440, 587.3, 880].forEach((f,i) =>
+      synthHit(f, now+1.1+i*0.065, 0.55, 0.07, 'triangle')
     );
 
-    // 1.50: Finaler Bell-Stab (Abschluss)
-    synthHit(1046.5, now+1.55, 1.4, 0.06, 'sine');
-    synthHit(1318.5, now+1.65, 1.2, 0.05, 'sine');
-    synthHit(1568.0, now+1.75, 1.0, 0.04, 'sine');
+    // 1.70: Dritter Kick (Abschluss-Punch)
+    kick808(now+1.70, 180, 0.9, 0.75);
+    noiseBurst(now+1.70, 0.15, 0.35, 3000);
+
+    // 2.00–2.4: Finaler Bell-Chord
+    [[523.3,0.07],[659.3,0.06],[880,0.055],[1046.5,0.05],[1318.5,0.04]].forEach(([f,v],i) =>
+      synthHit(f, now+2.0+i*0.06, 1.8-i*0.15, v, 'sine')
+    );
 
   } catch(e) {}
 }
 
-// Startup: Sound sofort beim Laden – Fallback bei Browser-Autoplay-Sperre
+// Startup: Sound + Voice sofort beim Laden – Fallback bei Browser-Autoplay-Sperre
 window.addEventListener('DOMContentLoaded', () => {
   buildVUCol('introVULeft', VU_LEFT);
   buildVUCol('introVURight', VU_RIGHT);
@@ -7344,9 +7493,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Sofort versuchen (klappt auf Desktop oft direkt)
   tryStartIntroBeat();
+  speakIntroLetters(); // tiefe Stimme für D-A-N
 
   if (screen) {
-    // Falls Browser Audio blockiert hat: bei erster Interaktion starten
+    // Falls Browser Audio/Speech blockiert: bei erster Interaktion nachholen
     const resumeOnce = () => {
       if (_introCtx && _introCtx.state === 'suspended') {
         _introCtx.resume().then(() => {
@@ -7355,6 +7505,7 @@ window.addEventListener('DOMContentLoaded', () => {
       } else if (!_introBeatStarted) {
         tryStartIntroBeat();
       }
+      speakIntroLetters(); // Stimme nachholen falls nötig
     };
     screen.addEventListener('click',      resumeOnce, {once:true, passive:true});
     screen.addEventListener('touchstart', resumeOnce, {once:true, passive:true});
