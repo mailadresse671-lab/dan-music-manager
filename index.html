@@ -1520,6 +1520,31 @@
   }
   .sp-preview-btn:hover { background:rgba(124,58,237,0.3); border-color:rgba(124,58,237,0.6); color:#fff; box-shadow:0 0 10px rgba(124,58,237,0.4); }
 
+  /* ===== STATION HEADERS (Phase 3) ===== */
+  .station-header {
+    display: flex; align-items: center; gap: 14px;
+    margin: 22px 0 10px;
+    padding: 0 2px;
+  }
+  .station-num {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: #fff;
+    box-shadow: 0 0 16px rgba(124,58,237,0.4);
+  }
+  .station-info { flex: 1; }
+  .station-title {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    letter-spacing: 0.5px;
+  }
+  .station-desc {
+    font-size: 11px; color: var(--text-muted); margin-top: 1px;
+  }
+  .station-sep {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(124,58,237,0.4), transparent);
+  }
   /* Beat Studio – Phase 3 section */
   .beat-studio-card { border-color:rgba(59,130,246,0.12); }
   .beat-studio-card::before { background:linear-gradient(90deg,transparent,rgba(59,130,246,0.2),transparent); }
@@ -2198,6 +2223,16 @@
         </div>
       </div>
 
+      <!-- STATION 1 -->
+      <div class="station-header">
+        <div class="station-num">1</div>
+        <div class="station-info">
+          <div class="station-title">Beat Studio</div>
+          <div class="station-desc">Genre wählen · BPM · Sequencer abspielen</div>
+        </div>
+        <div class="station-sep"></div>
+      </div>
+
       <!-- BEAT STUDIO VISUAL -->
       <div class="card beat-studio-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -2235,6 +2270,16 @@
           <button class="bs-genre-btn" style="color:#94a3b8;border-color:#94a3b844;background:#94a3b811;" onclick="setBsGenre(this,'Cloud Rap')">Cloud</button>
           <button class="bs-genre-btn" style="color:#06b6d4;border-color:#06b6d444;background:#06b6d411;" onclick="setBsGenre(this,'Afro Rap')">Afro</button>
         </div>
+      </div>
+
+      <!-- STATION 2 -->
+      <div class="station-header">
+        <div class="station-num">2</div>
+        <div class="station-info">
+          <div class="station-title">Song-Struktur</div>
+          <div class="station-desc">Sektionen planen · Reihenfolge festlegen</div>
+        </div>
+        <div class="station-sep"></div>
       </div>
 
       <!-- SONG STRUKTUR PLANER -->
@@ -2276,6 +2321,16 @@
         <div style="font-size:11px;color:rgba(148,163,184,0.4);margin-top:8px;">Tipp: Tags werden als neue Zeilen mit Leerzeile in die Lyrics eingefügt (Phase 2).</div>
       </div>
 
+      <!-- STATION 3 -->
+      <div class="station-header">
+        <div class="station-num">3</div>
+        <div class="station-info">
+          <div class="station-title">Stimm-Persona</div>
+          <div class="station-desc">Welche Stimme / Charakter soll der Song haben?</div>
+        </div>
+        <div class="station-sep"></div>
+      </div>
+
       <!-- SUNO PERSONA PICKER -->
       <div class="card" id="sunoPersonaCard" style="margin-bottom:12px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -2294,6 +2349,16 @@
           </div>
           <div class="sp-prompt-box" id="spPromptBox"></div>
         </div>
+      </div>
+
+      <!-- STATION 4 -->
+      <div class="station-header">
+        <div class="station-num">4</div>
+        <div class="station-info">
+          <div class="station-title">Beat-Parameter</div>
+          <div class="station-desc">BPM · Tonart · Mood · Stil · Instrumente</div>
+        </div>
+        <div class="station-sep"></div>
       </div>
 
       <div class="card">
@@ -2400,8 +2465,18 @@
         </div>
       </div>
 
+      <!-- STATION 5 -->
+      <div class="station-header">
+        <div class="station-num">5</div>
+        <div class="station-info">
+          <div class="station-title">Suno Cockpit</div>
+          <div class="station-desc">Lyrics · Stile · Optionen direkt für Suno eingeben</div>
+        </div>
+        <div class="station-sep"></div>
+      </div>
+
       <!-- SUNO-COCKPIT v2 -->
-      <div class="card suno-cockpit-card suno-ui-wrap" style="margin-top:16px;padding:0;border-color:rgba(255,255,255,0.1);">
+      <div class="card suno-cockpit-card suno-ui-wrap" style="margin-top:0;padding:0;border-color:rgba(255,255,255,0.1);">
         <!-- Hidden fields for save/load compatibility -->
         <input type="hidden" id="suno_modus" value="einfach">
         <input type="hidden" id="suno_geschlecht" value="maennlich">
@@ -2563,11 +2638,11 @@
           </div>
 
           <!-- Weitere Optionen section -->
-          <div class="suno-section collapsed" id="suno_sec_optionen">
+          <div class="suno-section" id="suno_sec_optionen">
             <div class="suno-section-header" onclick="toggleSunoSection('suno_sec_optionen')">
               <div class="suno-section-title"><span class="suno-section-arrow">▼</span> Weitere Optionen</div>
             </div>
-            <div class="suno-section-body" style="display:none">
+            <div class="suno-section-body">
               <div class="suno-opt-row">
                 <div class="suno-opt-label">Stimmliches Geschlecht <span class="suno-opt-info" title="Beeinflusst die Stimmrichtung der generierten Vocals">ⓘ</span></div>
                 <div class="suno-binary-toggle">
@@ -7153,46 +7228,137 @@ function enterStudio() {
 function playEntranceSound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const play = (freq, t, dur, vol, type='triangle') => {
+    const now = ctx.currentTime;
+
+    // ── Master compressor für Punch ──
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -12; comp.knee.value = 6;
+    comp.ratio.value = 8; comp.attack.value = 0.001; comp.release.value = 0.12;
+    comp.connect(ctx.destination);
+
+    // ── MASSIVE 808 SUB-BASS KICK ──
+    const kick808 = (t, freq=180, decay=0.9, vol=0.95) => {
       const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = type; o.frequency.value = freq;
-      o.connect(g); g.connect(ctx.destination);
-      g.gain.setValueAtTime(0, ctx.currentTime+t);
-      g.gain.linearRampToValueAtTime(vol, ctx.currentTime+t+0.03);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+t+dur);
-      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+dur+0.05);
+      const dist = ctx.createWaveShaper();
+      const curve = new Float32Array(256);
+      for (let i=0;i<256;i++) { const x=(i*2/256)-1; curve[i]=x < 0 ? -Math.pow(-x,0.6) : Math.pow(x,0.6); }
+      dist.curve = curve;
+      o.type='sine';
+      o.frequency.setValueAtTime(freq, t);
+      o.frequency.exponentialRampToValueAtTime(28, t+decay);
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t+decay+0.1);
+      o.connect(dist); dist.connect(g); g.connect(comp);
+      o.start(t); o.stop(t+decay+0.15);
     };
-    const kick = (t) => {
+
+    // ── NOISE CRASH / RAUSCHEN ──
+    const noiseBurst = (t, dur=0.18, vol=0.35, hpFreq=3000) => {
+      const len = Math.ceil(ctx.sampleRate * dur);
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i=0;i<len;i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/len, 1.5);
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value = hpFreq;
+      const g = ctx.createGain(); g.gain.value = vol;
+      src.connect(hp); hp.connect(g); g.connect(comp);
+      src.start(t); src.stop(t+dur+0.05);
+    };
+
+    // ── SUB-BASS RUMBLE (tiefer Drone) ──
+    const subRumble = (t, dur=1.8) => {
       const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type='sine'; o.frequency.setValueAtTime(180,ctx.currentTime+t);
-      o.frequency.exponentialRampToValueAtTime(28,ctx.currentTime+t+0.35);
-      g.gain.setValueAtTime(0.7,ctx.currentTime+t);
-      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.5);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.6);
+      const lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=80;
+      o.type='sawtooth'; o.frequency.value=38;
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(0.5, t+0.05);
+      g.gain.exponentialRampToValueAtTime(0.001, t+dur);
+      o.connect(lp); lp.connect(g); g.connect(comp);
+      o.start(t); o.stop(t+dur+0.1);
     };
-    // Two punchy kicks
-    kick(0); kick(0.45);
-    // Rising chord (C minor triumphant)
-    [130.81,155.56,196,233.08,293.66].forEach((f,i) => play(f, 0.05+i*0.07, 2.2, 0.09));
-    // Soaring lead
-    [392,440,523.25,587.33,659.25,783.99,880].forEach((f,i) => play(f, 0.5+i*0.11, 0.6, 0.11));
-    // Final bell
-    play(1567.98, 2.1, 1.5, 0.07, 'sine');
-    play(2093.00, 2.25, 1.2, 0.05, 'sine');
+
+    // ── RISER (hochsteigendes Rauschen) ──
+    const riser = (t, dur=0.5) => {
+      const len = Math.ceil(ctx.sampleRate * dur);
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i=0;i<len;i++) d[i] = (Math.random()*2-1) * (i/len);
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const bp = ctx.createBiquadFilter(); bp.type='bandpass';
+      bp.frequency.setValueAtTime(400, t);
+      bp.frequency.exponentialRampToValueAtTime(8000, t+dur);
+      bp.Q.value = 0.5;
+      const g = ctx.createGain(); g.gain.value = 0.28;
+      src.connect(bp); bp.connect(g); g.connect(comp);
+      src.start(t); src.stop(t+dur+0.05);
+    };
+
+    // ── POWER CHORD (Synth Hit) ──
+    const synthHit = (freq, t, dur, vol, type='sawtooth') => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      const lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
+      o.type=type; o.frequency.value=freq;
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t+dur);
+      o.connect(lp); lp.connect(g); g.connect(comp);
+      o.start(t); o.stop(t+dur+0.05);
+    };
+
+    // ═══ ABLAUF ═══
+    // 0.00: Riser baut sich auf
+    riser(now, 0.45);
+
+    // 0.45: IMPACT – 808 + Crash + Sub
+    kick808(now+0.45, 200, 1.0, 0.95);
+    noiseBurst(now+0.45, 0.22, 0.45, 2500);
+    subRumble(now+0.45, 2.2);
+
+    // 0.45: Power Chord Stab
+    [65.4, 98, 130.8, 174.6, 196].forEach((f,i) =>
+      synthHit(f, now+0.45, 1.8-i*0.1, 0.12)
+    );
+
+    // 0.65: Zweiter Kick (Echo-artiger Nachschlag)
+    kick808(now+0.65, 160, 0.6, 0.55);
+    noiseBurst(now+0.65, 0.1, 0.2, 4000);
+
+    // 0.90: Melodischer Aufstieg
+    [196, 261.6, 329.6, 392, 523.3, 659.3, 880].forEach((f,i) =>
+      synthHit(f, now+0.9+i*0.07, 0.5, 0.08, 'triangle')
+    );
+
+    // 1.50: Finaler Bell-Stab (Abschluss)
+    synthHit(1046.5, now+1.55, 1.4, 0.06, 'sine');
+    synthHit(1318.5, now+1.65, 1.2, 0.05, 'sine');
+    synthHit(1568.0, now+1.75, 1.0, 0.04, 'sine');
+
   } catch(e) {}
 }
 
-// Setup audio trigger on any mouse/touch activity on intro
+// Startup: Sound sofort beim Laden – Fallback bei Browser-Autoplay-Sperre
 window.addEventListener('DOMContentLoaded', () => {
   buildVUCol('introVULeft', VU_LEFT);
   buildVUCol('introVURight', VU_RIGHT);
   initLetterGlow();
   const screen = document.getElementById('intro-screen');
+
+  // Sofort versuchen (klappt auf Desktop oft direkt)
+  tryStartIntroBeat();
+
   if (screen) {
-    const startOnce = () => { tryStartIntroBeat(); screen.removeEventListener('mousemove', startOnce); screen.removeEventListener('touchstart', startOnce); };
-    screen.addEventListener('mousemove', startOnce, {passive:true});
-    screen.addEventListener('touchstart', startOnce, {passive:true, once:true});
+    // Falls Browser Audio blockiert hat: bei erster Interaktion starten
+    const resumeOnce = () => {
+      if (_introCtx && _introCtx.state === 'suspended') {
+        _introCtx.resume().then(() => {
+          if (!_introBeatStarted) tryStartIntroBeat();
+        });
+      } else if (!_introBeatStarted) {
+        tryStartIntroBeat();
+      }
+    };
+    screen.addEventListener('click',      resumeOnce, {once:true, passive:true});
+    screen.addEventListener('touchstart', resumeOnce, {once:true, passive:true});
+    screen.addEventListener('mousemove',  resumeOnce, {once:true, passive:true});
   }
 });
 
