@@ -1070,6 +1070,167 @@
     text-transform:uppercase; opacity:0; animation:fadeSlideUp 0.7s ease-out 3.6s both;
   }
 
+  /* ===== KULISSE PARTICLES ===== */
+  .intro-particle {
+    position:absolute; border-radius:50%; pointer-events:none; z-index:1;
+    animation:particleRise var(--dur,14s) linear var(--del,0s) infinite;
+    opacity:0;
+  }
+  @keyframes particleRise {
+    0%   { opacity:0; transform:translateY(0) scale(1); }
+    8%   { opacity:var(--op,0.25); }
+    85%  { opacity:var(--op,0.25); }
+    100% { opacity:0; transform:translateY(-110vh) scale(0.5); }
+  }
+
+  /* ===== SOUND MIXER ===== */
+  .btn-mixer {
+    padding:6px 14px; border-radius:6px; border:1px solid rgba(245,158,11,0.45);
+    background:rgba(245,158,11,0.1); color:#f59e0b; font-size:12px;
+    cursor:pointer; transition:all 0.2s; white-space:nowrap;
+  }
+  .btn-mixer:hover { border-color:#f59e0b; background:rgba(245,158,11,0.2); }
+  .mixer-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:1100;
+    display:none; align-items:center; justify-content:center;
+  }
+  .mixer-overlay.open { display:flex; }
+  .mixer-panel {
+    background:#0d0d1a; border:1px solid rgba(245,158,11,0.25);
+    border-radius:16px; padding:24px; width:580px; max-width:96vw;
+    box-shadow:0 0 80px rgba(0,0,0,0.8), 0 0 40px rgba(245,158,11,0.05);
+  }
+  .mixer-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:20px;
+  }
+  .mixer-title { font-size:16px; font-weight:800; letter-spacing:2px; color:#f59e0b; text-transform:uppercase; }
+  .mixer-subtitle { font-size:11px; color:#4b5563; letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
+  .mixer-close { background:none; border:none; color:#4b5563; font-size:20px; cursor:pointer; padding:0 4px; }
+  .mixer-close:hover { color:#e2e8f0; }
+  .mixer-category { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:#374151; font-weight:700; margin:12px 0 8px; }
+  .mixer-pads { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .mixer-pad {
+    background:#111827; border:1px solid rgba(255,255,255,0.06);
+    border-radius:10px; padding:12px 8px; cursor:pointer;
+    transition:all 0.12s; text-align:center; user-select:none;
+    position:relative; overflow:hidden;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+  }
+  .mixer-pad::before {
+    content:''; position:absolute; inset:0; border-radius:10px;
+    background:var(--pc,#7c3aed); opacity:0;
+    transition:opacity 0.12s;
+  }
+  .mixer-pad:hover::before { opacity:0.08; }
+  .mixer-pad:hover { border-color:var(--pc,#7c3aed); transform:translateY(-1px); box-shadow:0 4px 20px color-mix(in srgb,var(--pc,#7c3aed) 20%,transparent); }
+  .mixer-pad.firing { animation:padFire 0.28s ease-out; }
+  @keyframes padFire {
+    0%  { transform:scale(0.93); box-shadow:0 0 0 0 var(--pc,#7c3aed); }
+    45% { transform:scale(1.06); box-shadow:0 0 30px 8px color-mix(in srgb,var(--pc) 50%,transparent); background:color-mix(in srgb,var(--pc) 18%,#111827); border-color:var(--pc); }
+    100%{ transform:scale(1); box-shadow:none; }
+  }
+  .mp-emoji { font-size:22px; line-height:1; }
+  .mp-label { font-size:11px; font-weight:700; color:#e2e8f0; letter-spacing:0.5px; }
+  .mp-sub   { font-size:9px; color:#374151; text-transform:uppercase; letter-spacing:1px; }
+  /* Hero D_a_N pad */
+  .mixer-pad.hero {
+    grid-column:span 2; background:rgba(124,58,237,0.08);
+    border-color:rgba(124,58,237,0.4); padding:16px;
+  }
+  .mixer-pad.hero .mp-emoji { font-size:30px; }
+  .mixer-pad.hero .mp-label { font-size:14px; letter-spacing:2px; }
+  /* LED dot on pads */
+  .mp-led {
+    position:absolute; top:7px; right:8px; width:5px; height:5px;
+    border-radius:50%; background:var(--pc,#7c3aed); opacity:0.3;
+  }
+  .mixer-pad.firing .mp-led { opacity:1; box-shadow:0 0 8px var(--pc); }
+
+  /* ===== GLOBAL UI UPGRADES ===== */
+  /* Card glow on hover */
+  .card { transition:box-shadow 0.25s, border-color 0.25s; }
+  .card:hover { box-shadow:0 0 0 1px rgba(124,58,237,0.12), 0 8px 32px rgba(0,0,0,0.3); }
+  /* Phase header gradient accent */
+  .phase-header::after {
+    content:''; display:block; height:1px; margin-top:16px;
+    background:linear-gradient(90deg,rgba(124,58,237,0.6),rgba(59,130,246,0.3),transparent);
+  }
+  /* Nav item active glow */
+  .nav-item.active { box-shadow:inset 3px 0 0 var(--purple); background:rgba(124,58,237,0.1); }
+  /* Sidebar gradient top */
+  .sidebar::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:120px;
+    background:linear-gradient(180deg,rgba(124,58,237,0.06),transparent);
+    pointer-events:none;
+  }
+  /* Better result boxes */
+  .result-box.visible { border-color:rgba(124,58,237,0.35); box-shadow:0 0 30px rgba(124,58,237,0.06); }
+  /* Topbar gradient */
+  .topbar { background:linear-gradient(90deg,#0a0a0f 0%,#0d0d1a 50%,#0a0a0f 100%); border-bottom:1px solid rgba(124,58,237,0.15); }
+  /* Song list item hover */
+  .song-item:hover { background:rgba(124,58,237,0.08); border-color:rgba(124,58,237,0.2); }
+  .song-item.active { background:rgba(124,58,237,0.12); border-left:2px solid var(--purple); }
+
+  /* ===== YOUTUBE RELEASES PHASE ===== */
+  .yt-release-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
+  .yt-release-card {
+    background:var(--card2); border:1px solid var(--border); border-radius:10px;
+    overflow:hidden; cursor:pointer; transition:all 0.2s; position:relative;
+  }
+  .yt-release-card:hover { border-color:rgba(239,68,68,0.4); transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,0.4); }
+  .yt-thumb { width:100%; aspect-ratio:16/9; object-fit:cover; background:#1a1a2e; display:flex; align-items:center; justify-content:center; }
+  .yt-thumb-placeholder { width:100%; aspect-ratio:16/9; background:linear-gradient(135deg,#1a1a2e,#0f0f1a); display:flex; align-items:center; justify-content:center; font-size:32px; }
+  .yt-release-info { padding:10px 12px; }
+  .yt-release-title { font-size:12px; font-weight:600; color:var(--text); margin-bottom:4px; line-height:1.3; }
+  .yt-release-meta  { font-size:10px; color:var(--text-muted); display:flex; gap:8px; }
+  .yt-release-badge { font-size:9px; padding:2px 6px; border-radius:3px; font-weight:700; }
+  .yt-badge-live { background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); }
+  .yt-badge-linked { background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); }
+  .yt-add-form { display:flex; gap:8px; margin-bottom:16px; }
+  .yt-add-input { flex:1; background:var(--card2); border:1px solid var(--border); border-radius:6px; padding:9px 12px; color:var(--text); font-size:13px; }
+  .yt-add-input:focus { outline:none; border-color:rgba(239,68,68,0.5); }
+  .yt-add-btn { padding:9px 16px; border-radius:6px; border:none; background:#ef4444; color:#fff; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .yt-add-btn:hover { background:#dc2626; }
+  .yt-stats-bar { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+  .yt-stat { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:10px 16px; text-align:center; flex:1; min-width:80px; }
+  .yt-stat-num { font-size:20px; font-weight:800; color:var(--text); }
+  .yt-stat-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
+
+  /* ===== SINGLES & ALBUMS PHASE ===== */
+  .discography-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:8px; }
+  .album-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; margin-bottom:24px; }
+  .album-card {
+    background:var(--card2); border:1px solid var(--border); border-radius:10px;
+    overflow:hidden; cursor:pointer; transition:all 0.2s;
+  }
+  .album-card:hover { border-color:rgba(124,58,237,0.4); transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,0.4); }
+  .album-cover {
+    width:100%; aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+    font-size:40px; background:linear-gradient(135deg,var(--card2),#0a0a0f);
+  }
+  .album-info { padding:10px 12px; }
+  .album-name { font-size:12px; font-weight:700; color:var(--text); margin-bottom:2px; }
+  .album-meta { font-size:10px; color:var(--text-muted); }
+  .singles-list { display:flex; flex-direction:column; gap:6px; }
+  .single-item {
+    display:flex; align-items:center; gap:12px;
+    background:var(--card2); border:1px solid var(--border); border-radius:8px;
+    padding:10px 14px; cursor:pointer; transition:all 0.2s;
+  }
+  .single-item:hover { border-color:rgba(124,58,237,0.3); background:rgba(124,58,237,0.05); }
+  .single-num { font-size:11px; color:var(--text-muted); width:20px; text-align:center; }
+  .single-info { flex:1; }
+  .single-title { font-size:13px; font-weight:600; color:var(--text); }
+  .single-meta  { font-size:11px; color:var(--text-muted); margin-top:1px; }
+  .single-badge { font-size:9px; padding:2px 6px; border-radius:3px; font-weight:700; }
+  .sb-single { background:rgba(124,58,237,0.15); color:var(--purple-light); border:1px solid rgba(124,58,237,0.3); }
+  .sb-album  { background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
+  .sb-released { background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); }
+  .release-type-toggle { display:flex; gap:6px; }
+  .rt-btn { padding:5px 12px; border-radius:5px; border:1px solid var(--border); background:var(--card2); color:var(--text-muted); font-size:11px; cursor:pointer; transition:all 0.15s; }
+  .rt-btn.active { border-color:var(--purple); color:var(--purple-light); background:rgba(124,58,237,0.1); }
+
   /* ===== ARTIST BIOGRAPHY CARD ===== */
   .bio-card { margin-bottom:12px; }
   .bio-display { display:flex; flex-direction:column; gap:10px; }
@@ -1145,6 +1306,7 @@
   <div class="intro-grid-bg"></div>
   <div class="intro-vignette"></div>
   <div class="intro-scanlines"></div>
+  <div id="introParticles"></div>
 
   <!-- Corners -->
   <div class="intro-corner tl"></div>
@@ -1209,8 +1371,100 @@
     <button class="btn-api" onclick="exportSongs()" title="Songs als JSON exportieren">⬇ Export</button>
     <label class="btn-api" style="cursor:pointer;" title="Songs aus JSON importieren">⬆ Import<input type="file" accept=".json" onchange="importSongs(event)" style="display:none"></label>
     <button class="btn-tavily" onclick="openTavilyModal()" title="Tavily Web-Suche Key">🌐 Web-Suche</button>
+    <button class="btn-mixer" onclick="openMixer()" title="Sound Mixer – Pads & Voice">🎛️ Mixer</button>
     <button class="btn-voice" onclick="openVoiceModal()" title="Voice Persona – deine Stimme & Tonlage">🎤 Voice Persona</button>
     <button class="btn-api" onclick="openApiModal()">API Key</button>
+  </div>
+</div>
+
+<!-- ===== SOUND MIXER MODAL ===== -->
+<div class="mixer-overlay" id="mixerOverlay">
+  <div class="mixer-panel">
+    <div class="mixer-header">
+      <div>
+        <div class="mixer-title">🎛️ DaN Sound Mixer</div>
+        <div class="mixer-subtitle">Studio Sound Pads</div>
+      </div>
+      <button class="mixer-close" onclick="closeMixer()">✕</button>
+    </div>
+
+    <div class="mixer-category">🎤 Voice</div>
+    <div class="mixer-pads" id="mixerVoiceRow">
+      <div class="mixer-pad hero" style="--pc:#7c3aed" onclick="firePad(this,'speakDaN')">
+        <div class="mp-led"></div>
+        <div class="mp-emoji">🎤</div>
+        <div class="mp-label">D _ a _ N</div>
+        <div class="mp-sub">Deep Voice</div>
+      </div>
+      <div class="mixer-pad" style="--pc:#9d5ff3" onclick="firePad(this,'speakAyo')">
+        <div class="mp-led"></div>
+        <div class="mp-emoji">📢</div>
+        <div class="mp-label">Ayo!</div>
+        <div class="mp-sub">Callout</div>
+      </div>
+      <div class="mixer-pad" style="--pc:#6d28d9" onclick="firePad(this,'speakBerlin')">
+        <div class="mp-led"></div>
+        <div class="mp-emoji">🏙️</div>
+        <div class="mp-label">Berlin</div>
+        <div class="mp-sub">City</div>
+      </div>
+    </div>
+
+    <div class="mixer-category">🥁 Drums</div>
+    <div class="mixer-pads">
+      <div class="mixer-pad" style="--pc:#f97316" onclick="firePad(this,'mixer808')">
+        <div class="mp-led"></div>
+        <div class="mp-emoji">🔊</div>
+        <div class="mp-label">808</div>
+        <div class="mp-sub">Kick</div>
+      </div>
+      <div class="mixer-pad" style="--pc:#ef4444" onclick="firePad(this,'mixerSnare')">
+        <div class="mp-led"></div>
+        <div class="mp-emoji">💥</div>
+        <div class="mp-label">Snare</div>
+        <div class="mp-sub">Hit</div>
+      </div>
+      <div class="mixer-pad" style="--pc:#f59e0b" onclick="firePad(this,'mixerHat')">
+        <div class="mp-led"></div>
+        <div class="mp-emoji">🔔</div>
+        <div class="mp-label">Hi-Hat</div>
+        <div class="mp-sub">Closed</div>
+      </div>
+      <div class="mixer-pad" style="--pc:#eab308" onclick="firePad(this,'mixerClap')">
+        <div class="mp-led"></div>
+        <div class="mp-emoji">👏</div>
+        <div class="mp-label">Clap</div>
+        <div class="mp-sub">Snap</div>
+      </div>
+    </div>
+
+    <div class="mixer-category">🎹 Vibes</div>
+    <div class="mixer-pads">
+      <div class="mixer-pad" style="--pc:#3b82f6" onclick="firePad(this,'mixerBass')">
+        <div class="mp-led"></div>
+        <div class="mp-emoji">📉</div>
+        <div class="mp-label">Sub Drop</div>
+        <div class="mp-sub">Deep Bass</div>
+      </div>
+      <div class="mixer-pad" style="--pc:#06b6d4" onclick="firePad(this,'mixerChord')">
+        <div class="mp-led"></div>
+        <div class="mp-emoji">🎹</div>
+        <div class="mp-label">Chord</div>
+        <div class="mp-sub">C Minor</div>
+      </div>
+      <div class="mixer-pad" style="--pc:#10b981" onclick="firePad(this,'mixerRiser')">
+        <div class="mp-led"></div>
+        <div class="mp-emoji">📈</div>
+        <div class="mp-label">Rise</div>
+        <div class="mp-sub">Build-Up</div>
+      </div>
+      <div class="mixer-pad" style="--pc:#94a3b8" onclick="firePad(this,'mixerVinyl')">
+        <div class="mp-led"></div>
+        <div class="mp-emoji">💿</div>
+        <div class="mp-label">Vinyl</div>
+        <div class="mp-sub">Crackle</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1297,6 +1551,15 @@
       <div class="nav-item" data-phase="9" onclick="switchPhase(9)">
         <div class="phase-num" style="background:rgba(16,185,129,0.2);color:#10b981;">9</div>
         <span>Producer Chat</span>
+      </div>
+      <hr class="sidebar-divider">
+      <div class="nav-item" data-phase="10" onclick="switchPhase(10)">
+        <div class="phase-num" style="background:rgba(239,68,68,0.2);color:#ef4444;font-size:11px;">YT</div>
+        <span>YouTube Releases</span>
+      </div>
+      <div class="nav-item" data-phase="11" onclick="switchPhase(11)">
+        <div class="phase-num" style="background:rgba(234,179,8,0.2);color:#eab308;font-size:11px;">💿</div>
+        <span>Singles & Alben</span>
       </div>
     </div>
 
@@ -2486,6 +2749,108 @@
       </div>
     </div>
 
+    <!-- PHASE 10: YouTube Releases -->
+    <div class="phase-panel" id="phase10">
+      <div class="phase-header">
+        <div class="phase-icon" style="background:rgba(239,68,68,0.15);color:#ef4444;">▶</div>
+        <div>
+          <div class="phase-title">YouTube Releases</div>
+          <div class="phase-subtitle">Deine Songs die bereits online sind – Übersicht & Stats</div>
+        </div>
+      </div>
+      <div class="yt-stats-bar" id="ytStatsBar">
+        <div class="yt-stat"><div class="yt-stat-num" id="ytTotalReleases">0</div><div class="yt-stat-label">Releases</div></div>
+        <div class="yt-stat"><div class="yt-stat-num" id="ytTotalViews">–</div><div class="yt-stat-label">Views (gesamt)</div></div>
+        <div class="yt-stat"><div class="yt-stat-num" id="ytLinkedSongs">0</div><div class="yt-stat-label">Verknüpfte Songs</div></div>
+      </div>
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-title">▶ YouTube Video hinzufügen</div>
+        <div class="yt-add-form">
+          <input class="yt-add-input" id="ytAddUrl" placeholder="https://www.youtube.com/watch?v=... oder youtu.be/..." onkeydown="if(event.key==='Enter')addYtRelease()">
+          <button class="yt-add-btn" onclick="addYtRelease()">+ Hinzufügen</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);">Füge deine bereits auf YouTube veröffentlichten Songs hinzu. Titel & Thumbnail werden automatisch geladen.</div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div class="card-title" style="margin-bottom:0;">🎬 Meine Releases</div>
+          <button class="btn-secondary" onclick="refreshAllYtData()" style="font-size:11px;padding:5px 10px;">↻ Aktualisieren</button>
+        </div>
+        <div class="yt-release-grid" id="ytReleaseGrid">
+          <div style="color:var(--text-muted);font-size:13px;grid-column:1/-1;padding:20px 0;text-align:center;">
+            Noch keine Releases. Füge deine YouTube-Links oben hinzu.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 11: Singles & Albums -->
+    <div class="phase-panel" id="phase11">
+      <div class="phase-header">
+        <div class="phase-icon" style="background:rgba(234,179,8,0.15);color:#eab308;">💿</div>
+        <div>
+          <div class="phase-title">Singles & Alben</div>
+          <div class="phase-subtitle">Deine Diskografie – verwalte Releases, Singles und Alben</div>
+        </div>
+      </div>
+
+      <!-- Albums -->
+      <div class="card" style="margin-bottom:12px;">
+        <div class="discography-header">
+          <div class="card-title" style="margin-bottom:0;">🗂 Alben</div>
+          <button class="btn-ai" onclick="openCreateAlbum()" style="padding:7px 16px;font-size:12px;">+ Neues Album</button>
+        </div>
+        <div class="album-grid" id="albumGrid">
+          <div style="color:var(--text-muted);font-size:12px;grid-column:1/-1;">Noch keine Alben. Erstelle dein erstes Album.</div>
+        </div>
+      </div>
+
+      <!-- Singles / Tracklist -->
+      <div class="card">
+        <div class="discography-header">
+          <div class="card-title" style="margin-bottom:0;">🎵 Diskografie</div>
+          <div class="release-type-toggle">
+            <button class="rt-btn active" onclick="filterDisc(this,'all')">Alle</button>
+            <button class="rt-btn" onclick="filterDisc(this,'single')">Singles</button>
+            <button class="rt-btn" onclick="filterDisc(this,'album')">Album-Tracks</button>
+            <button class="rt-btn" onclick="filterDisc(this,'unreleased')">Unveröffentlicht</button>
+          </div>
+        </div>
+        <div class="singles-list" id="discList">
+          <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0;">
+            Erstelle Songs (Phase 1) und markiere sie als Single oder Album-Track.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Album erstellen Modal -->
+<div class="modal-overlay hidden" id="albumModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-title">🗂 Neues Album erstellen</div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label style="font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block;">Album-Titel</label>
+      <input type="text" class="modal-input" id="albumTitle" placeholder="z.B. Straßen von Berlin" style="margin-bottom:0;">
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label style="font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block;">Release-Datum (optional)</label>
+      <input type="date" class="modal-input" id="albumDate" style="margin-bottom:0;">
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label style="font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block;">Cover-Emoji (optional)</label>
+      <input type="text" class="modal-input" id="albumEmoji" placeholder="💿" maxlength="4" style="margin-bottom:0;width:80px;">
+    </div>
+    <div class="form-group" style="margin-bottom:16px;">
+      <label style="font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block;">Songs für dieses Album auswählen</label>
+      <div id="albumSongPicker" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="saveAlbum()">Album erstellen</button>
+      <button class="btn-cancel" onclick="document.getElementById('albumModal').classList.add('hidden')">Abbrechen</button>
+    </div>
   </div>
 </div>
 
@@ -2759,6 +3124,14 @@ CREATE POLICY "anon full access" ON dan_songs
     </div>
   </div>
 </div>
+
+<!-- ===== PHASE 10: YouTube Releases ===== -->
+<div style="display:none" id="phase10_placeholder">
+  <!-- injected into mainContent by switchPhase -->
+</div>
+
+<!-- ===== PHASE 11: Singles & Albums ===== -->
+<div style="display:none" id="phase11_placeholder"></div>
 
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
@@ -5821,11 +6194,417 @@ function applySpToBeat() {
 }
 
 // =============================
+// KULISSE PARTICLES
+// =============================
+function buildIntroParticles() {
+  const container = document.getElementById('introParticles');
+  if (!container) return;
+  const screen = document.getElementById('intro-screen');
+  if (!screen) return;
+  const colors = ['#7c3aed','#9d5ff3','#3b82f6','#60a5fa','#e2e8f0','#4c1d95','#1d4ed8'];
+  for (let i = 0; i < 38; i++) {
+    const p = document.createElement('div');
+    p.className = 'intro-particle';
+    const size = 1.5 + Math.random() * 3;
+    const x = 5 + Math.random() * 90;
+    const y = 15 + Math.random() * 85;
+    const dur = 9 + Math.random() * 16;
+    const del = -(Math.random() * dur);
+    const op = 0.08 + Math.random() * 0.28;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const isSquare = Math.random() > 0.7;
+    p.style.cssText = `width:${size}px;height:${size}px;left:${x}%;top:${y}%;background:${color};` +
+      `--dur:${dur}s;--del:${del}s;--op:${op};border-radius:${isSquare?'1px':'50%'};`;
+    screen.appendChild(p);
+  }
+}
+
+// =============================
+// SOUND MIXER
+// =============================
+function openMixer()  { document.getElementById('mixerOverlay').classList.add('open'); }
+function closeMixer() { document.getElementById('mixerOverlay').classList.remove('open'); }
+
+function firePad(el, fn) {
+  el.classList.remove('firing');
+  void el.offsetWidth;
+  el.classList.add('firing');
+  setTimeout(() => el.classList.remove('firing'), 350);
+  if (typeof window[fn] === 'function') window[fn]();
+}
+
+// — Voice pads (Web Speech API) —
+function _speak(text, pitch=0.05, rate=0.45) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = ['Google UK English Male','Microsoft David','Alex','Daniel','Google US English','en-US'];
+  let voice = voices.find(v => preferred.some(p => v.name.includes(p) || v.lang === p)) || voices.find(v => v.lang.startsWith('en')) || null;
+  const utt = new SpeechSynthesisUtterance(text);
+  if (voice) utt.voice = voice;
+  utt.pitch = pitch; utt.rate = rate; utt.volume = 1;
+  window.speechSynthesis.speak(utt);
+}
+
+function speakDaN() {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const voices = window.speechSynthesis.getVoices();
+  const deep = voices.find(v => ['Google UK English Male','Microsoft David','Alex','Daniel'].some(n => v.name.includes(n)))
+             || voices.find(v => v.lang.startsWith('en')) || voices[0];
+  const letters = [
+    { text:'D', delay:0   },
+    { text:'a', delay:520 },
+    { text:'N', delay:980 }
+  ];
+  letters.forEach(({text, delay}) => {
+    setTimeout(() => {
+      const u = new SpeechSynthesisUtterance(text);
+      if (deep) u.voice = deep;
+      u.pitch = 0.05; u.rate = 0.38; u.volume = 1;
+      window.speechSynthesis.speak(u);
+    }, delay);
+  });
+}
+function speakAyo()    { _speak('Ayo!', 0.1, 0.6); }
+function speakBerlin() { _speak('Berlin.', 0.05, 0.42); }
+
+// — Drum pads (Web Audio API) —
+function _ac() { return new (window.AudioContext || window.webkitAudioContext)(); }
+
+function mixer808() {
+  const ctx = _ac();
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(160, ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(22, ctx.currentTime + 0.6);
+  g.gain.setValueAtTime(0.9, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+  o.connect(g); g.connect(ctx.destination);
+  o.start(); o.stop(ctx.currentTime + 0.75);
+}
+function mixerSnare() {
+  const ctx = _ac();
+  const len = Math.ceil(ctx.sampleRate * 0.18);
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1)*Math.pow(1-i/len,1.8);
+  const src = ctx.createBufferSource(); src.buffer = buf;
+  const f = ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=2800; f.Q.value=0.7;
+  const g = ctx.createGain(); g.gain.value = 0.55;
+  src.connect(f); f.connect(g); g.connect(ctx.destination);
+  src.start(); src.stop(ctx.currentTime+0.22);
+}
+function mixerHat() {
+  const ctx = _ac();
+  const len = Math.ceil(ctx.sampleRate*0.06);
+  const buf = ctx.createBuffer(1,len,ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i=0;i<len;i++) d[i]=(Math.random()*2-1)*(1-i/len);
+  const src = ctx.createBufferSource(); src.buffer = buf;
+  const f = ctx.createBiquadFilter(); f.type='highpass'; f.frequency.value=10000;
+  const g = ctx.createGain(); g.gain.value=0.4;
+  src.connect(f); f.connect(g); g.connect(ctx.destination);
+  src.start(); src.stop(ctx.currentTime+0.08);
+}
+function mixerClap() {
+  const ctx = _ac();
+  [0, 0.018, 0.034].forEach(t => {
+    const len = Math.ceil(ctx.sampleRate*0.1);
+    const buf = ctx.createBuffer(1,len,ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.5);
+    const src = ctx.createBufferSource(); src.buffer=buf;
+    const f = ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=1500; f.Q.value=0.5;
+    const g = ctx.createGain(); g.gain.value=0.45;
+    src.connect(f); f.connect(g); g.connect(ctx.destination);
+    src.start(ctx.currentTime+t); src.stop(ctx.currentTime+t+0.12);
+  });
+}
+
+// — Vibe pads —
+function mixerBass() {
+  const ctx = _ac();
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type='sine'; o.frequency.value=55;
+  g.gain.setValueAtTime(0,ctx.currentTime);
+  g.gain.linearRampToValueAtTime(0.8,ctx.currentTime+0.05);
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1.2);
+  o.connect(g); g.connect(ctx.destination);
+  o.start(); o.stop(ctx.currentTime+1.3);
+}
+function mixerChord() {
+  const ctx = _ac();
+  [130.81,155.56,196,233.08].forEach((f,i) => {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type='triangle'; o.frequency.value=f;
+    g.gain.setValueAtTime(0,ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.12,ctx.currentTime+0.05+i*0.04);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1.8);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime+2);
+  });
+}
+function mixerRiser() {
+  const ctx = _ac();
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type='sawtooth';
+  o.frequency.setValueAtTime(80,ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(1200,ctx.currentTime+1.5);
+  g.gain.setValueAtTime(0,ctx.currentTime);
+  g.gain.linearRampToValueAtTime(0.15,ctx.currentTime+0.1);
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1.6);
+  const f=ctx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=2000;
+  o.connect(f); f.connect(g); g.connect(ctx.destination);
+  o.start(); o.stop(ctx.currentTime+1.7);
+}
+function mixerVinyl() {
+  const ctx = _ac();
+  const dur = 2.5;
+  const len = Math.ceil(ctx.sampleRate*dur);
+  const buf = ctx.createBuffer(1,len,ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i=0;i<len;i++) {
+    d[i] = Math.random() > 0.995 ? (Math.random()*2-1)*0.6 : (Math.random()*2-1)*0.03;
+  }
+  const src = ctx.createBufferSource(); src.buffer=buf;
+  const f=ctx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=4000;
+  const g=ctx.createGain(); g.gain.value=0.3;
+  g.gain.setValueAtTime(0.3,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+  src.connect(f); f.connect(g); g.connect(ctx.destination);
+  src.start(); src.stop(ctx.currentTime+dur);
+}
+
+// =============================
+// YOUTUBE RELEASES (Phase 10)
+// =============================
+let ytReleases = [];
+
+function loadYtReleases() {
+  try { ytReleases = JSON.parse(localStorage.getItem('dan_yt_releases')||'[]'); } catch(e){ytReleases=[];}
+}
+function saveYtReleases() {
+  localStorage.setItem('dan_yt_releases', JSON.stringify(ytReleases));
+}
+function extractYtId(url) {
+  const m = url.match(/(?:youtu\.be\/|v=|\/embed\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+async function addYtRelease() {
+  const url = document.getElementById('ytAddUrl').value.trim();
+  if (!url) { showToast('Bitte YouTube-URL eingeben!','error'); return; }
+  const vid = extractYtId(url);
+  if (!vid) { showToast('Ungültige YouTube-URL!','error'); return; }
+  if (ytReleases.find(r=>r.vid===vid)) { showToast('Bereits vorhanden!','error'); return; }
+  showToast('Lade Video-Infos...','success');
+  let title = '', thumb = `https://img.youtube.com/vi/${vid}/mqdefault.jpg`;
+  try {
+    const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${vid}&format=json`);
+    if (res.ok) { const d = await res.json(); title = d.title || ''; }
+  } catch(e) {}
+  const release = { vid, title: title || url, url:`https://youtu.be/${vid}`, thumb, addedAt: new Date().toISOString(), linkedSongId: null };
+  ytReleases.unshift(release);
+  saveYtReleases();
+  document.getElementById('ytAddUrl').value = '';
+  renderYtReleases();
+  showToast('Release hinzugefügt!','success');
+}
+function renderYtReleases() {
+  const grid = document.getElementById('ytReleaseGrid');
+  if (!grid) return;
+  updateYtStats();
+  if (!ytReleases.length) {
+    grid.innerHTML = '<div style="color:var(--text-muted);font-size:13px;grid-column:1/-1;padding:20px 0;text-align:center;">Noch keine Releases. Füge deine YouTube-Links oben hinzu.</div>';
+    return;
+  }
+  grid.innerHTML = ytReleases.map((r,i) => `
+    <div class="yt-release-card" title="${escHtml(r.title)}">
+      <div class="yt-thumb-placeholder">${r.thumb ? `<img src="${r.thumb}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentNode.innerHTML='▶'">` : '▶'}</div>
+      <div class="yt-release-info">
+        <div class="yt-release-title">${escHtml(r.title||r.url)}</div>
+        <div class="yt-release-meta">
+          <span class="yt-release-badge yt-badge-live">▶ YouTube</span>
+          ${r.linkedSongId&&songs[r.linkedSongId] ? `<span class="yt-release-badge yt-badge-linked">🔗 ${escHtml(songs[r.linkedSongId].name||'')}</span>` : ''}
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <a href="${r.url}" target="_blank" style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(239,68,68,0.15);color:#ef4444;text-decoration:none;border:1px solid rgba(239,68,68,0.3);">▶ Öffnen</a>
+          <button onclick="linkYtToSong(${i})" style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.3);cursor:pointer;">🔗 Song</button>
+          <button onclick="removeYtRelease(${i})" style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(239,68,68,0.05);color:#ef4444;border:1px solid rgba(239,68,68,0.2);cursor:pointer;">✕</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function removeYtRelease(i) {
+  if (!confirm('Release entfernen?')) return;
+  ytReleases.splice(i,1); saveYtReleases(); renderYtReleases();
+}
+function linkYtToSong(i) {
+  const songIds = Object.keys(songs);
+  if (!songIds.length) { showToast('Keine Songs vorhanden','error'); return; }
+  const options = songIds.map(id => songs[id].name).join('\n');
+  const choice = prompt(`Mit welchem Song verknüpfen?\n\n${options}\n\nSong-Namen eingeben:`);
+  if (!choice) return;
+  const found = songIds.find(id => songs[id].name.toLowerCase().includes(choice.toLowerCase()));
+  if (found) { ytReleases[i].linkedSongId = found; saveYtReleases(); renderYtReleases(); showToast('Verknüpft!','success'); }
+  else showToast('Song nicht gefunden','error');
+}
+function updateYtStats() {
+  const total = document.getElementById('ytTotalReleases');
+  const linked = document.getElementById('ytLinkedSongs');
+  if (total) total.textContent = ytReleases.length;
+  if (linked) linked.textContent = ytReleases.filter(r=>r.linkedSongId).length;
+}
+function refreshAllYtData() { renderYtReleases(); showToast('Aktualisiert!','success'); }
+
+// =============================
+// SINGLES & ALBUMS (Phase 11)
+// =============================
+let albums = [];
+let discFilter = 'all';
+
+function loadAlbums() {
+  try { albums = JSON.parse(localStorage.getItem('dan_albums')||'[]'); } catch(e){albums=[];}
+}
+function saveAlbums() { localStorage.setItem('dan_albums', JSON.stringify(albums)); }
+
+function openCreateAlbum() {
+  const picker = document.getElementById('albumSongPicker');
+  if (picker) {
+    picker.innerHTML = Object.entries(songs).map(([id,s]) =>
+      `<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;background:var(--card2);border:1px solid var(--border);cursor:pointer;font-size:12px;">
+        <input type="checkbox" value="${id}" style="accent-color:var(--purple);">
+        <span>${escHtml(s.name||'Unbenannt')}</span>
+      </label>`
+    ).join('') || '<div style="color:var(--text-muted);font-size:12px;">Keine Songs vorhanden</div>';
+  }
+  document.getElementById('albumTitle').value='';
+  document.getElementById('albumDate').value='';
+  document.getElementById('albumEmoji').value='💿';
+  document.getElementById('albumModal').classList.remove('hidden');
+}
+function saveAlbum() {
+  const title = document.getElementById('albumTitle').value.trim();
+  if (!title) { showToast('Bitte Album-Titel eingeben!','error'); return; }
+  const date  = document.getElementById('albumDate').value;
+  const emoji = document.getElementById('albumEmoji').value.trim() || '💿';
+  const songIds = [...document.querySelectorAll('#albumSongPicker input:checked')].map(el=>el.value);
+  albums.push({ id:'alb_'+Date.now(), title, date, emoji, songIds, createdAt:new Date().toISOString() });
+  saveAlbums();
+  document.getElementById('albumModal').classList.add('hidden');
+  renderDiscography();
+  showToast(`Album "${title}" erstellt!`,'success');
+}
+function deleteAlbum(id) {
+  if (!confirm('Album löschen?')) return;
+  albums = albums.filter(a=>a.id!==id);
+  saveAlbums(); renderDiscography();
+}
+function filterDisc(btn, type) {
+  discFilter = type;
+  document.querySelectorAll('.rt-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDiscList();
+}
+function markRelease(songId, type) {
+  if (!songs[songId]) return;
+  songs[songId].releaseType = type;
+  if (!songs[songId].releaseDate && type !== 'unreleased') songs[songId].releaseDate = new Date().toISOString().split('T')[0];
+  saveToStorage();
+  renderDiscography();
+  showToast(type==='single'?'Als Single markiert!':type==='album'?'Als Album-Track markiert!':'Markierung entfernt','success');
+}
+function renderDiscography() {
+  renderAlbumGrid();
+  renderDiscList();
+}
+function renderAlbumGrid() {
+  const grid = document.getElementById('albumGrid');
+  if (!grid) return;
+  if (!albums.length) {
+    grid.innerHTML='<div style="color:var(--text-muted);font-size:12px;grid-column:1/-1;">Noch keine Alben.</div>';
+    return;
+  }
+  grid.innerHTML = albums.map(a => {
+    const trackCount = a.songIds?.length || 0;
+    const yr = a.date ? a.date.split('-')[0] : '';
+    return `<div class="album-card" onclick="showAlbumDetail('${a.id}')">
+      <div class="album-cover">${a.emoji}</div>
+      <div class="album-info">
+        <div class="album-name">${escHtml(a.title)}</div>
+        <div class="album-meta">${yr}${yr&&trackCount?' · ':''}${trackCount?trackCount+' Tracks':''}</div>
+        <button onclick="event.stopPropagation();deleteAlbum('${a.id}')" style="margin-top:6px;font-size:10px;padding:2px 6px;border-radius:3px;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.3);cursor:pointer;">✕ Löschen</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function showAlbumDetail(id) {
+  const alb = albums.find(a=>a.id===id);
+  if (!alb) return;
+  const tracks = (alb.songIds||[]).map(sid=>songs[sid]?.name||'Unbekannt');
+  showToast(`${alb.emoji} ${alb.title}: ${tracks.join(', ')||'Keine Tracks'}`, 'success');
+}
+function renderDiscList() {
+  const list = document.getElementById('discList');
+  if (!list) return;
+  const all = Object.entries(songs).map(([id,s])=>({id,...s}));
+  const filtered = discFilter==='all' ? all
+    : discFilter==='single'     ? all.filter(s=>s.releaseType==='single')
+    : discFilter==='album'      ? all.filter(s=>s.releaseType==='album')
+    : all.filter(s=>!s.releaseType||s.releaseType==='unreleased');
+  if (!filtered.length) {
+    list.innerHTML='<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0;">Keine Songs in dieser Kategorie.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map((s,i) => {
+    const type = s.releaseType||'unreleased';
+    const badgeCls = type==='single'?'sb-single':type==='album'?'sb-album':'';
+    const badgeTxt = type==='single'?'Single':type==='album'?'Album-Track':'Unveröffentlicht';
+    const ytLink = ytReleases.find(r=>r.linkedSongId===s.id);
+    return `<div class="single-item">
+      <div class="single-num">${i+1}</div>
+      <div class="single-info">
+        <div class="single-title">${escHtml(s.name||'Unbenannt')}</div>
+        <div class="single-meta">${s.releaseDate?'📅 '+s.releaseDate:''}${ytLink?` · <a href="${ytLink.url}" target="_blank" style="color:#ef4444;text-decoration:none;">▶ YouTube</a>`:''}</div>
+      </div>
+      ${badgeCls?`<span class="single-badge ${badgeCls}">${badgeTxt}</span>`:`<span class="single-badge" style="background:rgba(100,116,139,0.1);color:#64748b;border:1px solid rgba(100,116,139,0.2);">${badgeTxt}</span>`}
+      <div style="display:flex;gap:4px;">
+        <button onclick="markRelease('${s.id}','single')" title="Als Single markieren" style="font-size:10px;padding:3px 7px;border-radius:4px;background:rgba(124,58,237,0.1);color:var(--purple-light);border:1px solid rgba(124,58,237,0.3);cursor:pointer;">💿 Single</button>
+        <button onclick="markRelease('${s.id}','album')" title="Als Album-Track markieren" style="font-size:10px;padding:3px 7px;border-radius:4px;background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.3);cursor:pointer;">📀 Album</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Hook Phase 10/11 init into switchPhase
+const _origSwitchPhase = switchPhase;
+function switchPhase(num) {
+  _origSwitchPhase(num);
+  if (num === 10) { loadYtReleases(); renderYtReleases(); }
+  if (num === 11) { loadAlbums(); renderDiscography(); }
+  // Allow phase 10/11 even without a song
+  if (num === 10 || num === 11) {
+    document.querySelectorAll('.phase-panel').forEach(p=>p.classList.remove('active'));
+    const panel = document.getElementById('phase'+num);
+    if (panel) panel.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', parseInt(el.dataset.phase)===num));
+  }
+}
+
+// =============================
 // INIT
 // =============================
 window.addEventListener('DOMContentLoaded', () => {
   initBioCard();
   updateVoicePersonaBadge();
+  buildIntroParticles();
+  loadYtReleases();
+  loadAlbums();
+  // Preload voices for Speech API
+  if (window.speechSynthesis) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.addEventListener('voiceschanged', ()=>window.speechSynthesis.getVoices(), {once:true});
+  }
 });
 </script>
 </body>
