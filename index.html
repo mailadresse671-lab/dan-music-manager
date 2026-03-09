@@ -1212,6 +1212,40 @@
     text-transform:uppercase; opacity:0; animation:fadeSlideUp 0.7s ease-out 3.6s both;
   }
 
+  /* ===== LAUNCH GATE (pre-intro click screen – solves browser autoplay) ===== */
+  #intro-launch {
+    position:fixed; inset:0; background:#000; z-index:10000;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;
+    transition:opacity 1s ease-out;
+  }
+  #intro-launch.gone { opacity:0; pointer-events:none; }
+  .launch-name {
+    font-size:clamp(80px, 22vw, 170px); font-weight:900; letter-spacing:-5px;
+    color:#fff; line-height:1;
+    text-shadow: 0 0 0px #fff;
+    animation: launchGlow 2.4s ease-in-out infinite;
+  }
+  @keyframes launchGlow {
+    0%,100% { text-shadow: 0 0 30px rgba(124,58,237,0.25), 0 0 60px rgba(0,0,0,0); }
+    50%      { text-shadow: 0 0 80px rgba(124,58,237,0.8), 0 0 160px rgba(124,58,237,0.3), 0 2px 0 rgba(255,255,255,0.05); }
+  }
+  .launch-sub {
+    font-size:12px; letter-spacing:8px; color:rgba(255,255,255,0.22);
+    text-transform:uppercase; margin-top:18px; font-weight:400;
+  }
+  .launch-line {
+    width:60px; height:1px; background:rgba(124,58,237,0.4); margin:22px auto 0;
+    animation: launchLinePulse 2.4s ease-in-out infinite;
+  }
+  @keyframes launchLinePulse { 0%,100%{opacity:.3;width:40px} 50%{opacity:1;width:80px} }
+  .launch-press {
+    position:absolute; bottom:44px; font-size:11px; letter-spacing:5px;
+    color:rgba(255,255,255,0.18); text-transform:uppercase;
+    animation:launchBlink 1.8s ease-in-out infinite;
+  }
+  @keyframes launchBlink { 0%,100%{opacity:.18} 50%{opacity:.7} }
+
   /* ===== KULISSE PARTICLES ===== */
   .intro-particle {
     position:absolute; border-radius:50%; pointer-events:none; z-index:1;
@@ -1598,6 +1632,14 @@
 
 </head>
 <body>
+
+<!-- ===== LAUNCH GATE (first click unlocks audio – required by all browsers) ===== -->
+<div id="intro-launch">
+  <div class="launch-name">DaN</div>
+  <div class="launch-sub">90 Rap &nbsp;·&nbsp; Berlin</div>
+  <div class="launch-line"></div>
+  <div class="launch-press">▶ &nbsp; Drücke irgendwo</div>
+</div>
 
 <!-- ===== INTRO SCREEN ===== -->
 <div id="intro-screen">
@@ -7122,46 +7164,62 @@ let _introComp       = null;
 let _introNextBar    = 0;
 let _introLoopId     = null;
 let _introBeatStarted = false;
-let _lettersSpoken   = false;
 
-// ── Voice: Deep gangster rapper – slow, low, menacing ──
-function speakIntroLetters() {
-  if (_lettersSpoken || !window.speechSynthesis) return;
-  _lettersSpoken = true;
-  const doSpeak = () => {
-    const voices = speechSynthesis.getVoices();
-    // Deepest available male voice
-    const deepVoice =
-      voices.find(v => /male/i.test(v.name) && v.lang.startsWith('de')) ||
-      voices.find(v => /(microsoft stefan|microsoft markus|google deutsch)/i.test(v.name)) ||
-      voices.find(v => /male/i.test(v.name)) ||
-      voices.find(v => /(georg|david|fred|james|daniel|alex)/i.test(v.name)) ||
-      null;
-    // Speak each letter like a gangster calling out his name – slow and heavy
-    // "dee... ay... en..." with long dramatic pauses between
-    [
-      { text: 'dee', delay: 1000 },
-      { text: 'ay',  delay: 2800 },
-      { text: 'en',  delay: 4600 },
-    ].forEach(({ text, delay }) => {
-      setTimeout(() => {
-        try {
-          const u = new SpeechSynthesisUtterance(text);
-          u.pitch  = 0;     // floor-level bass – as deep as the browser goes
-          u.rate   = 0.28;  // extremely slow – deliberate gangster delivery
-          u.volume = 1.0;
-          if (deepVoice) u.voice = deepVoice;
-          speechSynthesis.speak(u);
-        } catch(e) {}
-      }, delay);
+// ── Synthesized deep voice: D · A · N via formant synthesis (no browser TTS) ──
+// Uses oscillator + bandpass filters to model a 72 Hz bass voice. Sounds dark,
+// mechanical, demonic – no browser dependency, works identically everywhere.
+let _voiceSynthed = false;
+function synthIntroVoice() {
+  if (_voiceSynthed || !_introCtx || !_introMaster) return;
+  _voiceSynthed = true;
+  const ctx = _introCtx;
+
+  // Speak one vowel/syllable: sawtooth glottal source → two formant filters → envelope
+  const spell = (t, f1, f2, dur, consonant = false) => {
+    const PITCH = 72; // 72 Hz = very deep bass voice (lower than Barry White)
+    const osc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(PITCH, t);
+    osc.frequency.exponentialRampToValueAtTime(PITCH * 0.87, t + dur); // menacing pitch drop
+
+    // Amplitude envelope: sharp attack, clean release
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0, t);
+    env.gain.linearRampToValueAtTime(1, t + 0.04);
+    env.gain.setValueAtTime(1, t + dur - 0.09);
+    env.gain.linearRampToValueAtTime(0, t + dur);
+
+    // Formant 1 (vowel openness) and Formant 2 (vowel character)
+    [{ freq: f1, q: 11, vol: 0.14 }, { freq: f2, q: 16, vol: 0.038 }].forEach(({ freq, q, vol }) => {
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass'; bp.frequency.value = freq; bp.Q.value = q;
+      const g = ctx.createGain(); g.gain.value = vol;
+      osc.connect(bp); bp.connect(g); g.connect(env);
     });
+    env.connect(_introMaster);
+    osc.start(t); osc.stop(t + dur + 0.1);
+
+    // Consonant burst at start (for D and N – plosive/nasal attack)
+    if (consonant) {
+      const nlen = Math.ceil(ctx.sampleRate * 0.038);
+      const nbuf = ctx.createBuffer(1, nlen, ctx.sampleRate);
+      const nd = nbuf.getChannelData(0);
+      for (let i = 0; i < nlen; i++) nd[i] = (Math.random() * 2 - 1) * (1 - i / nlen);
+      const ns = ctx.createBufferSource(); ns.buffer = nbuf;
+      const nbp = ctx.createBiquadFilter(); nbp.type = 'bandpass'; nbp.frequency.value = 1800; nbp.Q.value = 2;
+      const ng = ctx.createGain(); ng.gain.value = 0.10;
+      ns.connect(nbp); nbp.connect(ng); ng.connect(_introMaster);
+      ns.start(t); ns.stop(t + 0.042);
+    }
   };
-  if (speechSynthesis.getVoices().length > 0) {
-    doSpeak();
-  } else {
-    speechSynthesis.addEventListener('voiceschanged', doSpeak, { once: true });
-    setTimeout(doSpeak, 500);
-  }
+
+  const T = ctx.currentTime;
+  // "D" → "dee" phonetics: F1=310 Hz (high, closed vowel), F2=2280 Hz (front)
+  spell(T + 0.0,  310, 2280, 0.90, true);
+  // "A" → "ay" phonetics:  F1=560 Hz (mid vowel), F2=1900 Hz
+  spell(T + 2.3,  560, 1900, 0.95, false);
+  // "N" → "en" phonetics:  F1=500 Hz, F2=1600 Hz + consonant close
+  spell(T + 4.7,  500, 1600, 0.85, true);
 }
 
 // ── Cinematic Gangster Beat Engine ──
@@ -7578,28 +7636,48 @@ function playEntranceSound() {
   } catch(e) {}
 }
 
-// Startup: Beat + Voice – sofort versuchen, Fallback auf erste echte Geste
+// ── startEverything: called by launch gate click – THE user gesture that unlocks audio ──
+function startEverything() {
+  // Fade and remove the launch gate
+  const gate = document.getElementById('intro-launch');
+  if (gate) {
+    gate.classList.add('gone');
+    setTimeout(() => { try { gate.remove(); } catch(e) {} }, 1050);
+  }
+
+  // Force-restart letter drop animations so they play AFTER the gate closes
+  // (they may have already run in the background – this resets them clean)
+  document.querySelectorAll('.intro-letter').forEach(el => {
+    el.classList.remove('lit');
+    el.style.animation = 'none';
+    void el.offsetWidth; // force browser reflow
+    el.style.animation = ''; // restore CSS class animation with its animation-delay
+  });
+  initLetterGlow();
+
+  // Start the beat – guaranteed to work because this IS the user gesture
+  tryStartIntroBeat();
+
+  // Voice starts 1.2s into the beat so it lands over the beat
+  setTimeout(synthIntroVoice, 1200);
+}
+
+// Startup
 window.addEventListener('DOMContentLoaded', () => {
   buildVUCol('introVULeft',  VU_LEFT);
   buildVUCol('introVURight', VU_RIGHT);
-  initLetterGlow();
+  // Don't init letters here – startEverything() handles it on gate click
 
-  // Immediately try (works on some browsers / if user interacted before)
-  tryStartIntroBeat();
-  speakIntroLetters();
-
-  // Fallback: resume on FIRST valid user gesture anywhere on the page.
-  // pointerdown = covers mouse click AND touch – broadest compatibility.
-  // mousemove is NOT a valid AudioContext gesture in Chrome/Firefox, so removed.
-  const resumeOnce = () => {
-    if (_introCtx && _introCtx.state === 'suspended') {
-      _introCtx.resume();
-    }
-    if (!_introBeatStarted) tryStartIntroBeat();
-    if (!_lettersSpoken)    speakIntroLetters();
-  };
-  document.addEventListener('pointerdown', resumeOnce, { once: true, passive: true });
-  document.addEventListener('keydown',     resumeOnce, { once: true, passive: true });
+  const gate = document.getElementById('intro-launch');
+  if (gate) {
+    // The launch gate IS the "click to start" – clean and intentional
+    gate.addEventListener('pointerdown', startEverything, { once: true, passive: true });
+  } else {
+    // No gate (e.g. removed manually) – try immediate start
+    initLetterGlow();
+    tryStartIntroBeat();
+    setTimeout(synthIntroVoice, 1200);
+  }
 });
 
 // =============================
@@ -8144,11 +8222,6 @@ window.addEventListener('DOMContentLoaded', () => {
   buildIntroParticles();
   loadYtReleases();
   loadAlbums();
-  // Preload voices for Speech API
-  if (window.speechSynthesis) {
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.addEventListener('voiceschanged', ()=>window.speechSynthesis.getVoices(), {once:true});
-  }
 });
 </script>
 </body>
