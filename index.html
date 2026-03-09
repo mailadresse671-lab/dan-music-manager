@@ -139,6 +139,33 @@
     background: var(--purple);
     color: white;
   }
+  .nav-item.locked {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .nav-item.locked .phase-num::after { content: " 🔒"; font-size: 8px; }
+  .nav-item.done .phase-num {
+    background: rgba(16,185,129,0.25);
+    color: #34d399;
+  }
+  .nav-item.done .phase-num::after { content: " ✓"; font-size: 9px; }
+  .required-mark { color: #ef4444; margin-left: 2px; }
+  .field-error .multi-sel-box,
+  .field-error input,
+  .field-error select { border-color: #ef4444 !important; }
+  .phase-next-row {
+    display: flex; justify-content: flex-end;
+    margin-top: 16px; padding: 0 4px;
+  }
+  .btn-phase-next {
+    background: var(--purple); color: white;
+    border: none; border-radius: 8px;
+    padding: 10px 20px; font-size: 13px;
+    font-weight: 600; cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-phase-next:hover { opacity: 0.85; }
   .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
   /* SONG MANAGEMENT */
   .song-management { padding: 12px 16px 16px; border-top: 1px solid var(--border); }
@@ -1063,14 +1090,34 @@
         <div class="card-title">Eingaben</div>
         <div class="form-row">
           <div class="form-group">
-            <label>Thema / Worum geht es?</label>
-            <input type="text" id="p1_thema" placeholder="z.B. Aufstieg, Heimat, Liebe..." oninput="autoSave()">
+            <label>Thema / Worum geht es?<span class="required-mark">*</span></label>
+            <input type="text" id="p1_thema" placeholder="z.B. Aufstieg, Heimat, Liebe..." oninput="autoSave();updateNavLocks()">
           </div>
           <div class="form-group">
-            <label>Emotion / Stimmung</label>
+            <label>Emotion / Stimmung<span class="required-mark">*</span></label>
             <div class="select-with-add">
               <select id="p1_emotion" onchange="onSelChange('p1_emotion','emotion')"></select>
               <button class="btn-add-opt" onclick="addCustomOpt('p1_emotion','emotion')" title="Eigene Option hinzufügen">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Sprache<span class="required-mark">*</span></label>
+            <select id="p1_sprache" onchange="autoSave();updateNavLocks()">
+              <option value="">-- Wählen... --</option>
+              <option value="Deutsch">Deutsch</option>
+              <option value="Englisch">Englisch</option>
+              <option value="Spanisch">Spanisch</option>
+              <option value="Französisch">Französisch</option>
+              <option value="Andere">Andere</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tonalität / Stil der Texte<span class="required-mark">*</span></label>
+            <div class="select-with-add">
+              <select id="p1_tonalitaet" onchange="onSelChange('p1_tonalitaet','tonalitaet')"></select>
+              <button class="btn-add-opt" onclick="addCustomOpt('p1_tonalitaet','tonalitaet')" title="Eigene Option hinzufügen">+</button>
             </div>
           </div>
         </div>
@@ -1147,6 +1194,9 @@
           </div>
         </div>
       </div>
+      <div class="phase-next-row">
+        <button class="btn-phase-next" onclick="switchPhase(2)">Weiter: Lyrics schreiben →</button>
+      </div>
     </div>
 
     <!-- PHASE 2: Lyrics schreiben -->
@@ -1175,7 +1225,7 @@
       </div>
       <div class="card">
         <div class="card-title">Lyrics Editor</div>
-        <textarea id="p2_lyrics" rows="30" placeholder="Deine Lyrics erscheinen hier. Du kannst sie direkt bearbeiten..." oninput="autoSave()" style="font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8;"></textarea>
+        <textarea id="p2_lyrics" rows="30" placeholder="Deine Lyrics erscheinen hier. Du kannst sie direkt bearbeiten..." oninput="autoSave();updateNavLocks()" style="font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8;"></textarea>
         <div class="btn-row">
           <button class="btn-secondary" onclick="copyText('p2_lyrics')">📋 Lyrics kopieren</button>
         </div>
@@ -1208,6 +1258,9 @@
             <button class="mgr-send" id="mgrSend2" onclick="sendMgr(2)">→</button>
           </div>
         </div>
+      </div>
+      <div class="phase-next-row">
+        <button class="btn-phase-next" onclick="switchPhase(3)">Weiter: Beat-Briefing →</button>
       </div>
     </div>
 
@@ -2351,7 +2404,8 @@ const OPTION_PRESETS = {
   stimmung: ['Aggressiv','Brutal','Dunkel','Düster','Elegant','Energetisch','Episch','Feierlich','Geheimnisvoll','Hoffnungsvoll','Kraftvoll','Melancholisch','Minimalistisch','Nostalgisch','Optimistisch','Poetisch','Rau','Romantisch','Stark','Triumphierend','Urban'],
   visual_stil: ['Abstract Art','Anime','Cinematic','Comic Art','Concept Art','Dark Fantasy','Digital Art','Film Noir','Futurism','Graffiti','Impressionism','Lo-Fi Art','Manga','Minimalist','Neon','Oil Painting','Photorealism','Pop Art','Street Art','Surrealism','Urban'],
   farben: ['Blau & Silber','Gold & Schwarz','Grün & Grau','Lila & Schwarz','Monochrom Schwarz','Monochrom Weiß','Neonfarben','Pastell','Rot & Schwarz','Rot & Weiß','Schwarz & Weiß','Schwarz Lila Gold','Sepia','Urban Grau'],
-  motiv: ['Abstrakt','Cityscape','Dark Landscape','Figur im Gegenlicht','Gesicht / Portrait','Graffiti Wall','Gruppenaufnahme','Hände','Mikrofonaufnahme','Portrait','Silhouette','Skyline','Spotlight','Stadium / Crowd','Studio Setup','Symbolik','Urban Street']
+  motiv: ['Abstrakt','Cityscape','Dark Landscape','Figur im Gegenlicht','Gesicht / Portrait','Graffiti Wall','Gruppenaufnahme','Hände','Mikrofonaufnahme','Portrait','Silhouette','Skyline','Spotlight','Stadium / Crowd','Studio Setup','Symbolik','Urban Street'],
+  tonalitaet: ['Aggressiv','Authentisch','Bescheiden','Direkt','Drohend','Dunkel','Düster','Ehrlich','Emotional','Episch','Euphorisch','Feierlich','Hoffnungsvoll','Humorvoll','Introvertiert','Ironisch','Kämpferisch','Kraftvoll','Melancholisch','Motivierend','Nachdenklich','Nostalgisch','Poetisch','Provokativ','Rau','Rebellisch','Sarkastisch','Sentimental','Stolz','Trotzig','Verletzlich','Wütend']
 };
 
 // =============================
@@ -2532,6 +2586,7 @@ function toggleMultiOpt(selId, value) {
   renderMultiSelTags(selId, current);
   refreshMultiSelOpts(selId, current, document.querySelector('#'+selId+'_drop .multi-sel-search')?.value || '');
   autoSave();
+  updateNavLocks();
 }
 function removeMultiOpt(selId, value) {
   toggleMultiOpt(selId, value);
@@ -3304,7 +3359,7 @@ function confirmNewSong() {
   songs[id] = {
     id, name,
     createdAt: new Date().toISOString(),
-    p1_thema: '', p1_emotion: '', p1_zielgruppe: '', p1_stil: '', p1_ai_result: '',
+    p1_thema: '', p1_emotion: '', p1_sprache: '', p1_tonalitaet: '', p1_zielgruppe: '', p1_stil: '', p1_ai_result: '',
     p2_konzept: '', p2_lyrics: '',
     p3_bpm: 140, p3_key: 'G minor', p3_stil: '', p3_mood: '', p3_instrumente: '', p3_ai_result: '', p3_suno_link: '', p3_feedback: '', p3_versions: [],
     p4_checklist: {}, p4_ai_result: '',
@@ -3401,15 +3456,52 @@ function hidePhases() {
 // =============================
 // PHASE NAVIGATION
 // =============================
+function isPhase1Complete() {
+  if (!currentSongId) return false;
+  const s = songs[currentSongId];
+  return !!(s?.p1_thema?.trim() && s?.p1_emotion && s?.p1_sprache && s?.p1_tonalitaet);
+}
+function isPhase2Complete() {
+  if (!currentSongId) return false;
+  const s = songs[currentSongId];
+  return !!(s?.p2_lyrics?.trim().length > 10);
+}
+function updateNavLocks() {
+  const p1ok = isPhase1Complete();
+  const p2ok = isPhase2Complete();
+  document.querySelectorAll('.nav-item').forEach(el => {
+    const ph = parseInt(el.dataset.phase);
+    el.classList.remove('locked','done');
+    if (ph === 1 && p1ok) el.classList.add('done');
+    if (ph === 2) {
+      if (!p1ok) el.classList.add('locked');
+      else if (p2ok) el.classList.add('done');
+    }
+    if (ph === 3 && !p2ok) el.classList.add('locked');
+  });
+}
 function switchPhase(num) {
   if (num === 0) { updateDashboard(); updateSunoCockpit(); }
   if (!currentSongId) return;
+
+  // Phase-Sperre: Phase 2 nur wenn Phase 1 vollständig
+  if (num === 2 && !isPhase1Complete()) {
+    showToast('⚠️ Bitte erst Phase 1 vollständig ausfüllen (Thema, Emotion, Sprache, Tonalität).', 'error');
+    return;
+  }
+  // Phase-Sperre: Phase 3 nur wenn Phase 2 Lyrics vorhanden
+  if (num === 3 && !isPhase2Complete()) {
+    showToast('⚠️ Bitte erst die Lyrics in Phase 2 schreiben.', 'error');
+    return;
+  }
+
   currentPhase = num;
 
   // Nav items
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', parseInt(el.dataset.phase) === num);
   });
+  updateNavLocks();
 
   // Panels
   document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
@@ -3438,6 +3530,8 @@ function loadSongData(id) {
   // Phase 1 – custom selects
   setVal('p1_thema', s.p1_thema);
   buildSelect('p1_emotion','emotion', s.p1_emotion||'');
+  setVal('p1_sprache', s.p1_sprache || '');
+  buildSelect('p1_tonalitaet','tonalitaet', s.p1_tonalitaet||'');
   buildSelect('p1_zielgruppe','zielgruppe', s.p1_zielgruppe||'');
   buildSelect('p1_stil','stil', s.p1_stil||'');
   if (s.p1_ai_result) { showResult('p1_result', 'p1_result_content', s.p1_ai_result); }
@@ -3557,6 +3651,8 @@ function loadSongData(id) {
   if (s.p8_audio_filename) {
     loadAudioFromIDB(id);
   }
+
+  updateNavLocks();
 }
 
 function hideResult(id) {
@@ -3571,6 +3667,8 @@ function autoSave() {
   s.p1_thema = getVal('p1_thema');
   // selects: read value directly
   s.p1_emotion = document.getElementById('p1_emotion')?.value || '';
+  s.p1_sprache = document.getElementById('p1_sprache')?.value || '';
+  s.p1_tonalitaet = document.getElementById('p1_tonalitaet')?.value || '';
   s.p1_zielgruppe = document.getElementById('p1_zielgruppe')?.value || '';
   s.p1_stil = document.getElementById('p1_stil')?.value || '';
 
