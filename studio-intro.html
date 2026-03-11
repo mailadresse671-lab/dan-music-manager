@@ -27,7 +27,7 @@
     /* ── Camera zoom ───────────────────────────────────────────────────── */
     .scene-wrap {
       transform: scale(1);
-      transition: transform 4.5s cubic-bezier(0.2, 0, 0.4, 1);
+      transition: transform 7s cubic-bezier(0.15, 0, 0.35, 1);
       transform-origin: center center;
     }
     .scene-wrap.zoom { transform: scale(1.55); }
@@ -37,7 +37,7 @@
       transform-origin: left center;
       transform-style: preserve-3d;
       transform: perspective(1100px) rotateY(0deg);
-      transition: transform 2s cubic-bezier(0.22, 0.61, 0.36, 1);
+      transition: transform 3.5s cubic-bezier(0.18, 0.7, 0.3, 1);
       will-change: transform;
     }
     .door-3d.open { transform: perspective(1100px) rotateY(-82deg); }
@@ -126,7 +126,8 @@
 {
   "imports": {
     "react":            "https://esm.sh/react@18",
-    "react-dom/client": "https://esm.sh/react-dom@18/client"
+    "react-dom/client": "https://esm.sh/react-dom@18/client",
+    "tone":             "https://esm.sh/tone@14"
   }
 }
 </script>
@@ -134,93 +135,76 @@
 <script type="module">
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
+import * as Tone from 'tone';
 
 /* ═══════════════════════════════════════════════════════════
-   AUDIO ENGINE
+   AUDIO ENGINE  –  Tone.js Salamander Grand Piano
 ═══════════════════════════════════════════════════════════ */
-function createReverb(ctx, decaySec = 1.4) {
-  const len = Math.ceil(ctx.sampleRate * decaySec);
-  const buf = ctx.createBuffer(2, len, ctx.sampleRate);
-  for (let ch = 0; ch < 2; ch++) {
-    const d = buf.getChannelData(ch);
-    for (let i = 0; i < len; i++)
-      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.2);
-  }
-  const conv = ctx.createConvolver();
-  conv.buffer = buf;
-  return conv;
+
+// Salamander Grand Piano samples via public CDN
+const SALAMANDER = 'https://tonejs.github.io/audio/salamander/';
+
+let _piano = null;        // shared Sampler instance
+let _pianoReady = false;  // true once samples loaded
+
+async function initPiano() {
+  if (_piano) return _piano;
+  _piano = new Tone.Sampler({
+    urls: {
+      A2: 'A2.mp3',  C3: 'C3.mp3',  'D#3': 'Ds3.mp3',
+      'F#3': 'Fs3.mp3',
+      A3: 'A3.mp3',  C4: 'C4.mp3',  'D#4': 'Ds4.mp3',
+      'F#4': 'Fs4.mp3',
+      A4: 'A4.mp3',  C5: 'C5.mp3',  'D#5': 'Ds5.mp3',
+    },
+    baseUrl: SALAMANDER,
+    release: 1.2,
+    onload: () => { _pianoReady = true; },
+  }).toDestination();
+
+  // Light reverb
+  const reverb = new Tone.Reverb({ decay: 3.5, wet: 0.28 });
+  await reverb.ready;
+  _piano.connect(reverb);
+  reverb.toDestination();
+
+  await Tone.loaded();
+  _pianoReady = true;
+  return _piano;
 }
 
-function pianoNote(ctx, dest, reverbDest, freq, t, dur, vol = 0.5) {
-  const master = ctx.createGain();
-  master.gain.setValueAtTime(0, t);
-  master.gain.linearRampToValueAtTime(vol, t + 0.007);
-  master.gain.exponentialRampToValueAtTime(vol * 0.35, t + 0.07);
-  master.gain.exponentialRampToValueAtTime(0.001, t + dur);
-  master.connect(dest);
+async function playStillDreRiff() {
+  const piano = await initPiano();
+  await Tone.start();
 
-  // Fundamental (triangle ≈ piano body)
-  const osc = ctx.createOscillator();
-  osc.type = 'triangle';
-  osc.frequency.value = freq;
-  osc.connect(master);
-  osc.start(t); osc.stop(t + dur + .06);
-
-  // Harmonics for piano timbre
-  [2, 3, 4].forEach((m, i) => {
-    const h = ctx.createOscillator();
-    const hg = ctx.createGain();
-    h.type = 'sine'; h.frequency.value = freq * m;
-    hg.gain.setValueAtTime(vol * .09 / (i + 1), t);
-    hg.gain.exponentialRampToValueAtTime(0.001, t + dur * .55);
-    h.connect(hg); hg.connect(dest);
-    h.start(t); h.stop(t + dur);
-  });
-
-  // Send to reverb
-  if (reverbDest) {
-    const rg = ctx.createGain();
-    rg.gain.setValueAtTime(vol * .35, t);
-    rg.gain.exponentialRampToValueAtTime(0.001, t + dur + .2);
-    const ro = ctx.createOscillator();
-    ro.type = 'triangle'; ro.frequency.value = freq;
-    ro.connect(rg); rg.connect(reverbDest);
-    ro.start(t); ro.stop(t + dur + .06);
-  }
-}
-
-function playStillDreRiff(ctx) {
-  const now = ctx.currentTime + 0.08;
-  const comp = ctx.createDynamicsCompressor();
-  comp.threshold.value = -14; comp.ratio.value = 6; comp.attack.value = .003; comp.release.value = .12;
-  comp.connect(ctx.destination);
-
-  const rev = createReverb(ctx, 1.6);
-  const revGain = ctx.createGain(); revGain.gain.value = .2;
-  rev.connect(revGain); revGain.connect(comp);
-
-  // "Still D.R.E." inspired descend in A-minor, then ascend
-  // freq  t      dur   vol
-  const notes = [
-    [440.0, 0.00, .20, .55],  // A4
-    [392.0, 0.17, .20, .50],  // G4
-    [329.6, 0.34, .20, .50],  // E4
-    [293.7, 0.51, .20, .48],  // D4
-    [261.6, 0.68, .19, .44],  // C4
-    [220.0, 0.85, .28, .58],  // A3  ← anchor
-    [246.9, 1.15, .18, .42],  // B3
-    [261.6, 1.33, .18, .42],  // C4
-    [293.7, 1.51, .18, .44],  // D4
-    [329.6, 1.69, .20, .48],  // E4
-    [392.0, 1.89, .20, .50],  // G4
-    [440.0, 2.09, .32, .58],  // A4  ← top
-    // Echo repeat (softer)
-    [440.0, 2.62, .16, .28],
-    [329.6, 2.80, .16, .24],
-    [261.6, 2.98, .16, .22],
-    [220.0, 3.16, .40, .30],  // A3  ← fade out
+  // A-Moll Riff  –  Still D.R.E. feel: Abstieg → Aufstieg → Auflösung
+  // [note, time_in_seconds, duration]
+  const riff = [
+    ['A4',  0.00, '8n'],
+    ['G4',  0.18, '8n'],
+    ['E4',  0.36, '8n'],
+    ['D4',  0.54, '8n'],
+    ['C4',  0.72, '8n'],
+    ['A3',  0.90, '4n'],   // Anker
+    ['B3',  1.24, '8n'],
+    ['C4',  1.42, '8n'],
+    ['D4',  1.60, '8n'],
+    ['E4',  1.78, '8n'],
+    ['G4',  1.96, '8n'],
+    ['A4',  2.14, '4n.'],  // Spitze – etwas länger
+    // Leises Echo
+    ['A4',  2.75, '16n'],
+    ['E4',  2.92, '16n'],
+    ['C4',  3.08, '16n'],
+    ['A3',  3.24, '2n'],   // Ausklang
   ];
-  notes.forEach(([f, t, d, v]) => pianoNote(ctx, comp, rev, f, now + t, d, v));
+
+  const now = Tone.now() + 0.05;
+  riff.forEach(([note, t, dur]) => {
+    // Velocity: volle Noten lauter, Echo leiser
+    const vel = t >= 2.75 ? 0.42 : (t === 0.90 || t === 2.14 || t === 3.24 ? 0.88 : 0.72);
+    piano.triggerAttackRelease(note, dur, now + t, vel);
+  });
 }
 
 function playBassRumble(ctx) {
@@ -418,6 +402,10 @@ function StudioMonitor() {
 /* ═══════════════════════════════════════════════════════════
    MAIN COMPONENT
 ═══════════════════════════════════════════════════════════ */
+
+// Samples im Hintergrund vorladen sobald die Seite bereit ist
+initPiano().catch(() => {});
+
 function StudioIntro({ onEnter }) {
   const [phase, setPhase] = useState('gate');
   // gate → zooming → doorOpening → revealed → ready
@@ -425,16 +413,18 @@ function StudioIntro({ onEnter }) {
 
   const handleStart = useCallback(async () => {
     if (phase !== 'gate') return;
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+    // Tone.js übernimmt den AudioContext – Web Audio API nur noch für Bass
+    await Tone.start();
+    const audioCtx = Tone.getContext().rawContext;
     ctx.current = audioCtx;
 
     setPhase('zooming');
-    playStillDreRiff(audioCtx);
+    playStillDreRiff();   // echter Salamander-Flügel
 
-    setTimeout(() => { setPhase('doorOpening'); playBassRumble(audioCtx); }, 2400);
-    setTimeout(() => setPhase('revealed'), 4200);
-    setTimeout(() => setPhase('ready'),    5600);
+    setTimeout(() => { setPhase('doorOpening'); playBassRumble(audioCtx); }, 3800);
+    setTimeout(() => setPhase('revealed'), 7000);
+    setTimeout(() => setPhase('ready'),    8800);
   }, [phase]);
 
   const handleEnter = useCallback(() => {
