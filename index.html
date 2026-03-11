@@ -7311,38 +7311,35 @@ function tryStartIntroBeat() {
     _introMaster.connect(_introComp);
     _introComp.connect(_introCtx.destination);
 
-    // Cinematic slow fade-in (1.5s of tension before full volume)
-    _introMaster.gain.linearRampToValueAtTime(0.80, _introCtx.currentTime + 1.5);
+    // Smooth fade-in
+    _introMaster.gain.linearRampToValueAtTime(0.78, _introCtx.currentTime + 1.2);
 
-    // ── Dark A-minor string pad (orchestral cinema layer) ──
+    // ── G minor pad (G2, Bb2, D3) – soft sine voices, West Coast warmth ──
     const padGain = _introCtx.createGain(); padGain.gain.value = 0;
     const padLP   = _introCtx.createBiquadFilter();
-    padLP.type = 'lowpass'; padLP.frequency.value = 1100; padLP.Q.value = 0.8;
+    padLP.type = 'lowpass'; padLP.frequency.value = 900; padLP.Q.value = 0.7;
     padLP.connect(padGain); padGain.connect(_introMaster);
-    // A minor chord: A2(110), E3(164.8), A3(220), C4(261.6) – all detuned for haunting feel
     [
-      [110.0,  0], [110.0, +4], [110.0, -3],
-      [164.8, +2], [164.8, -2],
-      [220.0,  0], [220.0, +3],
-      [261.6, -2],
-    ].forEach(([freq, cents]) => {
+      [98.0,  0], [98.0,  +5],   // G2
+      [116.5, 0], [116.5, -4],   // Bb2
+      [146.8, 0], [146.8, +3],   // D3
+      [196.0, 0],                 // G3
+    ].forEach(([freq, cents = 0]) => {
       const o = _introCtx.createOscillator();
-      o.type = 'sawtooth';
+      o.type = 'sine';
       o.frequency.value = freq * Math.pow(2, cents / 1200);
-      o.connect(padLP);
-      o.start();
+      o.connect(padLP); o.start();
     });
-    // Pad swells in slowly – 2.8s attack = true cinematic string swell
     padGain.gain.setValueAtTime(0, _introCtx.currentTime);
-    padGain.gain.linearRampToValueAtTime(0.042, _introCtx.currentTime + 2.8);
+    padGain.gain.linearRampToValueAtTime(0.032, _introCtx.currentTime + 2.2);
 
-    // ── Sub drone A1 (55 Hz) – the foundation beneath everything ──
+    // ── Sub G1 (49 Hz) ──
     const subOsc = _introCtx.createOscillator();
     const subLP  = _introCtx.createBiquadFilter();
     const subG   = _introCtx.createGain();
-    subLP.type = 'lowpass'; subLP.frequency.value = 75;
-    subOsc.type = 'sine'; subOsc.frequency.value = 55; // A1
-    subG.gain.value = 0.06;
+    subLP.type = 'lowpass'; subLP.frequency.value = 70;
+    subOsc.type = 'sine'; subOsc.frequency.value = 49; // G1
+    subG.gain.value = 0.055;
     subOsc.connect(subLP); subLP.connect(subG); subG.connect(_introMaster);
     subOsc.start();
 
@@ -7354,152 +7351,176 @@ function tryStartIntroBeat() {
 
 function scheduleIntroBar(barIdx) {
   if (!_introCtx || !_introMaster) return;
-  const BPM  = 68;          // Slow and heavy – real gangster tempo
-  const BEAT = 60 / BPM;   // 0.882 seconds per beat
+  const BPM  = 93;
+  const BEAT = 60 / BPM;   // 0.645s
+  const S16  = BEAT / 4;   // 16th note = 0.161s
   const T    = _introNextBar;
   const out  = _introMaster;
 
-  // ── Deep 808 Kick: 90 Hz → 20 Hz, long 1.4s decay ──
-  // Lower and longer than anything you've heard – pure cinema
-  const kick808 = (t, vol = 1.0, decay = 1.4) => {
-    const dist = _introCtx.createWaveShaper();
-    const cv = new Float32Array(256);
-    for (let i = 0; i < 256; i++) {
-      const x = (i * 2 / 256) - 1;
-      cv[i] = x < 0 ? -Math.pow(-x, 0.48) : Math.pow(x, 0.48);
-    }
-    dist.curve = cv;
-    // The big sub drop
+  // ── 808 Kick (tight, West Coast) ──
+  const kick = (t, vol = 1.0, decay = 0.85) => {
     const o = _introCtx.createOscillator(), g = _introCtx.createGain();
     o.type = 'sine';
-    o.frequency.setValueAtTime(90, t);
-    o.frequency.exponentialRampToValueAtTime(20, t + decay); // all the way to 20 Hz
-    g.gain.setValueAtTime(vol, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + decay + 0.12);
-    o.connect(dist); dist.connect(g); g.connect(out);
-    o.start(t); o.stop(t + decay + 0.18);
-    // Click transient – the punch on attack
+    o.frequency.setValueAtTime(82, t);
+    o.frequency.exponentialRampToValueAtTime(28, t + decay);
+    g.gain.setValueAtTime(vol * 0.88, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + decay + 0.06);
+    o.connect(g); g.connect(out);
+    o.start(t); o.stop(t + decay + 0.1);
+    // Click punch
     const oc = _introCtx.createOscillator(), gc = _introCtx.createGain();
-    oc.type = 'square'; oc.frequency.value = 650;
-    gc.gain.setValueAtTime(0.30, t);
-    gc.gain.exponentialRampToValueAtTime(0.001, t + 0.011);
+    oc.type = 'triangle'; oc.frequency.value = 480;
+    gc.gain.setValueAtTime(vol * 0.22, t);
+    gc.gain.exponentialRampToValueAtTime(0.001, t + 0.013);
     oc.connect(gc); gc.connect(out);
-    oc.start(t); oc.stop(t + 0.015);
+    oc.start(t); oc.stop(t + 0.016);
   };
 
-  // ── Cinematic Snare with gunshot reverb echo ──
-  // Sounds like a gunshot echoing in a massive hall – true gangster film sound
+  // ── Snare (clean West Coast crack) ──
   const snare = (t, vol = 1.0) => {
-    const reverbTime = 1.6; // 1.6 second echo tail
-    const totalDur   = 0.07 + reverbTime;
-    const sr         = _introCtx.sampleRate;
-    const totalLen   = Math.ceil(sr * totalDur);
-    const buf        = _introCtx.createBuffer(1, totalLen, sr);
-    const d          = buf.getChannelData(0);
-    const burstLen   = Math.ceil(sr * 0.07);
-    // Initial crack
-    for (let i = 0; i < burstLen; i++) {
-      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / burstLen, 0.35);
-    }
-    // Reverb tail – exponential decay of noise = realistic room reverb
-    for (let i = burstLen; i < totalLen; i++) {
-      const pos = (i - burstLen) / sr;
-      d[i] = (Math.random() * 2 - 1) * Math.exp(-pos * 3.2) * 0.45;
-    }
+    const sr  = _introCtx.sampleRate;
+    const dur = 0.28;
+    const len = Math.ceil(sr * dur);
+    const buf = _introCtx.createBuffer(1, len, sr);
+    const d   = buf.getChannelData(0);
+    for (let i = 0; i < len; i++)
+      d[i] = (Math.random() * 2 - 1) * Math.exp(-i / len * 12);
     const src = _introCtx.createBufferSource(); src.buffer = buf;
-    const bp  = _introCtx.createBiquadFilter();
-    bp.type = 'bandpass'; bp.frequency.value = 2600; bp.Q.value = 0.5;
-    const g = _introCtx.createGain(); g.gain.value = vol * 0.62;
-    src.connect(bp); bp.connect(g); g.connect(out);
-    src.start(t); src.stop(t + totalDur + 0.05);
-    // Layered crack transient
+    const hp  = _introCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2000;
+    const g   = _introCtx.createGain(); g.gain.value = vol * 0.52;
+    src.connect(hp); hp.connect(g); g.connect(out);
+    src.start(t); src.stop(t + dur + 0.01);
+    // Body thud
     const ot = _introCtx.createOscillator(), gt = _introCtx.createGain();
     ot.type = 'triangle';
-    ot.frequency.setValueAtTime(290, t);
-    ot.frequency.exponentialRampToValueAtTime(130, t + 0.055);
-    gt.gain.setValueAtTime(vol * 0.38, t);
-    gt.gain.exponentialRampToValueAtTime(0.001, t + 0.065);
+    ot.frequency.setValueAtTime(210, t);
+    ot.frequency.exponentialRampToValueAtTime(95, t + 0.065);
+    gt.gain.setValueAtTime(vol * 0.26, t);
+    gt.gain.exponentialRampToValueAtTime(0.001, t + 0.075);
     ot.connect(gt); gt.connect(out);
-    ot.start(t); ot.stop(t + 0.075);
+    ot.start(t); ot.stop(t + 0.085);
   };
 
-  // ── Sparse hi-hat (placed deliberately – not busy, not everywhere) ──
-  const hat = (t, vol = 0.055, open = false) => {
-    const dur = open ? 0.20 : 0.028;
+  // ── Hi-hat ──
+  const hat = (t, vol = 0.048, open = false) => {
+    const dur = open ? 0.13 : 0.020;
     const len = Math.ceil(_introCtx.sampleRate * dur);
     const buf = _introCtx.createBuffer(1, len, _introCtx.sampleRate);
     const d   = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    for (let i = 0; i < len; i++)
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, open ? 0.6 : 1.8);
     const src = _introCtx.createBufferSource(); src.buffer = buf;
-    const hp  = _introCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 9000;
+    const hp  = _introCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 10500;
     const g   = _introCtx.createGain(); g.gain.value = vol;
     src.connect(hp); hp.connect(g); g.connect(out);
     src.start(t); src.stop(t + dur + 0.01);
   };
 
-  // ── Dark piano stab (minor key – like Scarface, like Training Day) ──
-  const pianoStab = (t, freq, vol = 0.038) => {
-    const o  = _introCtx.createOscillator();
-    const g  = _introCtx.createGain();
-    const lp = _introCtx.createBiquadFilter();
-    lp.type = 'lowpass'; lp.frequency.value = 1800;
-    o.type = 'triangle'; o.frequency.value = freq;
-    g.gain.setValueAtTime(vol, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
-    o.connect(lp); lp.connect(g); g.connect(out);
-    o.start(t); o.stop(t + 0.55);
-    // Harmonic overtone for depth
-    const o2 = _introCtx.createOscillator(), g2 = _introCtx.createGain();
-    o2.type = 'sine'; o2.frequency.value = freq * 2;
-    g2.gain.setValueAtTime(vol * 0.3, t);
-    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+  // ── West Coast Piano (bright, clean – G minor tonality) ──
+  const piano = (t, freq, vol = 0.052, dur = 0.52) => {
+    const o1 = _introCtx.createOscillator(); o1.type = 'triangle'; o1.frequency.value = freq;
+    const o2 = _introCtx.createOscillator(); o2.type = 'sine';     o2.frequency.value = freq * 2;
+    const o3 = _introCtx.createOscillator(); o3.type = 'sine';     o3.frequency.value = freq * 3.01;
+    const pk = _introCtx.createBiquadFilter();
+    pk.type = 'peaking'; pk.frequency.value = 3200; pk.gain.value = 5; pk.Q.value = 0.9;
+    const g1 = _introCtx.createGain();
+    g1.gain.setValueAtTime(0, t);
+    g1.gain.linearRampToValueAtTime(vol, t + 0.005);
+    g1.gain.exponentialRampToValueAtTime(vol * 0.42, t + 0.065);
+    g1.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    const g2 = _introCtx.createGain();
+    g2.gain.setValueAtTime(0, t);
+    g2.gain.linearRampToValueAtTime(vol * 0.28, t + 0.003);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+    const g3 = _introCtx.createGain();
+    g3.gain.setValueAtTime(0, t);
+    g3.gain.linearRampToValueAtTime(vol * 0.13, t + 0.002);
+    g3.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+    o1.connect(pk); pk.connect(g1); g1.connect(out);
     o2.connect(g2); g2.connect(out);
-    o2.start(t); o2.stop(t + 0.3);
+    o3.connect(g3); g3.connect(out);
+    o1.start(t); o1.stop(t + dur + 0.05);
+    o2.start(t); o2.stop(t + 0.14);
+    o3.start(t); o3.stop(t + 0.055);
   };
 
-  // ══════════════════════════════════════════════════════
-  // BEAT PATTERN – builds over 4 bars (cinematic tension)
-  // ══════════════════════════════════════════════════════
+  // ── Sub bass line (G minor: G2 / Bb2 / F2) ──
+  const bass = (t, freq, vol = 0.075, dur = 0.42) => {
+    const o  = _introCtx.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+    const lp = _introCtx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 170;
+    const g  = _introCtx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(lp); lp.connect(g); g.connect(out);
+    o.start(t); o.stop(t + dur + 0.05);
+  };
+
+  // ══════════════════════════════════════════════
+  // MELODY – G minor piano hook (Still D.R.E. feel)
+  // G4=392 Bb4=466 C5=523 D5=587 F5=699
+  // ══════════════════════════════════════════════
+  const phraseA = [
+    [0,  392.0, 0.062, 0.52],  // G4
+    [2,  466.2, 0.057, 0.42],  // Bb4
+    [4,  523.3, 0.057, 0.42],  // C5
+    [6,  587.3, 0.060, 0.52],  // D5
+    [8,  698.5, 0.063, 0.58],  // F5  ← peak
+    [11, 587.3, 0.050, 0.36],  // D5 syncopated
+    [13, 523.3, 0.046, 0.32],  // C5
+    [15, 466.2, 0.043, 0.30],  // Bb4
+  ];
+  const phraseB = [
+    [0,  392.0, 0.060, 0.50],  // G4
+    [2,  466.2, 0.055, 0.40],  // Bb4
+    [4,  523.3, 0.057, 0.42],  // C5
+    [7,  587.3, 0.060, 0.46],  // D5 – syncopated
+    [8,  523.3, 0.054, 0.40],  // C5
+    [10, 466.2, 0.050, 0.36],  // Bb4
+    [12, 392.0, 0.047, 0.40],  // G4
+    [14, 349.2, 0.042, 0.32],  // F4 – resolution
+  ];
+
+  const phrase = (barIdx % 2 === 0) ? phraseA : phraseB;
+  phrase.forEach(([s, freq, vol, dur]) => piano(T + s * S16, freq, vol, dur));
+
+  // ══════════════════════════════════════════════
+  // DRUMS
+  // ══════════════════════════════════════════════
   if (barIdx === 0) {
-    // Bar 1: Only the kick – pure suspense, nothing else
-    kick808(T,             1.0, 1.5);
-    kick808(T + 2 * BEAT,  0.6, 1.0);
+    // Bar 1: Kicks only – tension builds
+    kick(T,            1.0, 0.80);
+    kick(T + 2*BEAT,   0.72, 0.70);
+    [0.5,1.5,2.5,3.5].forEach(b => hat(T + b*BEAT, 0.036));
   } else if (barIdx === 1) {
-    // Bar 2: Kicks + snare enters – gangster just walked in the room
-    kick808(T,             1.0, 1.5);
+    // Bar 2: Snare enters
+    kick(T,            1.0, 0.80);
     snare(T + BEAT);
-    kick808(T + 2 * BEAT,  0.65, 1.0);
-    snare(T + 3 * BEAT);
+    kick(T + 2*BEAT,   0.78, 0.72);
+    snare(T + 3*BEAT);
+    [0.5,1.5,2.5,3.5].forEach(b => hat(T + b*BEAT, 0.042));
+  } else if (barIdx % 2 === 0) {
+    // Full groove – Variation A
+    kick(T,                    1.0, 0.80);
+    kick(T + S16*3,            0.28, 0.48);
+    snare(T + BEAT);
+    kick(T + BEAT*2,           0.82, 0.74);
+    kick(T + BEAT*2 + S16*2,   0.22, 0.42);
+    snare(T + BEAT*3);
+    for (let e = 0; e < 8; e++) hat(T + e*BEAT*0.5, e%2===0 ? 0.050 : 0.036, e===7);
+    bass(T,           98.0,  0.08, 0.50);   // G2
+    bass(T + 2*BEAT,  116.5, 0.07, 0.46);  // Bb2
   } else {
-    // Bar 3+: Full cinematic gangster pattern
-    // Alternating A/B for groove and movement
-    if (barIdx % 2 === 0) {
-      // Variation A
-      kick808(T,               1.0, 1.5);
-      snare(T + BEAT);
-      kick808(T + BEAT * 1.5,  0.4, 0.8);   // ghost kick – subtle
-      kick808(T + BEAT * 2,    0.72, 1.1);
-      snare(T + BEAT * 3);
-      hat(T + BEAT * 1,        0.048);
-      hat(T + BEAT * 2,        0.042);
-      hat(T + BEAT * 3,        0.058, true); // open hat accent
-      pianoStab(T + BEAT * 0.5,  220.0, 0.035); // A3
-      pianoStab(T + BEAT * 2.5,  261.6, 0.028); // C4
-    } else {
-      // Variation B
-      kick808(T,               1.0, 1.5);
-      kick808(T + BEAT * 0.75, 0.28, 0.6);  // 16th-note flam before beat 2
-      snare(T + BEAT);
-      kick808(T + BEAT * 2,    0.78, 1.1);
-      kick808(T + BEAT * 2.75, 0.22, 0.5);  // ghost after beat 3
-      snare(T + BEAT * 3);
-      hat(T + BEAT * 0.5,      0.038);
-      hat(T + BEAT * 1.5,      0.035);
-      hat(T + BEAT * 2.5,      0.042);
-      hat(T + BEAT * 3.5,      0.062, true);
-      pianoStab(T + BEAT * 3.25, 164.8, 0.026); // E3
-      pianoStab(T + BEAT * 0.25, 110.0, 0.022); // A2 (deep)
-    }
+    // Full groove – Variation B
+    kick(T,              1.0, 0.80);
+    snare(T + BEAT);
+    kick(T + BEAT*1.75,  0.38, 0.52);
+    kick(T + BEAT*2,     0.78, 0.72);
+    snare(T + BEAT*3);
+    kick(T + BEAT*3.75,  0.25, 0.46);
+    for (let e = 0; e < 8; e++) hat(T + e*BEAT*0.5, e%2===0 ? 0.046 : 0.033, e===5);
+    bass(T,           87.3,  0.074, 0.44);  // F2
+    bass(T + 2*BEAT,  98.0,  0.078, 0.48); // G2
   }
 
   _introNextBar += 4 * BEAT;
