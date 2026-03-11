@@ -7545,7 +7545,7 @@ function stopIntroBeat(onDone) {
 function enterStudio() {
   const screen = document.getElementById('intro-screen');
   if (!screen) return;
-  stopIntroBeat(() => playEntranceSound());
+  stopIntroBeat(() => {});
   screen.style.pointerEvents = 'none';
 
   // 1) Fade out all content fast

@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>D_a_N Music Manager — Studio Intro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #000; overflow: hidden; font-family: 'Orbitron', monospace; }
+
+    /* ── Acoustic foam texture ─────────────────────────────────────────── */
+    .foam-wall {
+      background-color: #0e0e0e;
+      background-image:
+        linear-gradient(45deg,  #0a0a0a 25%, transparent 25%),
+        linear-gradient(-45deg, #0a0a0a 25%, transparent 25%),
+        linear-gradient(45deg,  transparent 75%, #0a0a0a 75%),
+        linear-gradient(-45deg, transparent 75%, #0a0a0a 75%),
+        repeating-linear-gradient(0deg,   transparent, transparent 23px, rgba(255,255,255,0.018) 23px, rgba(255,255,255,0.018) 24px),
+        repeating-linear-gradient(90deg,  transparent, transparent 23px, rgba(255,255,255,0.018) 23px, rgba(255,255,255,0.018) 24px);
+      background-size: 24px 24px;
+    }
+
+    /* ── Camera zoom ───────────────────────────────────────────────────── */
+    .scene-wrap {
+      transform: scale(1);
+      transition: transform 4.5s cubic-bezier(0.2, 0, 0.4, 1);
+      transform-origin: center center;
+    }
+    .scene-wrap.zoom { transform: scale(1.55); }
+
+    /* ── Door swing (3-D) ──────────────────────────────────────────────── */
+    .door-3d {
+      transform-origin: left center;
+      transform-style: preserve-3d;
+      transform: perspective(1100px) rotateY(0deg);
+      transition: transform 2s cubic-bezier(0.22, 0.61, 0.36, 1);
+      will-change: transform;
+    }
+    .door-3d.open { transform: perspective(1100px) rotateY(-82deg); }
+
+    /* ── Neon text ─────────────────────────────────────────────────────── */
+    @keyframes neonPulse {
+      0%,100% { text-shadow: 0 0 4px #fff, 0 0 14px #fff, 0 0 30px rgba(255,255,255,.5); opacity:1; }
+      92%     { text-shadow: 0 0 4px #fff, 0 0 14px #fff, 0 0 30px rgba(255,255,255,.5); opacity:1; }
+      93%     { text-shadow: 0 0 2px #fff; opacity:.6; }
+      94%     { text-shadow: 0 0 4px #fff, 0 0 14px #fff, 0 0 30px rgba(255,255,255,.5); opacity:1; }
+      96%     { text-shadow: 0 0 2px #fff; opacity:.75; }
+      97%     { text-shadow: 0 0 4px #fff, 0 0 14px #fff, 0 0 30px rgba(255,255,255,.5); opacity:1; }
+    }
+    .neon { color: #fff; animation: neonPulse 4s ease-in-out infinite; }
+
+    /* ── LED buttons ───────────────────────────────────────────────────── */
+    @keyframes ledBlink {
+      0%,100% { opacity:.35; box-shadow: none; }
+      50%     { opacity:1;   box-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+    }
+    .led { animation: ledBlink 1.8s ease-in-out infinite; }
+
+    /* ── VU meter bars ─────────────────────────────────────────────────── */
+    @keyframes vu {
+      0%,100% { height:18%; }
+      50%     { height:85%; }
+    }
+    .vu-bar {
+      width: 4px;
+      background: linear-gradient(to top, #22c55e, #eab308 65%, #ef4444);
+      border-radius: 1px 1px 0 0;
+      animation: vu 1s ease-in-out infinite;
+    }
+
+    /* ── Fader knob accent line ────────────────────────────────────────── */
+    /* ── Enter button glow ─────────────────────────────────────────────── */
+    @keyframes btnGlow {
+      0%,100% { box-shadow: 0 0 12px rgba(255,255,255,.25), inset 0 0 12px rgba(255,255,255,.04); }
+      50%     { box-shadow: 0 0 26px rgba(255,255,255,.55), inset 0 0 20px rgba(255,255,255,.08); }
+    }
+    .enter-btn { animation: btnGlow 2.2s ease-in-out infinite; }
+    .enter-btn:hover { background: rgba(255,255,255,.07) !important; letter-spacing: .55em !important; }
+
+    /* ── Atmospheric floor glow (warm) ─────────────────────────────────── */
+    .floor-warm {
+      background: linear-gradient(to top, rgba(255,110,30,.12), transparent);
+    }
+
+    /* ── Press hint blink ──────────────────────────────────────────────── */
+    @keyframes hint {
+      0%,100% { opacity:.22; transform: scale(1); }
+      50%     { opacity:.85; transform: scale(1.03); }
+    }
+    .press-hint { animation: hint 2s ease-in-out infinite; }
+
+    /* ── Fade helpers ──────────────────────────────────────────────────── */
+    @keyframes fadeIn    { from {opacity:0}           to {opacity:1} }
+    @keyframes fadeInUp  { from {opacity:0;transform:translateY(16px)} to {opacity:1;transform:translateY(0)} }
+    .fade-in     { animation: fadeIn   .9s ease-out forwards; }
+    .fade-in-up  { animation: fadeInUp .8s ease-out forwards; }
+
+    /* ── Vignette & scanlines ──────────────────────────────────────────── */
+    .vignette   { background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,.88) 100%); pointer-events:none; }
+    .scanlines  { background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px); pointer-events:none; }
+
+    /* ── Door frame glow when open ─────────────────────────────────────── */
+    @keyframes frameGlow {
+      0%,100% { box-shadow: 0 0 30px 8px rgba(255,110,20,.3),  0 0 60px 15px rgba(255,80,10,.15); }
+      50%     { box-shadow: 0 0 40px 12px rgba(255,130,30,.45), 0 0 80px 25px rgba(255,100,20,.2); }
+    }
+    .frame-glow { animation: frameGlow 3s ease-in-out infinite; }
+
+    /* ── Smoke particles ───────────────────────────────────────────────── */
+    @keyframes smoke {
+      0%   { transform:translateX(0)   translateY(0)   scale(1);   opacity:.14; }
+      50%  { transform:translateX(8px) translateY(-22px) scale(1.3); opacity:.08; }
+      100% { transform:translateX(-4px)translateY(-44px) scale(1.6); opacity:0; }
+    }
+    .smoke { animation: smoke 5s ease-out infinite; pointer-events:none; border-radius:50%; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "react":            "https://esm.sh/react@18",
+    "react-dom/client": "https://esm.sh/react-dom@18/client"
+  }
+}
+</script>
+
+<script type="module">
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createRoot } from 'react-dom/client';
+
+/* ═══════════════════════════════════════════════════════════
+   AUDIO ENGINE
+═══════════════════════════════════════════════════════════ */
+function createReverb(ctx, decaySec = 1.4) {
+  const len = Math.ceil(ctx.sampleRate * decaySec);
+  const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = buf.getChannelData(ch);
+    for (let i = 0; i < len; i++)
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.2);
+  }
+  const conv = ctx.createConvolver();
+  conv.buffer = buf;
+  return conv;
+}
+
+function pianoNote(ctx, dest, reverbDest, freq, t, dur, vol = 0.5) {
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0, t);
+  master.gain.linearRampToValueAtTime(vol, t + 0.007);
+  master.gain.exponentialRampToValueAtTime(vol * 0.35, t + 0.07);
+  master.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  master.connect(dest);
+
+  // Fundamental (triangle ≈ piano body)
+  const osc = ctx.createOscillator();
+  osc.type = 'triangle';
+  osc.frequency.value = freq;
+  osc.connect(master);
+  osc.start(t); osc.stop(t + dur + .06);
+
+  // Harmonics for piano timbre
+  [2, 3, 4].forEach((m, i) => {
+    const h = ctx.createOscillator();
+    const hg = ctx.createGain();
+    h.type = 'sine'; h.frequency.value = freq * m;
+    hg.gain.setValueAtTime(vol * .09 / (i + 1), t);
+    hg.gain.exponentialRampToValueAtTime(0.001, t + dur * .55);
+    h.connect(hg); hg.connect(dest);
+    h.start(t); h.stop(t + dur);
+  });
+
+  // Send to reverb
+  if (reverbDest) {
+    const rg = ctx.createGain();
+    rg.gain.setValueAtTime(vol * .35, t);
+    rg.gain.exponentialRampToValueAtTime(0.001, t + dur + .2);
+    const ro = ctx.createOscillator();
+    ro.type = 'triangle'; ro.frequency.value = freq;
+    ro.connect(rg); rg.connect(reverbDest);
+    ro.start(t); ro.stop(t + dur + .06);
+  }
+}
+
+function playStillDreRiff(ctx) {
+  const now = ctx.currentTime + 0.08;
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -14; comp.ratio.value = 6; comp.attack.value = .003; comp.release.value = .12;
+  comp.connect(ctx.destination);
+
+  const rev = createReverb(ctx, 1.6);
+  const revGain = ctx.createGain(); revGain.gain.value = .2;
+  rev.connect(revGain); revGain.connect(comp);
+
+  // "Still D.R.E." inspired descend in A-minor, then ascend
+  // freq  t      dur   vol
+  const notes = [
+    [440.0, 0.00, .20, .55],  // A4
+    [392.0, 0.17, .20, .50],  // G4
+    [329.6, 0.34, .20, .50],  // E4
+    [293.7, 0.51, .20, .48],  // D4
+    [261.6, 0.68, .19, .44],  // C4
+    [220.0, 0.85, .28, .58],  // A3  ← anchor
+    [246.9, 1.15, .18, .42],  // B3
+    [261.6, 1.33, .18, .42],  // C4
+    [293.7, 1.51, .18, .44],  // D4
+    [329.6, 1.69, .20, .48],  // E4
+    [392.0, 1.89, .20, .50],  // G4
+    [440.0, 2.09, .32, .58],  // A4  ← top
+    // Echo repeat (softer)
+    [440.0, 2.62, .16, .28],
+    [329.6, 2.80, .16, .24],
+    [261.6, 2.98, .16, .22],
+    [220.0, 3.16, .40, .30],  // A3  ← fade out
+  ];
+  notes.forEach(([f, t, d, v]) => pianoNote(ctx, comp, rev, f, now + t, d, v));
+}
+
+function playBassRumble(ctx) {
+  const now = ctx.currentTime + 0.05;
+  const out = ctx.destination;
+
+  // Sub-bass thud
+  const kickOsc = ctx.createOscillator();
+  const kickGain = ctx.createGain();
+  kickOsc.type = 'sine';
+  kickOsc.frequency.setValueAtTime(110, now);
+  kickOsc.frequency.exponentialRampToValueAtTime(28, now + 1.4);
+  kickGain.gain.setValueAtTime(.9, now);
+  kickGain.gain.exponentialRampToValueAtTime(.001, now + 1.55);
+  kickOsc.connect(kickGain); kickGain.connect(out);
+  kickOsc.start(now); kickOsc.stop(now + 1.6);
+
+  // Deep detuned saws rumble
+  [36, 36.5, 72].forEach((freq, i) => {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 100;
+    o.type = 'sawtooth'; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime([.28, .22, .12][i], now + .12);
+    g.gain.exponentialRampToValueAtTime(.001, now + 2.8);
+    o.connect(lp); lp.connect(g); g.connect(out);
+    o.start(now); o.stop(now + 2.9);
+  });
+
+  // Attack noise burst
+  const nLen = Math.ceil(ctx.sampleRate * .12);
+  const nBuf = ctx.createBuffer(1, nLen, ctx.sampleRate);
+  const nd = nBuf.getChannelData(0);
+  for (let i = 0; i < nLen; i++) nd[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / nLen, 1.8);
+  const ns = ctx.createBufferSource(); ns.buffer = nBuf;
+  const nlp = ctx.createBiquadFilter(); nlp.type = 'lowpass'; nlp.frequency.value = 250;
+  const ng = ctx.createGain(); ng.gain.value = .45;
+  ns.connect(nlp); nlp.connect(ng); ng.connect(out);
+  ns.start(now); ns.stop(now + .15);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SUB-COMPONENTS
+═══════════════════════════════════════════════════════════ */
+const e = React.createElement;
+
+function MixingConsole() {
+  const CH = 8;
+  return e('div', { style: { width: 300, flexShrink: 0 } },
+    e('div', {
+      style: {
+        background: 'linear-gradient(180deg,#1b1b1b,#111)',
+        border: '1px solid #282828',
+        borderRadius: '6px 6px 0 0',
+        padding: '8px 6px',
+        boxShadow: '0 -6px 24px rgba(255,110,20,.18), 0 0 50px rgba(255,80,10,.08)',
+      }
+    },
+      // ─ LED strip
+      e('div', { style: { display:'flex', justifyContent:'space-around', marginBottom:6 } },
+        Array.from({ length: CH }, (_, i) =>
+          e('div', { key: i, style: { display:'flex', flexDirection:'column', alignItems:'center', gap:2 } },
+            e('div', { style: { display:'flex', gap:2 } },
+              ['#ef4444','#eab308','#22c55e'].map((c, j) =>
+                e('div', {
+                  key: j, className:'led',
+                  style: {
+                    width:5, height:5, borderRadius:1,
+                    backgroundColor:c, color:c,
+                    animationDelay:`${i*.14+j*.09}s`
+                  }
+                })
+              )
+            ),
+            e('span', { style: { fontSize:7, color:'#444', fontFamily:'monospace' } }, i+1)
+          )
+        )
+      ),
+      // ─ Faders
+      e('div', { style: { display:'flex', justifyContent:'space-around', alignItems:'flex-end', height:72 } },
+        Array.from({ length: CH }, (_, i) => {
+          const knobTop = 8 + (i % 4) * 11 + Math.abs(Math.sin(i*1.4)) * 7;
+          return e('div', { key: i, style: { position:'relative', height:70, display:'flex', flexDirection:'column', alignItems:'center' } },
+            e('div', {
+              style: {
+                width:3, height:66,
+                background:'linear-gradient(to bottom,#1f1f1f,#2c2c2c)',
+                borderRadius:2, position:'relative'
+              }
+            },
+              e('div', {
+                style: {
+                  position:'absolute', left:-4, top:knobTop,
+                  width:11, height:6,
+                  background:'linear-gradient(to right,#3a3a3a,#666,#3a3a3a)',
+                  borderRadius:2,
+                  boxShadow:'0 1px 4px rgba(0,0,0,.7)',
+                }
+              },
+                // accent line on knob
+                e('div', { style: { position:'absolute', top:2, left:'50%', transform:'translateX(-50%)', width:1, height:2, background:'#aaa', borderRadius:1 } })
+              )
+            )
+          );
+        })
+      ),
+      // ─ VU + display + knobs
+      e('div', { style: { display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:6, padding:'0 2px' } },
+        // Left VU
+        e('div', { style: { display:'flex', gap:2, alignItems:'flex-end', height:18 } },
+          Array.from({ length:6 }, (_,i) =>
+            e('div', { key:i, className:'vu-bar', style: { animationDelay:`${i*.07}s` } })
+          )
+        ),
+        // Center display
+        e('div', {
+          style: {
+            width:72, height:20, borderRadius:3,
+            background:'#071407', border:'1px solid #1a3a1a',
+            boxShadow:'inset 0 0 8px rgba(0,200,0,.2)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            fontSize:8, color:'#22c55e', fontFamily:'monospace', letterSpacing:'1.5px'
+          }
+        }, '● REC'),
+        // Right VU
+        e('div', { style: { display:'flex', gap:2, alignItems:'flex-end', height:18 } },
+          Array.from({ length:6 }, (_,i) =>
+            e('div', { key:i, className:'vu-bar', style: { animationDelay:`${i*.09+.25}s` } })
+          )
+        )
+      ),
+      // ─ Knobs row
+      e('div', { style: { display:'flex', justifyContent:'space-around', marginTop:7 } },
+        Array.from({ length: CH }, (_, i) =>
+          e('div', { key: i,
+            style: {
+              width:11, height:11, borderRadius:'50%',
+              background:'radial-gradient(circle at 36% 35%,#4c4c4c,#171717)',
+              boxShadow:'0 1px 4px rgba(0,0,0,.8),inset 0 0 2px rgba(255,255,255,.05)',
+              border:'1px solid #2c2c2c', position:'relative'
+            }
+          },
+            e('div', {
+              style: {
+                position:'absolute', width:2, height:4,
+                background:'#777', borderRadius:1,
+                top:1, left:'50%',
+                transform:`translateX(-50%) rotate(${(i%7)*25-55}deg)`,
+                transformOrigin:'bottom center'
+              }
+            })
+          )
+        )
+      )
+    )
+  );
+}
+
+function StudioMonitor() {
+  return e('div', {
+    style: {
+      width:52, padding:'6px 5px',
+      background:'linear-gradient(180deg,#1e1e1e,#0f0f0f)',
+      borderRadius:6, border:'1px solid #252525',
+      boxShadow:'0 0 18px rgba(0,0,0,.7)',
+      display:'flex', flexDirection:'column', alignItems:'center', gap:5
+    }
+  },
+    // Tweeter
+    e('div', {
+      style: {
+        width:20, height:20, borderRadius:'50%',
+        background:'radial-gradient(circle at 38% 36%,#282828,#090909)',
+        border:'2px solid #2e2e2e', boxShadow:'inset 0 0 5px rgba(0,0,0,.9)'
+      }
+    }),
+    // Woofer
+    e('div', {
+      style: {
+        width:38, height:38, borderRadius:'50%',
+        background:'radial-gradient(circle at 38% 36%,#222,#080808)',
+        border:'2px solid #2c2c2c', boxShadow:'inset 0 0 10px rgba(0,0,0,.95)',
+        display:'flex', alignItems:'center', justifyContent:'center'
+      }
+    },
+      e('div', { style:{ width:12,height:12,borderRadius:'50%',background:'#0a0a0a',border:'1px solid #1e1e1e' } })
+    ),
+    // Power LED
+    e('div', { className:'led', style:{ width:5,height:5,borderRadius:'50%',backgroundColor:'#22c55e',color:'#22c55e',animationDelay:'0.6s' } })
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MAIN COMPONENT
+═══════════════════════════════════════════════════════════ */
+function StudioIntro({ onEnter }) {
+  const [phase, setPhase] = useState('gate');
+  // gate → zooming → doorOpening → revealed → ready
+  const ctx = useRef(null);
+
+  const handleStart = useCallback(async () => {
+    if (phase !== 'gate') return;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+    ctx.current = audioCtx;
+
+    setPhase('zooming');
+    playStillDreRiff(audioCtx);
+
+    setTimeout(() => { setPhase('doorOpening'); playBassRumble(audioCtx); }, 2400);
+    setTimeout(() => setPhase('revealed'), 4200);
+    setTimeout(() => setPhase('ready'),    5600);
+  }, [phase]);
+
+  const handleEnter = useCallback(() => {
+    if (onEnter) onEnter();
+  }, [onEnter]);
+
+  const doorOpen    = ['doorOpening','revealed','ready'].includes(phase);
+  const showStudio  = ['revealed','ready'].includes(phase);
+  const showEnter   = phase === 'ready';
+  const zooming     = phase !== 'gate';
+
+  /* ── GATE ─────────────────────────────────────────────────────── */
+  if (phase === 'gate') {
+    return e('div', {
+      onClick: handleStart,
+      style: {
+        position:'fixed', inset:0, background:'#000',
+        display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+        cursor:'pointer', userSelect:'none',
+      }
+    },
+      // Dim grid lines
+      e('div', { style:{
+        position:'absolute', inset:0, pointerEvents:'none',
+        backgroundImage:'repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(255,255,255,.025) 59px,rgba(255,255,255,.025) 60px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(255,255,255,.025) 59px,rgba(255,255,255,.025) 60px)',
+      }}),
+      e('div', { style:{ textAlign:'center' } },
+        e('div', { className:'neon', style:{ fontSize:11,letterSpacing:10,marginBottom:6,color:'#555' } }, 'D_A_N'),
+        e('div', { className:'neon', style:{ fontSize:30,fontWeight:900,letterSpacing:5,marginBottom:4 } }, 'MUSIC MANAGER'),
+        e('div', { style:{ width:60,height:1,background:'rgba(255,255,255,.15)',margin:'10px auto 20px' } }),
+        e('div', { className:'press-hint', style:{ color:'#3a3a3a',fontSize:11,letterSpacing:5 } }, '▶  DRÜCKE IRGENDWO')
+      ),
+      // Corner decorations
+      ...['top-0 left-0','top-0 right-0','bottom-0 left-0','bottom-0 right-0'].map((pos,i) =>
+        e('div', { key:i, style:{
+          position:'absolute',
+          ...(pos.includes('top-0 left-0')  ? {top:20,left:20}  : {}),
+          ...(pos.includes('top-0 right-0') ? {top:20,right:20}  : {}),
+          ...(pos.includes('bottom-0 left-0')  ? {bottom:20,left:20}  : {}),
+          ...(pos.includes('bottom-0 right-0') ? {bottom:20,right:20}  : {}),
+          width:18, height:18,
+          borderTop:   pos.includes('bottom') ? 'none' : '1px solid rgba(255,255,255,.18)',
+          borderBottom:pos.includes('top')    ? 'none' : '1px solid rgba(255,255,255,.18)',
+          borderLeft:  pos.includes('right')  ? 'none' : '1px solid rgba(255,255,255,.18)',
+          borderRight: pos.includes('left')   ? 'none' : '1px solid rgba(255,255,255,.18)',
+        }})
+      )
+    );
+  }
+
+  /* ── SCENE ────────────────────────────────────────────────────── */
+  return e('div', {
+    style: { position:'fixed', inset:0, background:'#000', overflow:'hidden' }
+  },
+    // Scene wrapper (camera zoom)
+    e('div', {
+      className: `scene-wrap foam-wall ${zooming ? 'zoom' : ''}`,
+      style: { position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }
+    },
+      // Floor warm glow
+      e('div', { className:'floor-warm', style:{ position:'absolute', bottom:0, left:0, right:0, height:'38%', pointerEvents:'none' } }),
+
+      // Ceiling light bar
+      e('div', { style:{
+        position:'absolute', top:0, left:0, right:0, height:3, pointerEvents:'none',
+        background:'linear-gradient(90deg,transparent 0%,rgba(255,120,40,.25) 40%,rgba(255,120,40,.25) 60%,transparent 100%)',
+        boxShadow:'0 0 18px rgba(255,100,20,.15)',
+      }}),
+
+      // ─── Studio Interior (behind door) ───
+      e('div', {
+        style: {
+          position:'absolute',
+          width:200, height:270,
+          left:'50%', top:'50%', transform:'translate(-50%,-50%)',
+          background:'linear-gradient(180deg,#080400 0%,#100800 60%,#160c00 100%)',
+          zIndex:1,
+          opacity: doorOpen ? 1 : 0,
+          transition:'opacity .6s ease',
+          display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end',
+          paddingBottom:8,
+        }
+      },
+        // Smoke particle 1
+        doorOpen && e('div', { className:'smoke', style:{
+          position:'absolute', top:'20%', left:'30%', width:60, height:30,
+          background:'radial-gradient(ellipse,rgba(255,180,80,.06),transparent)',
+          animationDuration:'5.5s',
+        }}),
+        // Smoke particle 2
+        doorOpen && e('div', { className:'smoke', style:{
+          position:'absolute', top:'30%', right:'25%', width:50, height:25,
+          background:'radial-gradient(ellipse,rgba(255,160,60,.05),transparent)',
+          animationDuration:'7s', animationDelay:'.8s',
+        }}),
+
+        // Neon logo
+        showStudio && e('div', { className:'neon fade-in', style:{
+          textAlign:'center', marginBottom:12,
+          fontSize:10, fontWeight:900, letterSpacing:3, lineHeight:1.5,
+          animationDelay:'.6s', opacity:0,
+        } },
+          'D_a_N',
+          e('br'),
+          e('span', { style:{ fontSize:8,letterSpacing:2,fontWeight:400 } }, 'MUSIC MANAGER')
+        ),
+
+        // Monitors + Console
+        e('div', {
+          className: showStudio ? 'fade-in' : '',
+          style:{ display:'flex', alignItems:'flex-end', gap:8, opacity: showStudio ? 0 : 0, animationDelay:'.3s' }
+        },
+          e(StudioMonitor),
+          e(MixingConsole),
+          e(StudioMonitor)
+        )
+      ),
+
+      // ─── Door Frame ───────────────────────────────────────────────
+      e('div', {
+        className: doorOpen ? 'frame-glow' : '',
+        style: {
+          position:'absolute',
+          width:178, height:262,
+          left:'50%', top:'50%', transform:'translate(-50%,-50%)',
+          zIndex:2,
+          transition:'box-shadow .8s ease',
+        }
+      },
+        // Frame border
+        e('div', { style:{
+          position:'absolute', inset:0,
+          border:'9px solid #181008',
+          borderRadius:'4px 4px 0 0',
+          boxShadow:'inset 0 0 18px rgba(0,0,0,.9), 0 0 0 2px #221608',
+          zIndex:4, pointerEvents:'none',
+        }}),
+
+        // Frame side details (hinges)
+        ...[{ top: 30 },{ top: 100 },{ top: 170 }].map((s, i) =>
+          e('div', { key:i, style:{
+            position:'absolute', left:-2, top:s.top,
+            width:8, height:18,
+            background:'linear-gradient(to right,#2a2a2a,#444,#2a2a2a)',
+            borderRadius:2, zIndex:5,
+          }})
+        ),
+
+        // ─── DOOR ──────────────────────────────────────────────────
+        e('div', {
+          className: `door-3d ${doorOpen ? 'open' : ''}`,
+          style: {
+            position:'absolute', inset:0, zIndex:3,
+            backgroundImage:'linear-gradient(135deg,#1e1008 0%,#2e1b0a 45%,#180e06 100%),repeating-linear-gradient(93deg,transparent,transparent 16px,rgba(0,0,0,.13) 16px,rgba(0,0,0,.13) 17px)',
+            backgroundBlendMode:'multiply',
+            borderRadius:'4px 4px 0 0',
+          }
+        },
+          // Door panel inset
+          e('div', { style:{ position:'absolute',inset:10,border:'2px solid rgba(0,0,0,.3)',borderRadius:3 } },
+            // Top panel
+            e('div', { style:{ position:'absolute',top:8,left:8,right:8,height:'32%',border:'1px solid rgba(0,0,0,.25)',borderRadius:2,background:'rgba(0,0,0,.15)' } }),
+            // Studio window (frosted, glowing amber)
+            e('div', { style:{
+              position:'absolute', top:'43%', left:'50%', transform:'translate(-50%,-50%)',
+              width:58, height:36, borderRadius:4,
+              background:'rgba(255,140,60,.08)',
+              border:'2px solid #1a1008',
+              boxShadow:'inset 0 0 16px rgba(255,120,40,.2), 0 0 8px rgba(255,100,20,.15)',
+              backdropFilter:'blur(1px)',
+            }}),
+            // Bottom panel
+            e('div', { style:{ position:'absolute',bottom:8,left:8,right:8,height:'22%',border:'1px solid rgba(0,0,0,.25)',borderRadius:2,background:'rgba(0,0,0,.15)' } }),
+            // Handle plate
+            e('div', { style:{ position:'absolute',right:14,top:'50%',transform:'translateY(-50%)' } },
+              e('div', { style:{ width:7,height:30,background:'linear-gradient(to right,#4a4a4a,#888,#4a4a4a)',borderRadius:3,boxShadow:'0 2px 6px rgba(0,0,0,.8)' } }),
+              e('div', { style:{ position:'absolute',top:9,left:-9,width:17,height:5,background:'linear-gradient(to bottom,#888,#555)',borderRadius:'0 2px 2px 0',boxShadow:'0 2px 4px rgba(0,0,0,.6)' } })
+            )
+          )
+        ),
+
+        // Threshold
+        e('div', { style:{ position:'absolute',bottom:0,left:0,right:0,height:6,background:'#0a0805',zIndex:5 } })
+      ),
+
+      // Vignette
+      e('div', { className:'vignette', style:{ position:'absolute',inset:0,zIndex:6 } }),
+      // Scanlines
+      e('div', { className:'scanlines', style:{ position:'absolute',inset:0,zIndex:7 } }),
+    ),
+
+    // ─── ENTER BUTTON ─────────────────────────────────────────────
+    showEnter && e('div', {
+      style:{ position:'absolute',inset:0,display:'flex',alignItems:'flex-end',justifyContent:'center',paddingBottom:56,zIndex:20 }
+    },
+      e('button', {
+        className:'enter-btn fade-in-up',
+        onClick: handleEnter,
+        style:{
+          padding:'13px 44px',
+          background:'transparent',
+          border:'1px solid rgba(255,255,255,.55)',
+          color:'#fff',
+          fontSize:11,
+          letterSpacing:'.45em',
+          fontFamily:'Orbitron,monospace',
+          cursor:'pointer',
+          borderRadius:2,
+          transition:'all .25s ease',
+          outline:'none',
+        }
+      }, 'ENTER STUDIO')
+    )
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MOUNT
+═══════════════════════════════════════════════════════════ */
+createRoot(document.getElementById('root')).render(
+  e(StudioIntro, {
+    onEnter: () => {
+      // ── Hier deinen App-Start-Code einfügen ──
+      // Beispiel: window.location.href = 'index.html'
+      document.getElementById('root').innerHTML = `
+        <div style="
+          color:#fff;display:flex;flex-direction:column;
+          align-items:center;justify-content:center;height:100vh;
+          background:#000;font-family:Orbitron,monospace;gap:16px;
+        ">
+          <div style="font-size:11px;letter-spacing:5px;color:#555">WELCOME TO</div>
+          <div style="font-size:28px;font-weight:900;letter-spacing:4px;
+            text-shadow:0 0 12px #fff,0 0 30px rgba(255,255,255,.4)">D_a_N</div>
+          <div style="font-size:13px;letter-spacing:3px">MUSIC MANAGER</div>
+        </div>`;
+    }
+  })
+);
+</script>
+</body>
+</html>
