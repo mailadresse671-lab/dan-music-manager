@@ -10,9 +10,18 @@ const DEBOUNCE_MS = 3000; // 3 Sekunden warten nach letzter Änderung
 let timer = null;
 let pending = false;
 
+function updateTimestamp() {
+  const file = path.join(DIR, 'index.html');
+  let html = fs.readFileSync(file, 'utf8');
+  const now = new Date().toLocaleString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  html = html.replace(/✅ Stand: [^"]+/, `✅ Stand: ${now}`);
+  fs.writeFileSync(file, html, 'utf8');
+}
+
 function push() {
   try {
     console.log('\n⏳ Änderungen erkannt – pushe zu GitHub...');
+    updateTimestamp();
     execSync('git add .', { cwd: DIR, stdio: 'inherit' });
     execSync(`git commit -m "auto: ${new Date().toLocaleString('de-DE')}"`, { cwd: DIR, stdio: 'inherit' });
     execSync('git push origin main', { cwd: DIR, stdio: 'inherit' });
