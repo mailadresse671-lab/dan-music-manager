@@ -2493,6 +2493,8 @@
   /* ── STATION HEADERS (Phase 3) ── */
   .station-num { box-shadow: 0 0 16px rgba(0,212,255,0.3); }
 </style>
+<!-- Tone.js vor dem App-Script laden – Beat Lab benötigt Tone global -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 
 </head>
 <body>
@@ -4026,7 +4028,7 @@
           <div class="audio-dropzone-icon">🎵</div>
           <div class="audio-dropzone-text">
             <strong>Datei hier reinziehen</strong> oder klicken zum Auswählen<br>
-            MP3, WAV, OGG, AAC, FLAC – max. 25 MB
+            MP3, WAV, OGG, AAC, FLAC – max. 50 MB
           </div>
         </div>
         <input type="file" id="audioFileInput" accept="audio/*" style="display:none" onchange="handleAudioFile(event)">
@@ -4851,9 +4853,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const inp = document.getElementById('mat'+t+'Note') || document.getElementById('mat'+t.charAt(0).toUpperCase()+t.slice(1)+'Link');
     if(cb && inp) cb.addEventListener('change', () => { inp.style.display = cb.checked ? 'block' : 'none'; });
   });
-  const driveCb = document.getElementById('matHasDrive');
-  const driveInp = document.getElementById('matDriveLink');
-  if(driveCb && driveInp) driveCb.addEventListener('change', () => { driveInp.style.display = driveCb.checked ? 'block' : 'none'; });
 
   // Load first song if exists
   const songIds = Object.keys(songs);
@@ -5039,7 +5038,7 @@ document.addEventListener('click', (e) => {
 });
 function initAllSelects() {
   const map = [
-    ['p1_emotion','emotion'],['p1_zielgruppe','zielgruppe'],['p1_stil','stil'],
+    ['p1_emotion','emotion'],['p1_tonalitaet','tonalitaet'],['p1_zielgruppe','zielgruppe'],['p1_stil','stil'],
     ['p3_mood','mood'],['p3_stil','genre'],['p3_instrumente','instrumente'],
     ['p5_stimmung','stimmung'],['p5_stil','visual_stil'],['p5_farben','farben'],['p5_motiv','motiv']
   ];
@@ -5157,7 +5156,7 @@ async function callClaude(prompt, systemPrompt = null) {
     body: JSON.stringify({
       model: getGroqModel(),
       messages,
-      max_tokens: 1100
+      max_tokens: 4096
     })
   });
 
@@ -5411,15 +5410,15 @@ function bsTickStep() {
 function setBsGenre(btn, genre) {
   document.querySelectorAll('.bs-genre-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  // Apply to p3_stil
-  const sel = document.getElementById('p3_stil');
-  if (sel) {
-    let found = false;
-    for (const opt of sel.options) { if (opt.value === genre || opt.value.toLowerCase().includes(genre.toLowerCase())) { sel.value = opt.value; found = true; break; } }
-    if (!found) {
-      const opt = document.createElement('option');
-      opt.value = genre; opt.textContent = genre; opt.selected = true;
-      sel.appendChild(opt);
+  // Apply to p3_stil (custom multi-select hidden input)
+  const hidden = document.getElementById('p3_stil');
+  if (hidden) {
+    // Add genre if not already present
+    let current = hidden.value.split(',').map(v => v.trim()).filter(Boolean);
+    if (!current.includes(genre)) {
+      current.push(genre);
+      hidden.value = current.join(', ');
+      renderMultiSelTags('p3_stil', current);
     }
     autoSave();
   }
@@ -5480,7 +5479,8 @@ async function generatePhase3() {
 
 async function improveSunoPrompt() {
   const song = songs[currentSongId] || {};
-  const currentPrompt = document.getElementById('p3_result_content').textContent.trim();
+  // Read from saved state first, fall back to DOM
+  const currentPrompt = song.p3_ai_result?.trim() || document.getElementById('p3_result_content').textContent.trim();
   const feedback = document.getElementById('p3_feedback').value.trim();
 
   if (!currentPrompt) { showToast('Zuerst einen Suno Prompt generieren!', 'error'); return; }
@@ -6241,7 +6241,7 @@ function switchPhase(num) {
   if (num === 3) { setTimeout(() => { initSunoPersonaPicker(); initBeatStudio(); updateBsBpm(); updateSunoLyricsCounter(); updateSunoCockpit(); }, 0); }
   if (num === 10) { loadYtReleases(); renderYtReleases(); }
   if (num === 11) { loadAlbums(); renderDiscography(); }
-  if (num === 12) { /* Beat Lab – already initialized */ }
+  if (num === 12) { if (!window._blInit) { initBeatLab(); window._blInit = true; } }
 
   // Phases 10/11/12 work without a song selected
   if (num === 10 || num === 11 || num === 12) {
@@ -6493,16 +6493,13 @@ function autoSave() {
 
   // Suno Cockpit
   s.suno_modus = document.getElementById('suno_modus')?.value || 'einfach';
-  s.suno_version = document.getElementById('suno_version')?.value || 'v45';
-  s.suno_add_audio = document.getElementById('suno_add_audio')?.checked || false;
-  s.suno_add_persona = document.getElementById('suno_add_persona')?.checked || false;
-  s.suno_add_inspo = document.getElementById('suno_add_inspo')?.checked || false;
+  s.suno_version = document.getElementById('suno_version')?.value || 'v5';
   s.suno_stile = document.getElementById('suno_stile')?.value || '';
   s.suno_stile_exclude = document.getElementById('suno_stile_exclude')?.value || '';
-  s.suno_geschlecht = document.getElementById('suno_geschlecht')?.value || 'auto';
+  s.suno_geschlecht = document.getElementById('suno_geschlecht')?.value || 'maennlich';
   s.suno_lyrics_mode = document.getElementById('suno_lyrics_mode')?.value || 'handbuch';
-  s.suno_seltsamkeit = document.getElementById('suno_seltsamkeit')?.value || 50;
-  s.suno_stileinfluss = document.getElementById('suno_stileinfluss')?.value || 75;
+  s.suno_seltsamkeit = parseInt(document.getElementById('suno_seltsamkeit')?.value) || 50;
+  s.suno_stileinfluss = parseInt(document.getElementById('suno_stileinfluss')?.value) || 50;
   s.suno_titel = document.getElementById('suno_titel')?.value || '';
   updateSunoCockpit();
   updateDashboard();
@@ -6686,8 +6683,9 @@ function confirmRenameSong() {
 // =============================
 // SUPABASE CLOUD SYNC
 // =============================
-let sbUrl = 'https://aytvvbasvxbuwsfsbypj.supabase.co';
-let sbKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5dHZ2YmFzdnhidXdzZnNieXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNjA3MDQsImV4cCI6MjA4MzYzNjcwNH0.YsmU-M8Gc-qA8kjWfXoIa3DOAhLwHhiacKRK2ly10iI';
+// Credentials are stored in localStorage only — never hardcode here
+let sbUrl = '';
+let sbKey = '';
 let cloudConnected = false;
 let syncDebounceTimer = null;
 
@@ -6702,12 +6700,9 @@ function getSbHeaders() {
 
 function loadCloudConfig() {
   const storedUrl = localStorage.getItem('dan_sb_url') || '';
-  // Ignore stored URL if invalid (missing https://)
+  const storedKey = localStorage.getItem('dan_sb_key') || '';
   if (storedUrl.startsWith('https://')) sbUrl = storedUrl;
-  sbKey = localStorage.getItem('dan_sb_key') || sbKey;
-  // Fix localStorage with correct values
-  localStorage.setItem('dan_sb_url', sbUrl);
-  localStorage.setItem('dan_sb_key', sbKey);
+  if (storedKey) sbKey = storedKey;
   if (sbUrl && sbKey) {
     cloudConnected = true;
     updateCloudStatus('connected');
@@ -7427,13 +7422,13 @@ async function sendChatMessage() {
   const input = document.getElementById('chatInput');
   const msg = input.value.trim();
   if (!msg) return;
+  if (!currentSongId || !songs[currentSongId]) {
+    showToast('Bitte erst einen Song auswählen!', 'error');
+    return;
+  }
   const useSearch = document.getElementById('useWebSearch').checked;
   input.value = '';
   appendChatMessage('user', msg);
-  if (!currentSongId || !songs[currentSongId]) {
-    appendChatMessage('assistant', 'Bitte erst einen Song auswählen!');
-    return;
-  }
   const sendBtn = document.getElementById('chatSendBtn');
   sendBtn.disabled = true;
   sendBtn.textContent = '...';
@@ -7496,7 +7491,7 @@ async function callClaudeChat(messages, systemPrompt) {
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    body: JSON.stringify({ model: getGroqModel(), messages: [{ role: 'system', content: systemPrompt }, ...messages], max_tokens: 1200 })
+    body: JSON.stringify({ model: getGroqModel(), messages: [{ role: 'system', content: systemPrompt }, ...messages], max_tokens: 2048 })
   });
   if (!res.ok) {
     const err = await res.json().catch(()=>({}));
@@ -9061,13 +9056,15 @@ function applySpToBeat() {
   const bpmEl = document.getElementById('p3_bpm');
   const bpmValEl = document.getElementById('p3_bpm_val');
   if (bpmEl) { bpmEl.value = persona.bpm; if(bpmValEl) bpmValEl.textContent = persona.bpm; }
-  // Apply mood tag if mood select exists
-  const moodEl = document.getElementById('p3_mood');
-  if (moodEl && persona.tag) {
-    // Try to find matching option, else leave
-    const opts = Array.from(moodEl.options);
-    const match = opts.find(o => o.value.toLowerCase().includes(persona.tag.toLowerCase()));
-    if (match) moodEl.value = match.value;
+  // Apply mood tag to custom multi-select component
+  const moodHidden = document.getElementById('p3_mood');
+  if (moodHidden && persona.tag) {
+    let current = moodHidden.value.split(',').map(v => v.trim()).filter(Boolean);
+    if (!current.some(v => v.toLowerCase().includes(persona.tag.toLowerCase()))) {
+      current.push(persona.tag);
+      moodHidden.value = current.join(', ');
+      renderMultiSelTags('p3_mood', current);
+    }
   }
   autoSave();
   showToast(`BPM auf ${persona.bpm} gesetzt!`, 'success');
@@ -9493,22 +9490,26 @@ function toggleMetronome() {
     }
   });
 }
+let blMetroClickAccent = null;
+let blMetroClickNorm   = null;
+
 function startMetronome() {
   Tone.Transport.bpm.value = metroBpm;
   metroCurrentBeat = 0;
   if (blMetroSeq) { blMetroSeq.dispose(); }
+  // Reuse two fixed synths instead of creating a new one per tick
+  if (!blMetroClickAccent) {
+    blMetroClickAccent = new Tone.Synth({ oscillator:{type:'triangle'}, envelope:{attack:0.001,decay:0.08,sustain:0,release:0.05} }).connect(blMasterVol);
+    blMetroClickNorm   = new Tone.Synth({ oscillator:{type:'sine'},     envelope:{attack:0.001,decay:0.08,sustain:0,release:0.05} }).connect(blMasterVol);
+  }
   const timeSig = parseInt(document.getElementById('metroTimeSig').value) || 4;
   metroTimeSig = timeSig;
   buildMetroDots();
   blMetroSeq = new Tone.Sequence((time, beat) => {
     const isAccent = beat === 0;
-    // Click sound
-    const click = new Tone.Synth({
-      oscillator: { type: isAccent ? 'triangle' : 'sine' },
-      envelope: { attack: 0.001, decay: 0.08, sustain: 0, release: 0.05 }
-    }).connect(blMasterVol);
+    // Click sound — use pre-built synths
+    const click = isAccent ? blMetroClickAccent : blMetroClickNorm;
     click.triggerAttackRelease(isAccent ? 1200 : 800, '16n', time);
-    setTimeout(() => click.dispose(), 500);
     // Visual
     Tone.Draw.schedule(() => {
       flashMetroBeat(beat, isAccent);
@@ -9830,11 +9831,7 @@ function buildMiniKeyboard() {
 function playNote(note) {
   initTone().then(() => {
     if (!activeSynth) return;
-    if (activeSynth === blPluck || activeSynth === blMetal) {
-      activeSynth.triggerAttack(note);
-    } else {
-      activeSynth.triggerAttack(note);
-    }
+    activeSynth.triggerAttack(note);
     const el = document.getElementById('kw_' + note) || document.getElementById('kb_' + note);
     if (el) el.classList.add('pressed');
   });
@@ -9848,7 +9845,8 @@ function stopNote(note) {
   if (el) el.classList.remove('pressed');
 }
 // Computer keyboard → piano
-const KB_MAP = { a:'C',s:'D',d:'E',f:'F',g:'G',h:'A',j:'B',w:'C#',e:'D#',t:'F#',y:'G#',u:'A#' };
+// QWERTY: y=G# / QWERTZ (DE): z=G# — beide werden unterstützt
+const KB_MAP = { a:'C',s:'D',d:'E',f:'F',g:'G',h:'A',j:'B',w:'C#',e:'D#',t:'F#',y:'G#',z:'G#',u:'A#' };
 document.addEventListener('keydown', e => {
   if (e.repeat) return;
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -9947,9 +9945,8 @@ window.addEventListener('DOMContentLoaded', () => {
   buildIntroParticles();
   loadYtReleases();
   loadAlbums();
-  initBeatLab();
+  if (!window._blInit) { initBeatLab(); window._blInit = true; }
 });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 </body>
 </html>
