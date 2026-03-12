@@ -1833,6 +1833,665 @@
     background: var(--card2); border: 1px solid var(--border);
     display: block;
   }
+
+  /* ================================================================
+     ██████   AI NEURAL CORE — DESIGN SYSTEM v2
+     Complete visual overhaul: fonts, colors, motion, feel
+     ================================================================ */
+
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  /* ── EXTENDED DESIGN TOKENS ── */
+  :root {
+    --cyan:       #00d4ff;
+    --cyan-dim:   rgba(0,212,255,0.12);
+    --neon:       #00ff88;
+    --neon-dim:   rgba(0,255,136,0.08);
+    --bg-deep:    #04040a;
+    --font-ui:    'Inter', -apple-system, sans-serif;
+    --font-tech:  'JetBrains Mono', 'Courier New', monospace;
+    --font-head:  'Orbitron', sans-serif;
+  }
+
+  /* ── BASE: Neural Grid Body ── */
+  body {
+    font-family: var(--font-ui);
+    background: var(--bg-deep);
+    background-image:
+      linear-gradient(rgba(124,58,237,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* ── TOPBAR: Command Center ── */
+  .topbar {
+    background: linear-gradient(90deg, rgba(4,4,12,0.98), rgba(6,6,18,0.98));
+    border-bottom: 1px solid rgba(0,212,255,0.1);
+    box-shadow: 0 0 60px rgba(0,0,0,0.9), 0 1px 0 rgba(0,212,255,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+  /* Scanning line that drifts across the topbar */
+  .topbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: -50%;
+    width: 40%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), rgba(124,58,237,0.7), transparent);
+    animation: topbarScan 5s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes topbarScan {
+    0%   { left: -40%; }
+    100% { left: 140%; }
+  }
+
+  .topbar-logo {
+    background: linear-gradient(135deg, #7c3aed, #00d4ff);
+    box-shadow: 0 0 24px rgba(0,212,255,0.35), 0 0 48px rgba(124,58,237,0.2);
+    font-family: var(--font-head);
+    font-size: 12px;
+    letter-spacing: 1px;
+    border-radius: 6px;
+  }
+  .topbar-title {
+    font-family: var(--font-head);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    background: linear-gradient(90deg, #e2e8f0, #c4b5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .topbar-brand {
+    background: rgba(0,212,255,0.06);
+    border: 1px solid rgba(0,212,255,0.22);
+    color: var(--cyan);
+    font-family: var(--font-tech);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .api-status {
+    font-family: var(--font-tech);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+  .api-dot.active {
+    box-shadow: 0 0 8px var(--neon);
+    background: var(--neon);
+  }
+  /* Topbar buttons */
+  .btn-api {
+    font-family: var(--font-tech);
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    background: rgba(124,58,237,0.08);
+    border: 1px solid rgba(124,58,237,0.2);
+    color: #a78bfa;
+    transition: all 0.2s;
+  }
+  .btn-api:hover {
+    background: rgba(124,58,237,0.18);
+    border-color: rgba(124,58,237,0.45);
+    box-shadow: 0 0 16px rgba(124,58,237,0.2);
+  }
+  .btn-cloud {
+    font-family: var(--font-tech);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    background: rgba(0,255,136,0.05);
+    border: 1px solid rgba(0,255,136,0.18);
+    color: var(--neon);
+  }
+  .btn-cloud:hover { background: rgba(0,255,136,0.12); box-shadow: 0 0 16px rgba(0,255,136,0.12); }
+  .cloud-dot.connected { background: var(--neon); box-shadow: 0 0 8px var(--neon); }
+  .btn-tavily {
+    font-family: var(--font-tech); font-size: 10px;
+    background: rgba(245,158,11,0.07);
+    border-color: rgba(245,158,11,0.22);
+  }
+  .btn-voice {
+    font-family: var(--font-tech); font-size: 10px; letter-spacing: 0.5px;
+    background: rgba(0,212,255,0.06);
+    border: 1px solid rgba(0,212,255,0.22);
+    color: var(--cyan);
+  }
+  .btn-voice:hover { background: rgba(0,212,255,0.14); box-shadow: 0 0 16px rgba(0,212,255,0.15); }
+
+  /* ── SIDEBAR: Neural Module Navigator ── */
+  .sidebar {
+    background: rgba(4,4,10,0.99);
+    border-right: 1px solid rgba(0,212,255,0.07);
+    position: relative;
+  }
+  /* Fine circuit-trace grid overlay */
+  .sidebar::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(124,58,237,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.018) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none; z-index: 0;
+  }
+  .sidebar > * { position: relative; z-index: 1; }
+
+  .sidebar-section-title {
+    font-family: var(--font-tech);
+    font-size: 8.5px;
+    letter-spacing: 3px;
+    color: rgba(0,212,255,0.3);
+    text-transform: uppercase;
+  }
+  .nav-item {
+    font-family: var(--font-ui);
+    font-size: 12.5px;
+    border: 1px solid transparent;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .nav-item:hover {
+    background: rgba(0,212,255,0.04);
+    border-color: rgba(0,212,255,0.1);
+    color: #a5f3fc;
+  }
+  .nav-item.active {
+    background: rgba(124,58,237,0.1);
+    border-color: rgba(124,58,237,0.25);
+    color: #c4b5fd;
+    box-shadow: inset 3px 0 0 var(--cyan), 0 0 20px rgba(0,212,255,0.04);
+  }
+  .nav-item.active .phase-num {
+    background: linear-gradient(135deg, #7c3aed, #00d4ff);
+    color: #fff;
+    box-shadow: 0 0 14px rgba(0,212,255,0.4);
+    font-family: var(--font-tech);
+    font-size: 9.5px;
+    font-weight: 700;
+  }
+  .phase-num { font-family: var(--font-tech); }
+
+  .sidebar-divider { border-color: rgba(0,212,255,0.05); }
+
+  .btn-new-song {
+    background: linear-gradient(135deg, #5b21b6, #7c3aed 50%, rgba(0,212,255,0.6));
+    box-shadow: 0 0 24px rgba(0,212,255,0.15);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(0,212,255,0.15);
+  }
+  .btn-new-song:hover {
+    box-shadow: 0 0 36px rgba(0,212,255,0.3), 0 0 60px rgba(124,58,237,0.2);
+    opacity: 1; filter: brightness(1.1);
+  }
+  .song-item:hover  { background: rgba(0,212,255,0.03) !important; border-color: rgba(0,212,255,0.15) !important; }
+  .song-item.active { border-left: 2px solid var(--cyan) !important; box-shadow: 0 0 14px rgba(0,212,255,0.08); }
+
+  /* ── MAIN CONTENT: Deep Space Grid ── */
+  .main-content {
+    background:
+      linear-gradient(rgba(0,212,255,0.004) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.004) 1px, transparent 1px),
+      var(--bg-deep);
+    background-size: 60px 60px, 60px 60px, 100%;
+  }
+
+  /* ── PHASE HEADER: Mission Control ── */
+  .phase-header {
+    border-bottom: 1px solid transparent;
+    border-image: linear-gradient(90deg, var(--cyan), rgba(124,58,237,0.5), transparent) 0 0 1 0;
+  }
+  .phase-title {
+    font-family: var(--font-head);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    background: linear-gradient(90deg, #f0f0ff, #c4b5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .phase-subtitle { font-family: var(--font-tech); font-size: 11px; letter-spacing: 0.5px; }
+  .phase-icon {
+    background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(124,58,237,0.15));
+    border: 1px solid rgba(0,212,255,0.18);
+    box-shadow: 0 0 24px rgba(0,212,255,0.08), inset 0 0 20px rgba(0,0,0,0.4);
+  }
+
+  /* ── CARDS: Holographic Panels ── */
+  .card {
+    background: linear-gradient(135deg, rgba(10,10,22,0.95) 0%, rgba(6,6,16,0.98) 100%);
+    border: 1px solid rgba(124,58,237,0.1);
+    position: relative; overflow: hidden;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  /* HUD corner brackets */
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 18px; height: 18px;
+    border-top: 1px solid rgba(0,212,255,0.28);
+    border-left: 1px solid rgba(0,212,255,0.28);
+    pointer-events: none; z-index: 1;
+  }
+  .card::after {
+    content: '';
+    position: absolute; bottom: 0; right: 0;
+    width: 18px; height: 18px;
+    border-bottom: 1px solid rgba(124,58,237,0.28);
+    border-right: 1px solid rgba(124,58,237,0.28);
+    pointer-events: none; z-index: 1;
+  }
+  .card:hover {
+    border-color: rgba(0,212,255,0.18);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.06);
+  }
+  .card-title {
+    font-family: var(--font-tech);
+    font-size: 9.5px;
+    letter-spacing: 2.5px;
+    color: rgba(0,212,255,0.4);
+    text-transform: uppercase;
+  }
+
+  /* ── INPUTS: Cyberpunk Fields ── */
+  input[type="text"], input[type="number"], textarea, select {
+    background: rgba(4,4,14,0.9);
+    border-color: rgba(124,58,237,0.14);
+    font-family: var(--font-ui);
+    color: #dde4f0;
+  }
+  input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
+    border-color: rgba(0,212,255,0.38);
+    box-shadow: 0 0 0 2px rgba(0,212,255,0.05), 0 0 20px rgba(0,212,255,0.04);
+    background: rgba(4,4,18,0.95);
+  }
+  input::placeholder, textarea::placeholder { color: rgba(148,163,184,0.35); }
+
+  /* ── AI BUTTON: Neural Activation ── */
+  .btn-ai {
+    background: linear-gradient(135deg, #4c1d95, #7c3aed 50%, rgba(0,180,220,0.5));
+    border: 1px solid rgba(0,212,255,0.18);
+    box-shadow: 0 0 20px rgba(124,58,237,0.2);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    position: relative; overflow: hidden;
+  }
+  .btn-ai::before {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0,212,255,0.1), transparent);
+    animation: aiScan 3.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes aiScan {
+    0%   { left: -60%; }
+    100% { left: 140%; }
+  }
+  .btn-ai:hover {
+    box-shadow: 0 0 32px rgba(124,58,237,0.45), 0 0 60px rgba(0,212,255,0.1);
+    border-color: rgba(0,212,255,0.35);
+  }
+  .btn-secondary {
+    font-family: var(--font-ui);
+    background: rgba(8,8,20,0.8);
+    border-color: rgba(124,58,237,0.15);
+  }
+  .btn-secondary:hover { border-color: rgba(0,212,255,0.3); color: var(--cyan); }
+  .btn-primary {
+    background: linear-gradient(135deg, #5b21b6, rgba(0,180,220,0.7));
+  }
+  .btn-phase-next {
+    background: linear-gradient(135deg, #5b21b6, #7c3aed);
+    border: 1px solid rgba(0,212,255,0.15);
+  }
+  .btn-phase-next:hover {
+    box-shadow: 0 0 24px rgba(0,212,255,0.25), 0 0 48px rgba(124,58,237,0.15);
+  }
+
+  /* ── AI RESULT BOX: Terminal Output ── */
+  .result-box {
+    background: rgba(3,6,4,0.97);
+    border: 1px solid rgba(0,212,255,0.12);
+    position: relative;
+  }
+  .result-box::before {
+    content: '// AI_OUTPUT';
+    position: absolute; top: -1px; left: 12px;
+    font-family: var(--font-tech);
+    font-size: 9px;
+    color: rgba(0,212,255,0.35);
+    background: rgba(3,6,4,0.97);
+    padding: 0 6px;
+    letter-spacing: 1.5px;
+  }
+  .result-box.visible {
+    border-color: rgba(0,212,255,0.2);
+    box-shadow: 0 0 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,212,255,0.04);
+  }
+  .result-box-title {
+    font-family: var(--font-tech);
+    color: var(--cyan);
+    letter-spacing: 2px;
+    font-size: 10px;
+  }
+  .result-content {
+    font-family: var(--font-tech);
+    font-size: 13px;
+    line-height: 1.85;
+    color: #b8d8c0; /* soft terminal green */
+  }
+
+  /* ── CHAT: AI Terminal Conversation ── */
+  .chat-message.assistant {
+    background: rgba(3,7,5,0.96);
+    border: 1px solid rgba(0,212,255,0.1);
+    color: #a8dab8;
+    font-family: var(--font-tech);
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .chat-message.user {
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.22);
+    font-family: var(--font-ui);
+  }
+  .chat-textarea {
+    background: rgba(4,4,14,0.9);
+    border-color: rgba(124,58,237,0.14);
+    font-family: var(--font-ui);
+  }
+  .chat-textarea:focus { border-color: rgba(0,212,255,0.35); }
+  .chat-send-btn {
+    background: linear-gradient(135deg, #5b21b6, rgba(0,180,220,0.7));
+    border: 1px solid rgba(0,212,255,0.2);
+    font-family: var(--font-ui);
+    font-weight: 600;
+  }
+  .chat-quick-btn {
+    font-family: var(--font-tech);
+    font-size: 11px;
+    background: rgba(0,212,255,0.04);
+    border-color: rgba(0,212,255,0.15);
+    color: rgba(0,212,255,0.7);
+  }
+  .chat-quick-btn:hover { background: rgba(0,212,255,0.1); color: var(--cyan); }
+
+  /* Manager messages */
+  .mgr-msg.assistant {
+    background: rgba(3,7,5,0.95);
+    border-color: rgba(0,212,255,0.1);
+    color: #a8d8b0;
+    font-family: var(--font-tech);
+    font-size: 12px;
+    line-height: 1.75;
+  }
+  .mgr-msg.user { background: rgba(124,58,237,0.1); border-color: rgba(124,58,237,0.2); }
+  .mgr-quick-btn {
+    font-family: var(--font-tech); font-size: 10px;
+    background: rgba(0,212,255,0.04); border-color: rgba(0,212,255,0.14);
+    color: rgba(0,212,255,0.65);
+  }
+  .mgr-quick-btn:hover { background: rgba(0,212,255,0.1); color: var(--cyan); }
+  .mgr-textarea { font-family: var(--font-ui); background: rgba(4,4,14,0.9); border-color: rgba(124,58,237,0.14); }
+  .mgr-textarea:focus { border-color: rgba(0,212,255,0.35); }
+  .mgr-send { background: linear-gradient(135deg, #5b21b6, rgba(0,180,220,0.7)); border: 1px solid rgba(0,212,255,0.2); }
+
+  /* ── SPINNER: Neural Processing ── */
+  .spinner {
+    border-color: rgba(0,212,255,0.15);
+    border-top-color: var(--cyan);
+    filter: drop-shadow(0 0 4px var(--cyan));
+  }
+
+  /* ── PROGRESS BAR: Data Stream ── */
+  .progress-bar {
+    background: linear-gradient(90deg, #5b21b6, #7c3aed, var(--cyan));
+    position: relative; overflow: hidden;
+  }
+  .progress-bar::after {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    animation: progressShimmer 1.8s ease-in-out infinite;
+  }
+  @keyframes progressShimmer { 0% { left: -50%; } 100% { left: 150%; } }
+
+  /* ── TAGS & BADGES: Data Chips ── */
+  .tag {
+    font-family: var(--font-tech);
+    font-size: 10px;
+    background: rgba(0,212,255,0.05);
+    border-color: rgba(0,212,255,0.18);
+    color: var(--cyan);
+    letter-spacing: 0.5px;
+  }
+  .section-badge.phase {
+    background: rgba(0,212,255,0.05);
+    border-color: rgba(0,212,255,0.18);
+    color: var(--cyan);
+    font-family: var(--font-tech);
+    letter-spacing: 1.5px;
+    font-size: 10px;
+  }
+  .ov-tag {
+    background: rgba(0,212,255,0.05);
+    border-color: rgba(0,212,255,0.16);
+    color: rgba(0,212,255,0.8);
+    font-family: var(--font-tech);
+    font-size: 10px;
+  }
+
+  /* ── TOAST: System Notifications ── */
+  .toast {
+    font-family: var(--font-tech);
+    font-size: 11px;
+    letter-spacing: 0.3px;
+    backdrop-filter: blur(20px);
+  }
+  .toast.success {
+    background: rgba(0,255,136,0.06);
+    border-color: rgba(0,255,136,0.22);
+    color: var(--neon);
+    box-shadow: 0 0 20px rgba(0,255,136,0.08);
+  }
+  .toast.error {
+    background: rgba(239,68,68,0.07);
+    border-color: rgba(239,68,68,0.25);
+    box-shadow: 0 0 20px rgba(239,68,68,0.08);
+  }
+  .toast.info {
+    background: rgba(0,212,255,0.06);
+    border-color: rgba(0,212,255,0.22);
+    color: var(--cyan);
+    box-shadow: 0 0 20px rgba(0,212,255,0.08);
+  }
+
+  /* ── MODAL: Overlay Panel ── */
+  .modal {
+    background: rgba(6,6,16,0.98);
+    border: 1px solid rgba(124,58,237,0.22);
+    backdrop-filter: blur(40px);
+    box-shadow: 0 0 100px rgba(0,0,0,0.95), 0 0 40px rgba(124,58,237,0.08);
+  }
+  .modal-title {
+    font-family: var(--font-head);
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+  .modal-input { background: rgba(4,4,14,0.9); border-color: rgba(124,58,237,0.14); font-family: var(--font-tech); }
+  .modal-input:focus { border-color: rgba(0,212,255,0.35); }
+
+  /* ── BPM DISPLAY: Data Readout ── */
+  .bpm-value {
+    font-family: var(--font-head);
+    background: linear-gradient(135deg, var(--cyan), #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── AUDIO DROPZONE ── */
+  .audio-dropzone {
+    border: 1px dashed rgba(0,212,255,0.18);
+    background: rgba(0,212,255,0.015);
+  }
+  .audio-dropzone:hover, .audio-dropzone.dragover {
+    border-color: rgba(0,212,255,0.45);
+    background: rgba(0,212,255,0.04);
+    box-shadow: 0 0 30px rgba(0,212,255,0.07);
+  }
+  .audio-progress-fill { background: linear-gradient(90deg, #7c3aed, var(--cyan)); }
+  .audio-play-btn {
+    background: linear-gradient(135deg, #5b21b6, rgba(0,180,220,0.8));
+    box-shadow: 0 0 16px rgba(0,212,255,0.2);
+  }
+
+  /* ── TIMELINE ── */
+  .timeline-bar { background: rgba(4,4,14,0.9); border-color: rgba(0,212,255,0.1); }
+  .timeline-progress-line { background: rgba(0,212,255,0.4); }
+  .marker-time { font-family: var(--font-tech); color: var(--cyan); }
+
+  /* ── SLIDERS ── */
+  input[type="range"]::-webkit-slider-thumb {
+    background: var(--cyan);
+    box-shadow: 0 0 10px rgba(0,212,255,0.5);
+  }
+  input[type="range"]::-moz-range-thumb { background: var(--cyan); }
+  .slider-val { font-family: var(--font-tech); color: var(--cyan); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.18); }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.38); }
+  ::selection { background: rgba(0,212,255,0.2); color: #fff; }
+
+  /* ── COPY BUTTON ── */
+  .btn-copy {
+    font-family: var(--font-tech);
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    background: rgba(0,212,255,0.06);
+    border-color: rgba(0,212,255,0.18);
+    color: var(--cyan);
+  }
+  .btn-copy:hover { background: rgba(0,212,255,0.14); }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    font-family: var(--font-tech);
+    background: rgba(3,6,4,0.95);
+    border-color: rgba(0,212,255,0.1);
+    color: #7ee8a2;
+  }
+
+  /* ── NO SONG PLACEHOLDER ── */
+  .no-song-icon { filter: drop-shadow(0 0 20px rgba(0,212,255,0.25)); }
+
+  /* ── SUNO UI ── */
+  .suno-ui-wrap {
+    background: rgba(6,6,14,0.98);
+    border: 1px solid rgba(124,58,237,0.12);
+  }
+  .suno-struct-tag { font-family: var(--font-tech); }
+  .suno-vocal-tag  { font-family: var(--font-tech); }
+  .suno-chip, .suno-style-chip { font-family: var(--font-ui); }
+  .suno-prompt-copy-btn {
+    font-family: var(--font-tech); font-size: 11px;
+    border-color: rgba(0,212,255,0.2);
+    background: rgba(0,212,255,0.05);
+    color: var(--cyan);
+  }
+  .suno-prompt-copy-btn:hover { background: rgba(0,212,255,0.12); }
+
+  /* ── SUNO PERSONA CARDS ── */
+  .sp-card.selected {
+    box-shadow: 0 0 0 1px var(--sp-color,#7c3aed), 0 0 24px color-mix(in srgb,var(--sp-color,#7c3aed) 25%,transparent);
+  }
+  .sp-prompt-box { font-family: var(--font-tech); color: #b8d8c0; background: rgba(3,6,4,0.9); }
+
+  /* ── OVERVIEW ── */
+  .ov-copy-box { font-family: var(--font-tech); font-size: 12px; background: rgba(4,4,14,0.9); }
+
+  /* ── YT & DISCOGRAPHY ── */
+  .yt-stat { background: rgba(8,8,18,0.9); border-color: rgba(124,58,237,0.1); }
+  .yt-stat-num { font-family: var(--font-head); }
+
+  /* ── BEAT LAB FX KNOBS ── */
+  .fx-val { font-family: var(--font-head); color: var(--cyan); }
+  .fx-knob-label { font-family: var(--font-tech); color: rgba(0,212,255,0.4); }
+  .fx-knob-wrap {
+    background: rgba(6,6,16,0.9);
+    border: 1px solid rgba(124,58,237,0.12);
+  }
+  .bl-visualizer { background: rgba(4,4,12,0.95); border-color: rgba(0,212,255,0.1); }
+
+  /* ── SUNO TOGGLE BUTTONS ── */
+  .suno-toggle-btn { font-family: var(--font-tech); font-size: 11px; }
+  .suno-toggle-btn.sel { border-color: var(--cyan); color: var(--cyan); background: rgba(0,212,255,0.07); }
+
+  /* ── MATERIAL ITEMS ── */
+  .material-item { background: rgba(6,6,18,0.95); border-color: rgba(124,58,237,0.1); }
+  .material-item-type { font-family: var(--font-tech); color: rgba(0,212,255,0.35); }
+
+  /* ── CHECKLIST ── */
+  .checklist-item input[type="checkbox"] { accent-color: var(--cyan); }
+
+  /* ── RESULT BOX HEADER GLOW ── */
+  .result-box-header { border-bottom: 1px solid rgba(0,212,255,0.08); padding-bottom: 8px; }
+
+  /* ── VOICE MODAL ── */
+  .voice-modal {
+    background: rgba(6,6,16,0.98);
+    border: 1px solid rgba(124,58,237,0.2);
+    backdrop-filter: blur(40px);
+  }
+  .voice-modal-title { font-family: var(--font-head); font-size: 15px; letter-spacing: 0.8px; }
+  .voice-emotion-btn { font-family: var(--font-tech); font-size: 11px; }
+  .voice-emotion-btn.sel { border-color: var(--cyan); color: var(--cyan); background: rgba(0,212,255,0.08); }
+
+  /* ── STEP DOTS (new song wizard) ── */
+  .step-dot.active { background: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.4); }
+  .step-line.done { background: var(--cyan); }
+
+  /* ── DROPZONE MAT FILE ── */
+  .mat-file-drop:hover, .mat-file-drop.drag {
+    border-color: rgba(0,212,255,0.4);
+    color: var(--cyan);
+    background: rgba(0,212,255,0.03);
+  }
+
+  /* ── PHASE LOCKED ── */
+  .phase-locked { color: rgba(0,212,255,0.25); }
+
+  /* ── MULTI-SELECT ── */
+  .multi-sel-box.open { border-color: var(--cyan); }
+  .multi-sel-box:hover { border-color: rgba(0,212,255,0.3); }
+  .multi-sel-drop { background: rgba(6,6,18,0.99); border-color: rgba(124,58,237,0.2); }
+  .multi-sel-opt.sel { color: var(--cyan); background: rgba(0,212,255,0.06); }
+  .multi-sel-tag { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.22); color: var(--cyan); }
+
+  /* ── SONG ITEM STATUS ── */
+  .nav-item.done .phase-num {
+    background: rgba(0,255,136,0.15);
+    color: var(--neon);
+    box-shadow: 0 0 10px rgba(0,255,136,0.2);
+  }
+
+  /* ── PROGRESS TEXT ── */
+  .progress-text { font-family: var(--font-tech); color: var(--cyan); letter-spacing: 0.5px; }
+
+  /* ── MGR TOGGLE ── */
+  .mgr-title { font-family: var(--font-ui); }
+  .mgr-toggle { background: rgba(124,58,237,0.04); }
+  .mgr-toggle:hover { background: rgba(0,212,255,0.04); }
+
+  /* ── STATION HEADERS (Phase 3) ── */
+  .station-num { box-shadow: 0 0 16px rgba(0,212,255,0.3); }
 </style>
 
 </head>
@@ -1905,23 +2564,27 @@
     <div class="topbar-logo">DaN</div>
     <span class="topbar-title">DaN Music Manager</span>
     <span class="topbar-brand">@DaN_90_rap</span>
-    <span id="lastUpdated" style="font-size:11px;color:#10b981;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);padding:3px 10px;border-radius:20px;">✅ Stand: 12.03.2026 – 19:30</span>
+    <span id="lastUpdated" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#00ff88;background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.18);padding:3px 10px;border-radius:4px;letter-spacing:0.5px;">▸ Stand: 12.03.2026 – 19:30</span>
+    <!-- Neural Core status indicator -->
+    <span style="display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(0,212,255,0.5);letter-spacing:1.5px;text-transform:uppercase;">
+      <span style="width:5px;height:5px;border-radius:50%;background:#00d4ff;box-shadow:0 0 8px #00d4ff;animation:pulse 2s ease-in-out infinite;"></span>
+      NEURAL CORE
+    </span>
   </div>
   <div class="topbar-right">
     <div class="api-status">
       <div class="api-dot" id="apiDot"></div>
-      <span id="apiStatusText">Kein API Key</span>
+      <span id="apiStatusText" style="font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;">KEIN API</span>
     </div>
     <button class="btn-cloud" id="cloudBtn" onclick="openCloudModal()" title="Supabase Cloud-Sync">
       <div class="cloud-dot" id="cloudDot"></div>
-      <span id="cloudBtnText">☁ Cloud</span>
+      <span id="cloudBtnText">⬡ SYNC</span>
     </button>
-    <button class="btn-api" onclick="exportSongs()" title="Songs als JSON exportieren">⬇ Export</button>
-    <label class="btn-api" style="cursor:pointer;" title="Songs aus JSON importieren">⬆ Import<input type="file" accept=".json" onchange="importSongs(event)" style="display:none"></label>
-    <button class="btn-tavily" onclick="openTavilyModal()" title="Tavily Web-Suche Key">🌐 Web-Suche</button>
-
-    <button class="btn-voice" onclick="openVoiceModal()" title="Voice Persona – deine Stimme & Tonlage">🎤 Voice Persona</button>
-    <button class="btn-api" onclick="openApiModal()">API Key</button>
+    <button class="btn-api" onclick="exportSongs()" title="Songs als JSON exportieren">↓ EXPORT</button>
+    <label class="btn-api" style="cursor:pointer;" title="Songs aus JSON importieren">↑ IMPORT<input type="file" accept=".json" onchange="importSongs(event)" style="display:none"></label>
+    <button class="btn-tavily" onclick="openTavilyModal()" title="Tavily Web-Suche Key">⌖ WEB</button>
+    <button class="btn-voice" onclick="openVoiceModal()" title="Voice Persona – deine Stimme & Tonlage">◈ VOICE</button>
+    <button class="btn-api" onclick="openApiModal()">⚿ API</button>
   </div>
 </div>
 
@@ -1967,9 +2630,9 @@
   <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-section">
-      <div class="sidebar-section-title">Phasen</div>
+      <div class="sidebar-section-title">// MODULE.CORE</div>
       <div class="nav-item" data-phase="0" onclick="switchPhase(0)">
-        <div class="phase-num" style="background:rgba(59,130,246,0.2);color:#60a5fa;font-size:12px;">DB</div>
+        <div class="phase-num" style="background:rgba(0,212,255,0.15);color:#00d4ff;font-size:9px;letter-spacing:0.5px;">HQ</div>
         <span>Übersicht & Suno</span>
       </div>
       <div class="nav-item active" data-phase="1" onclick="switchPhase(1)">
@@ -1986,7 +2649,7 @@
       </div>
       <div class="nav-item" data-phase="4" onclick="switchPhase(4)">
         <div class="phase-num">4</div>
-        <span>Produktions-Checkliste</span>
+        <span>Produktions-Check</span>
       </div>
       <div class="nav-item" data-phase="5" onclick="switchPhase(5)">
         <div class="phase-num">5</div>
@@ -2001,26 +2664,29 @@
         <span>YouTube Upload</span>
       </div>
       <hr class="sidebar-divider">
+      <div class="sidebar-section-title" style="padding:8px 4px 4px;">// MODULE.STUDIO</div>
       <div class="nav-item" data-phase="8" onclick="switchPhase(8)">
-        <div class="phase-num" style="background:rgba(245,158,11,0.2);color:#f59e0b;">8</div>
+        <div class="phase-num" style="background:rgba(245,158,11,0.15);color:#f59e0b;font-size:9px;">8</div>
         <span>Audio Studio</span>
       </div>
       <div class="nav-item" data-phase="9" onclick="switchPhase(9)">
-        <div class="phase-num" style="background:rgba(16,185,129,0.2);color:#10b981;">9</div>
+        <div class="phase-num" style="background:rgba(0,255,136,0.12);color:#00ff88;font-size:9px;">9</div>
         <span>Producer Chat</span>
       </div>
       <hr class="sidebar-divider">
+      <div class="sidebar-section-title" style="padding:8px 4px 4px;">// MODULE.RELEASE</div>
       <div class="nav-item" data-phase="10" onclick="switchPhase(10)">
-        <div class="phase-num" style="background:rgba(239,68,68,0.2);color:#ef4444;font-size:11px;">YT</div>
+        <div class="phase-num" style="background:rgba(239,68,68,0.15);color:#ef4444;font-size:9px;letter-spacing:0.5px;">YT</div>
         <span>YouTube Releases</span>
       </div>
       <div class="nav-item" data-phase="11" onclick="switchPhase(11)">
-        <div class="phase-num" style="background:rgba(234,179,8,0.2);color:#eab308;font-size:11px;">💿</div>
+        <div class="phase-num" style="background:rgba(234,179,8,0.15);color:#eab308;font-size:13px;">💿</div>
         <span>Singles & Alben</span>
       </div>
       <hr class="sidebar-divider">
+      <div class="sidebar-section-title" style="padding:8px 4px 4px;">// MODULE.LAB</div>
       <div class="nav-item" data-phase="12" onclick="switchPhase(12)">
-        <div class="phase-num" style="background:rgba(236,72,153,0.2);color:#ec4899;font-size:11px;">🎹</div>
+        <div class="phase-num" style="background:rgba(236,72,153,0.15);color:#ec4899;font-size:13px;">🎹</div>
         <span>Beat Lab</span>
       </div>
     </div>
@@ -2028,9 +2694,17 @@
     <hr class="sidebar-divider">
 
     <div class="song-management">
-      <button class="btn-new-song" onclick="createNewSong()">+ Neuer Song</button>
-      <div class="sidebar-section-title" style="margin-bottom:8px;">Meine Songs</div>
+      <button class="btn-new-song" onclick="createNewSong()">⊕ NEUER TRACK</button>
+      <div class="sidebar-section-title" style="margin-bottom:8px;">// TRACKS</div>
       <div class="song-list" id="songList"></div>
+    </div>
+
+    <!-- AI Status Footer -->
+    <div style="padding:10px 14px 14px;margin-top:auto;border-top:1px solid rgba(0,212,255,0.05);">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <span style="width:6px;height:6px;border-radius:50%;background:#00d4ff;box-shadow:0 0 8px #00d4ff;animation:pulse 2.5s ease-in-out infinite;flex-shrink:0;"></span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:rgba(0,212,255,0.35);letter-spacing:1.5px;text-transform:uppercase;">GROQ AI READY</span>
+      </div>
     </div>
   </div>
 
@@ -2039,9 +2713,11 @@
 
     <!-- NO SONG -->
     <div id="noSongView" class="no-song">
-      <div class="no-song-icon">🎵</div>
-      <h3>Kein Song ausgewählt</h3>
-      <p>Erstelle einen neuen Song oder wähle einen aus der Liste</p>
+      <div class="no-song-icon" style="font-size:52px;margin-bottom:20px;">◈</div>
+      <h3 style="font-family:'Orbitron',sans-serif;font-size:16px;letter-spacing:1.5px;background:linear-gradient(90deg,#c4b5fd,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">KEIN TRACK GELADEN</h3>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.5px;margin-top:8px;">Erstelle einen neuen Track oder wähle einen aus</p>
+      <div style="margin-top:24px;width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,0.4),transparent);margin-left:auto;margin-right:auto;"></div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,212,255,0.3);margin-top:12px;text-transform:uppercase;">SYSTEM BEREIT</p>
     </div>
 
     <!-- PHASE 0: Übersicht & Suno Dashboard -->
