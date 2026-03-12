@@ -8198,23 +8198,78 @@ let _introComp       = null;
 let _introNextBar    = 0;
 let _introLoopId     = null;
 let _introBeatStarted = false;
+let _introRevSend     = null;   // reverb send bus
+let _introRev         = null;   // convolver reverb node
 
-// ── Synthesized deep voice: D · A · N via formant synthesis (no browser TTS) ──
-// Uses oscillator + bandpass filters to model a 72 Hz bass voice. Sounds dark,
-// mechanical, demonic – no browser dependency, works identically everywhere.
+// ── Stereo reverb from algorithmically generated impulse response ──
+function _makeIntroReverb(ctx, dur = 2.4, decay = 2.8) {
+  const len = ctx.sampleRate * dur;
+  const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+  for (let c = 0; c < 2; c++) {
+    const d = buf.getChannelData(c);
+    for (let i = 0; i < len; i++)
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+  }
+  const conv = ctx.createConvolver();
+  conv.buffer = buf;
+  return conv;
+}
+
+// ── "DaN" cinematic FM-bell ident (replaces broken formant voice) ──
+// Three bell tones tuned to D4–A4–D5 (D·A·N mnemonic) with heavy reverb
 let _voiceSynthed = false;
 function synthIntroVoice() {
   if (_voiceSynthed || !_introCtx || !_introMaster) return;
   _voiceSynthed = true;
   const ctx = _introCtx;
 
+  // FM bell: modulator rides on carrier, creates metallic shimmer
+  const bell = (t, freq, vol = 0.11, dur = 2.2) => {
+    const mod  = ctx.createOscillator();
+    const modG = ctx.createGain();
+    mod.type = 'sine';
+    mod.frequency.value = freq * 3.51;
+    modG.gain.setValueAtTime(freq * 4.5, t);
+    modG.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.35);
+    mod.connect(modG);
+
+    const car = ctx.createOscillator();
+    car.type  = 'sine';
+    car.frequency.value = freq;
+    modG.connect(car.frequency);   // FM: modulator → carrier frequency
+
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0, t);
+    env.gain.linearRampToValueAtTime(vol, t + 0.004);
+    env.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    car.connect(env);
+    env.connect(_introRevSend);    // lush reverb
+    env.connect(_introMaster);     // dry too
+
+    mod.start(t); mod.stop(t + dur);
+    car.start(t); car.stop(t + dur);
+  };
+
+  const T = ctx.currentTime + 0.3;
+  bell(T + 0.00, 293.7, 0.11, 2.8);  // D4
+  bell(T + 0.72, 440.0, 0.09, 2.4);  // A4
+  bell(T + 1.45, 587.3, 0.08, 2.0);  // D5 (octave up)
+}
+
+// ── PLACEHOLDER: old formant voice (kept as dead comment only) ──
+// Formant synthesis removed – it sounded terrible (robotic/demonic artefacts).
+// Replaced by FM-bell ident above.
+function _oldFormant_REMOVED() {
+  // void – do not call
+  const ctx = _introCtx;
+
   // Speak one vowel/syllable: sawtooth glottal source → two formant filters → envelope
   const spell = (t, f1, f2, dur, consonant = false) => {
-    const PITCH = 72; // 72 Hz = very deep bass voice (lower than Barry White)
+    const PITCH = 72;
     const osc = ctx.createOscillator();
     osc.type = 'sawtooth';
     osc.frequency.setValueAtTime(PITCH, t);
-    osc.frequency.exponentialRampToValueAtTime(PITCH * 0.87, t + dur); // menacing pitch drop
+    osc.frequency.exponentialRampToValueAtTime(PITCH * 0.87, t + dur);
 
     // Amplitude envelope: sharp attack, clean release
     const env = ctx.createGain();
@@ -8248,262 +8303,303 @@ function synthIntroVoice() {
   };
 
   const T = ctx.currentTime;
-  // "D" → "dee" phonetics: F1=310 Hz (high, closed vowel), F2=2280 Hz (front)
-  spell(T + 0.0,  310, 2280, 0.90, true);
-  // "A" → "ay" phonetics:  F1=560 Hz (mid vowel), F2=1900 Hz
-  spell(T + 2.3,  560, 1900, 0.95, false);
-  // "N" → "en" phonetics:  F1=500 Hz, F2=1600 Hz + consonant close
-  spell(T + 4.7,  500, 1600, 0.85, true);
+  // old formant spells (dead code – see _oldFormant_REMOVED above)
+  // spell(T + 0.0, 310, 2280, 0.90, true);
+  // spell(T + 2.3, 560, 1900, 0.95, false);
+  // spell(T + 4.7, 500, 1600, 0.85, true);
 }
 
-// ── Cinematic Gangster Beat Engine ──
+// ══════════════════════════════════════════════════════════════════════
+//  NEURAL TRAP — Dark Intro Beat  |  95 BPM  |  G minor
+//  Architecture: master → compressor → destination
+//                      reverb bus ─────────────↗
+//  808 kick · layered snare · triplet hats · 808 bass slides
+//  detuned sawtooth pad · filtered lead melody · FM bell ident
+// ══════════════════════════════════════════════════════════════════════
 function tryStartIntroBeat() {
   if (_introBeatStarted) return;
   _introBeatStarted = true;
   try {
-    _introCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (_introCtx.state === 'suspended') _introCtx.resume();
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    _introCtx = ctx;
+    if (ctx.state === 'suspended') ctx.resume();
 
-    // Master gain
-    _introMaster = _introCtx.createGain();
+    // ── Master bus ──
+    _introMaster = ctx.createGain();
     _introMaster.gain.value = 0;
 
-    // Compressor for punch without clipping
-    _introComp = _introCtx.createDynamicsCompressor();
-    _introComp.threshold.value = -12;
-    _introComp.knee.value      = 3;
-    _introComp.ratio.value     = 10;
-    _introComp.attack.value    = 0.001;
-    _introComp.release.value   = 0.08;
+    _introComp = ctx.createDynamicsCompressor();
+    _introComp.threshold.value = -10;
+    _introComp.knee.value      = 5;
+    _introComp.ratio.value     = 6;
+    _introComp.attack.value    = 0.003;
+    _introComp.release.value   = 0.14;
     _introMaster.connect(_introComp);
-    _introComp.connect(_introCtx.destination);
+    _introComp.connect(ctx.destination);
 
-    // Smooth fade-in
-    _introMaster.gain.linearRampToValueAtTime(0.78, _introCtx.currentTime + 1.2);
+    // ── Reverb bus (algorithmic IR) ──
+    _introRev  = _makeIntroReverb(ctx, 2.4, 2.8);
+    const revG = ctx.createGain(); revG.gain.value = 0.22;
+    _introRev.connect(revG); revG.connect(_introMaster);
+    _introRevSend = ctx.createGain(); _introRevSend.gain.value = 1.0;
+    _introRevSend.connect(_introRev);
 
-    // ── G minor pad (G2, Bb2, D3) – soft sine voices, West Coast warmth ──
-    const padGain = _introCtx.createGain(); padGain.gain.value = 0;
-    const padLP   = _introCtx.createBiquadFilter();
-    padLP.type = 'lowpass'; padLP.frequency.value = 900; padLP.Q.value = 0.7;
-    padLP.connect(padGain); padGain.connect(_introMaster);
+    // ── Smooth fade-in ──
+    _introMaster.gain.linearRampToValueAtTime(0.82, ctx.currentTime + 1.4);
+
+    // ── Dark detuned pad: G minor (G2 Bb2 D3 G3) – 2 sawtooth layers per note ──
+    const padLP  = ctx.createBiquadFilter();
+    padLP.type = 'lowpass'; padLP.frequency.value = 700; padLP.Q.value = 0.55;
+    const padG   = ctx.createGain(); padG.gain.value = 0;
+    padLP.connect(padG);
+    padG.connect(_introRevSend);   // mostly reverb
+    padG.connect(_introMaster);    // a little dry
     [
-      [98.0,  0], [98.0,  +5],   // G2
-      [116.5, 0], [116.5, -4],   // Bb2
-      [146.8, 0], [146.8, +3],   // D3
-      [196.0, 0],                 // G3
-    ].forEach(([freq, cents = 0]) => {
-      const o = _introCtx.createOscillator();
-      o.type = 'sine';
-      o.frequency.value = freq * Math.pow(2, cents / 1200);
-      o.connect(padLP); o.start();
+      [98.0,  +0], [98.0,  +7],   // G2 detuned pair
+      [116.5, +0], [116.5, -5],   // Bb2 detuned pair
+      [146.8, +0], [146.8, +4],   // D3 detuned pair
+      [196.0, +0], [196.0, -3],   // G3 detuned pair
+    ].forEach(([hz, c]) => {
+      const o = ctx.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.value = hz * Math.pow(2, c / 1200);
+      const og = ctx.createGain(); og.gain.value = 0.06;
+      o.connect(og); og.connect(padLP); o.start();
     });
-    padGain.gain.setValueAtTime(0, _introCtx.currentTime);
-    padGain.gain.linearRampToValueAtTime(0.032, _introCtx.currentTime + 2.2);
+    padG.gain.setValueAtTime(0,      ctx.currentTime);
+    padG.gain.linearRampToValueAtTime(0.38, ctx.currentTime + 2.8);
 
     // ── Sub G1 (49 Hz) ──
-    const subOsc = _introCtx.createOscillator();
-    const subLP  = _introCtx.createBiquadFilter();
-    const subG   = _introCtx.createGain();
-    subLP.type = 'lowpass'; subLP.frequency.value = 70;
-    subOsc.type = 'sine'; subOsc.frequency.value = 49; // G1
-    subG.gain.value = 0.055;
-    subOsc.connect(subLP); subLP.connect(subG); subG.connect(_introMaster);
-    subOsc.start();
+    const subO = ctx.createOscillator();
+    const subL = ctx.createBiquadFilter();
+    const subG2 = ctx.createGain();
+    subO.type = 'sine'; subO.frequency.value = 49;
+    subL.type = 'lowpass'; subL.frequency.value = 80;
+    subG2.gain.value = 0.06;
+    subO.connect(subL); subL.connect(subG2); subG2.connect(_introMaster);
+    subO.start();
 
-    // Schedule the beat
-    _introNextBar = _introCtx.currentTime + 0.2;
+    _introNextBar = ctx.currentTime + 0.18;
     scheduleIntroBar(0);
-  } catch(e) { /* silent */ }
+  } catch(e) { /* silent fail on unsupported browsers */ }
 }
 
 function scheduleIntroBar(barIdx) {
   if (!_introCtx || !_introMaster) return;
-  const BPM  = 93;
-  const BEAT = 60 / BPM;   // 0.645s
-  const S16  = BEAT / 4;   // 16th note = 0.161s
-  const T    = _introNextBar;
+  const ctx  = _introCtx;
   const out  = _introMaster;
+  const revS = _introRevSend;
 
-  // ── 808 Kick (tight, West Coast) ──
-  const kick = (t, vol = 1.0, decay = 0.85) => {
-    const o = _introCtx.createOscillator(), g = _introCtx.createGain();
+  const BPM  = 95;
+  const BEAT = 60 / BPM;   // ≈ 0.632 s
+  const S16  = BEAT / 4;   // ≈ 0.158 s  (16th note)
+  const T    = _introNextBar;
+
+  // ── 808 Kick ──
+  const kick = (t, vol = 1.0, decay = 0.72) => {
+    const o = ctx.createOscillator(), g = ctx.createGain();
     o.type = 'sine';
-    o.frequency.setValueAtTime(82, t);
-    o.frequency.exponentialRampToValueAtTime(28, t + decay);
-    g.gain.setValueAtTime(vol * 0.88, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + decay + 0.06);
+    o.frequency.setValueAtTime(105, t);
+    o.frequency.exponentialRampToValueAtTime(28, t + decay * 0.88);
+    g.gain.setValueAtTime(vol * 0.96, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + decay);
     o.connect(g); g.connect(out);
-    o.start(t); o.stop(t + decay + 0.1);
-    // Click punch
-    const oc = _introCtx.createOscillator(), gc = _introCtx.createGain();
-    oc.type = 'triangle'; oc.frequency.value = 480;
-    gc.gain.setValueAtTime(vol * 0.22, t);
-    gc.gain.exponentialRampToValueAtTime(0.001, t + 0.013);
+    o.start(t); o.stop(t + decay + 0.12);
+    // Transient click
+    const oc = ctx.createOscillator(), gc = ctx.createGain();
+    oc.type = 'triangle'; oc.frequency.value = 560;
+    gc.gain.setValueAtTime(vol * 0.30, t);
+    gc.gain.exponentialRampToValueAtTime(0.001, t + 0.014);
     oc.connect(gc); gc.connect(out);
-    oc.start(t); oc.stop(t + 0.016);
+    oc.start(t); oc.stop(t + 0.018);
   };
 
-  // ── Snare (clean West Coast crack) ──
+  // ── Snare (noise layer + oscillator body) ──
   const snare = (t, vol = 1.0) => {
-    const sr  = _introCtx.sampleRate;
-    const dur = 0.28;
-    const len = Math.ceil(sr * dur);
-    const buf = _introCtx.createBuffer(1, len, sr);
+    const sr = ctx.sampleRate, dur = 0.26;
+    const buf = ctx.createBuffer(1, Math.ceil(sr * dur), sr);
     const d   = buf.getChannelData(0);
-    for (let i = 0; i < len; i++)
-      d[i] = (Math.random() * 2 - 1) * Math.exp(-i / len * 12);
-    const src = _introCtx.createBufferSource(); src.buffer = buf;
-    const hp  = _introCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2000;
-    const g   = _introCtx.createGain(); g.gain.value = vol * 0.52;
-    src.connect(hp); hp.connect(g); g.connect(out);
-    src.start(t); src.stop(t + dur + 0.01);
-    // Body thud
-    const ot = _introCtx.createOscillator(), gt = _introCtx.createGain();
-    ot.type = 'triangle';
-    ot.frequency.setValueAtTime(210, t);
-    ot.frequency.exponentialRampToValueAtTime(95, t + 0.065);
-    gt.gain.setValueAtTime(vol * 0.26, t);
-    gt.gain.exponentialRampToValueAtTime(0.001, t + 0.075);
-    ot.connect(gt); gt.connect(out);
-    ot.start(t); ot.stop(t + 0.085);
+    for (let i = 0; i < buf.length; i++)
+      d[i] = (Math.random() * 2 - 1) * Math.exp(-i / buf.length * 11);
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const hp  = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2200;
+    const gs  = ctx.createGain();         gs.gain.value = vol * 0.60;
+    src.connect(hp); hp.connect(gs); gs.connect(out);
+    gs.connect(revS);  // snare into reverb for space
+    src.start(t); src.stop(t + dur);
+    // Body tone
+    const ob = ctx.createOscillator(), gb = ctx.createGain();
+    ob.type = 'triangle';
+    ob.frequency.setValueAtTime(220, t);
+    ob.frequency.exponentialRampToValueAtTime(88, t + 0.058);
+    gb.gain.setValueAtTime(vol * 0.32, t);
+    gb.gain.exponentialRampToValueAtTime(0.001, t + 0.072);
+    ob.connect(gb); gb.connect(out);
+    ob.start(t); ob.stop(t + 0.085);
   };
 
-  // ── Hi-hat ──
-  const hat = (t, vol = 0.048, open = false) => {
-    const dur = open ? 0.13 : 0.020;
-    const len = Math.ceil(_introCtx.sampleRate * dur);
-    const buf = _introCtx.createBuffer(1, len, _introCtx.sampleRate);
-    const d   = buf.getChannelData(0);
-    for (let i = 0; i < len; i++)
-      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, open ? 0.6 : 1.8);
-    const src = _introCtx.createBufferSource(); src.buffer = buf;
-    const hp  = _introCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 10500;
-    const g   = _introCtx.createGain(); g.gain.value = vol;
-    src.connect(hp); hp.connect(g); g.connect(out);
-    src.start(t); src.stop(t + dur + 0.01);
-  };
-
-  // ── West Coast Piano (bright, clean – G minor tonality) ──
-  const piano = (t, freq, vol = 0.052, dur = 0.52) => {
-    const o1 = _introCtx.createOscillator(); o1.type = 'triangle'; o1.frequency.value = freq;
-    const o2 = _introCtx.createOscillator(); o2.type = 'sine';     o2.frequency.value = freq * 2;
-    const o3 = _introCtx.createOscillator(); o3.type = 'sine';     o3.frequency.value = freq * 3.01;
-    const pk = _introCtx.createBiquadFilter();
-    pk.type = 'peaking'; pk.frequency.value = 3200; pk.gain.value = 5; pk.Q.value = 0.9;
-    const g1 = _introCtx.createGain();
-    g1.gain.setValueAtTime(0, t);
-    g1.gain.linearRampToValueAtTime(vol, t + 0.005);
-    g1.gain.exponentialRampToValueAtTime(vol * 0.42, t + 0.065);
-    g1.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    const g2 = _introCtx.createGain();
-    g2.gain.setValueAtTime(0, t);
-    g2.gain.linearRampToValueAtTime(vol * 0.28, t + 0.003);
-    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
-    const g3 = _introCtx.createGain();
-    g3.gain.setValueAtTime(0, t);
-    g3.gain.linearRampToValueAtTime(vol * 0.13, t + 0.002);
-    g3.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
-    o1.connect(pk); pk.connect(g1); g1.connect(out);
-    o2.connect(g2); g2.connect(out);
-    o3.connect(g3); g3.connect(out);
-    o1.start(t); o1.stop(t + dur + 0.05);
-    o2.start(t); o2.stop(t + 0.14);
-    o3.start(t); o3.stop(t + 0.055);
-  };
-
-  // ── Sub bass line (G minor: G2 / Bb2 / F2) ──
-  const bass = (t, freq, vol = 0.075, dur = 0.42) => {
-    const o  = _introCtx.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
-    const lp = _introCtx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 170;
-    const g  = _introCtx.createGain();
+  // ── 808 Bass with optional frequency slide ──
+  const bass808 = (t, fromHz, toHz, vol = 0.14, dur = 0.55, slideMs = 0.10) => {
+    const o  = ctx.createOscillator();
+    const lp = ctx.createBiquadFilter();
+    const g  = ctx.createGain();
+    o.type = 'sine'; lp.type = 'lowpass'; lp.frequency.value = 200;
+    o.frequency.setValueAtTime(fromHz, t);
+    if (toHz !== fromHz)
+      o.frequency.exponentialRampToValueAtTime(toHz, t + slideMs);
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(vol, t + 0.012);
+    g.gain.linearRampToValueAtTime(vol, t + 0.016);
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
     o.connect(lp); lp.connect(g); g.connect(out);
-    o.start(t); o.stop(t + dur + 0.05);
+    o.start(t); o.stop(t + dur + 0.06);
   };
 
-  // ══════════════════════════════════════════════
-  // MELODY – G minor piano hook (Still D.R.E. feel)
-  // G4=392 Bb4=466 C5=523 D5=587 F5=699
-  // ══════════════════════════════════════════════
+  // ── Closed / Open Hi-hat ──
+  const hat = (t, vol = 0.065, open = false) => {
+    const dur = open ? 0.14 : 0.020;
+    const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * dur), ctx.sampleRate);
+    const d   = buf.getChannelData(0);
+    for (let i = 0; i < buf.length; i++)
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / buf.length, open ? 0.5 : 2.2);
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const hp  = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 10500;
+    const g   = ctx.createGain(); g.gain.value = vol;
+    src.connect(hp); hp.connect(g); g.connect(out);
+    src.start(t); src.stop(t + dur + 0.01);
+  };
+
+  // ── Filtered sawtooth lead melody ──
+  const lead = (t, freq, vol = 0.062, dur = 0.42, cutoff = 2000) => {
+    const o  = ctx.createOscillator();
+    const lp = ctx.createBiquadFilter();
+    const g  = ctx.createGain();
+    o.type  = 'sawtooth'; o.frequency.value = freq;
+    lp.type = 'lowpass'; lp.Q.value = 3.5;
+    lp.frequency.setValueAtTime(cutoff, t);
+    lp.frequency.exponentialRampToValueAtTime(cutoff * 0.28, t + dur * 0.55);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(lp); lp.connect(g);
+    g.connect(out);
+    g.connect(revS);   // lead has some reverb tail
+    o.start(t); o.stop(t + dur + 0.06);
+  };
+
+  // ── Melody phrases — G minor (G4=392 Bb4=466 C5=523 D5=587 Eb5=622 F5=699) ──
+  // phraseA: ascending tension phrase
   const phraseA = [
-    [0,  392.0, 0.062, 0.52],  // G4
-    [2,  466.2, 0.057, 0.42],  // Bb4
-    [4,  523.3, 0.057, 0.42],  // C5
-    [6,  587.3, 0.060, 0.52],  // D5
-    [8,  698.5, 0.063, 0.58],  // F5  ← peak
-    [11, 587.3, 0.050, 0.36],  // D5 syncopated
-    [13, 523.3, 0.046, 0.32],  // C5
-    [15, 466.2, 0.043, 0.30],  // Bb4
+    [0,  392.0, 0.068, 0.44, 2400],  // G4
+    [3,  466.2, 0.062, 0.38, 2100],  // Bb4
+    [5,  523.3, 0.060, 0.36, 1900],  // C5
+    [7,  587.3, 0.064, 0.42, 2200],  // D5
+    [9,  699.5, 0.072, 0.54, 2600],  // F5  ← peak note
+    [12, 622.3, 0.052, 0.30, 1700],  // Eb5 chromatic colour
+    [14, 523.3, 0.046, 0.26, 1500],  // C5  descend
+    [15, 466.2, 0.040, 0.22, 1400],  // Bb4 land
   ];
+  // phraseB: falling resolution phrase
   const phraseB = [
-    [0,  392.0, 0.060, 0.50],  // G4
-    [2,  466.2, 0.055, 0.40],  // Bb4
-    [4,  523.3, 0.057, 0.42],  // C5
-    [7,  587.3, 0.060, 0.46],  // D5 – syncopated
-    [8,  523.3, 0.054, 0.40],  // C5
-    [10, 466.2, 0.050, 0.36],  // Bb4
-    [12, 392.0, 0.047, 0.40],  // G4
-    [14, 349.2, 0.042, 0.32],  // F4 – resolution
+    [0,  392.0, 0.064, 0.42, 2200],  // G4
+    [2,  349.2, 0.058, 0.34, 1800],  // F4
+    [4,  392.0, 0.062, 0.38, 2000],  // G4
+    [6,  466.2, 0.066, 0.44, 2100],  // Bb4
+    [8,  523.3, 0.064, 0.52, 2000],  // C5 sustained
+    [11, 466.2, 0.052, 0.32, 1700],  // Bb4
+    [13, 392.0, 0.046, 0.28, 1500],  // G4 resolution
+    [15, 349.2, 0.040, 0.24, 1300],  // F4 close
   ];
 
   const phrase = (barIdx % 2 === 0) ? phraseA : phraseB;
-  phrase.forEach(([s, freq, vol, dur]) => piano(T + s * S16, freq, vol, dur));
 
-  // ══════════════════════════════════════════════
-  // DRUMS
-  // ══════════════════════════════════════════════
+  // ── Arrange by bar ──
   if (barIdx === 0) {
-    // Bar 1: Kicks only – tension builds
-    kick(T,            1.0, 0.80);
-    kick(T + 2*BEAT,   0.72, 0.70);
-    [0.5,1.5,2.5,3.5].forEach(b => hat(T + b*BEAT, 0.036));
+    // ── Intro bar: silence + bell ident ──
+    synthIntroVoice();
+    // Low sub pulse only, no drums yet
+    bass808(T,          98.0, 98.0, 0.10, 1.8, 0);   // long G2 drone
+    bass808(T + 2*BEAT, 87.3, 87.3, 0.08, 1.4, 0);   // F2 drift
+
   } else if (barIdx === 1) {
-    // Bar 2: Snare enters
-    kick(T,            1.0, 0.80);
+    // ── Drop bar: bare kick, no snare yet ──
+    kick(T,          1.0,  0.72);
+    kick(T + 2*BEAT, 0.80, 0.70);
+    hat(T + 0.5*BEAT, 0.045); hat(T + 1.5*BEAT, 0.038);
+    hat(T + 2.5*BEAT, 0.045); hat(T + 3.5*BEAT, 0.038);
+    bass808(T, 98.0, 73.4, 0.14, 1.5, 0.14);   // G2 slides down
+
+  } else if (barIdx === 2) {
+    // ── Full beat enters ──
+    kick(T,          1.0,  0.72);
     snare(T + BEAT);
-    kick(T + 2*BEAT,   0.78, 0.72);
+    kick(T + 2*BEAT, 0.86, 0.68);
     snare(T + 3*BEAT);
-    [0.5,1.5,2.5,3.5].forEach(b => hat(T + b*BEAT, 0.042));
+    for (let e = 0; e < 8; e++) hat(T + e * 0.5 * BEAT, e % 2 === 0 ? 0.068 : 0.048);
+    bass808(T,          98.0, 73.4,  0.14, 0.52, 0.11);  // G2 → F#2 slide
+    bass808(T + 2*BEAT, 116.5, 116.5, 0.13, 0.52, 0);    // Bb2 steady
+    // Melody starts bar 2
+    phrase.forEach(([s, fr, v, d, c]) => lead(T + s * S16, fr, v, d, c));
+
+  } else if (barIdx % 4 === 3) {
+    // ── Fill bar (every 4th) ──
+    kick(T,                1.0,  0.72);
+    snare(T + BEAT);
+    kick(T + 1.5 * BEAT,   0.38, 0.52);
+    kick(T + 2 * BEAT,     0.84, 0.68);
+    snare(T + 3 * BEAT);
+    kick(T + 3.75 * BEAT,  0.26, 0.44);
+    // Triplet hi-hat roll in bar 4
+    for (let e = 0; e < 8; e++) hat(T + e * 0.5 * BEAT, 0.058 - e * 0.003);
+    hat(T + 3 * BEAT + S16 * 0.67, 0.04);
+    hat(T + 3 * BEAT + S16 * 1.33, 0.04);
+    hat(T + 3 * BEAT + S16 * 2.0,  0.04, true); // open on end
+    bass808(T,          87.3, 98.0, 0.13, 0.46, 0.09);   // F2 → G2 slide
+    bass808(T + 2*BEAT, 110.0, 82.4, 0.14, 0.50, 0.13);  // A2 → E2 down-slide
+    phrase.forEach(([s, fr, v, d, c]) => lead(T + s * S16, fr, v, d, c));
+
   } else if (barIdx % 2 === 0) {
-    // Full groove – Variation A
-    kick(T,                    1.0, 0.80);
-    kick(T + S16*3,            0.28, 0.48);
+    // ── Groove A ──
+    kick(T,               1.0,  0.72);
+    kick(T + S16 * 3,     0.28, 0.46);
     snare(T + BEAT);
-    kick(T + BEAT*2,           0.82, 0.74);
-    kick(T + BEAT*2 + S16*2,   0.22, 0.42);
-    snare(T + BEAT*3);
-    for (let e = 0; e < 8; e++) hat(T + e*BEAT*0.5, e%2===0 ? 0.050 : 0.036, e===7);
-    bass(T,           98.0,  0.08, 0.50);   // G2
-    bass(T + 2*BEAT,  116.5, 0.07, 0.46);  // Bb2
+    kick(T + 2 * BEAT,    0.86, 0.68);
+    kick(T + 2*BEAT + S16*2, 0.20, 0.40);
+    snare(T + 3 * BEAT);
+    for (let e = 0; e < 8; e++) hat(T + e * 0.5 * BEAT, e % 2 === 0 ? 0.065 : 0.046, e === 7);
+    bass808(T,          98.0, 73.4,  0.14, 0.50, 0.11);
+    bass808(T + 2*BEAT, 116.5, 116.5, 0.13, 0.50, 0);
+    phrase.forEach(([s, fr, v, d, c]) => lead(T + s * S16, fr, v, d, c));
+
   } else {
-    // Full groove – Variation B
-    kick(T,              1.0, 0.80);
+    // ── Groove B ──
+    kick(T,               1.0,  0.72);
     snare(T + BEAT);
-    kick(T + BEAT*1.75,  0.38, 0.52);
-    kick(T + BEAT*2,     0.78, 0.72);
-    snare(T + BEAT*3);
-    kick(T + BEAT*3.75,  0.25, 0.46);
-    for (let e = 0; e < 8; e++) hat(T + e*BEAT*0.5, e%2===0 ? 0.046 : 0.033, e===5);
-    bass(T,           87.3,  0.074, 0.44);  // F2
-    bass(T + 2*BEAT,  98.0,  0.078, 0.48); // G2
+    kick(T + 1.75*BEAT,   0.36, 0.52);
+    kick(T + 2*BEAT,      0.84, 0.68);
+    snare(T + 3*BEAT);
+    for (let e = 0; e < 8; e++) hat(T + e * 0.5 * BEAT, 0.058 - e * 0.001);
+    hat(T + 1.5*BEAT, 0.055, true);   // open hat ghost accent
+    hat(T + 3.5*BEAT, 0.050, true);
+    bass808(T,          87.3, 98.0, 0.13, 0.46, 0.08);   // F2 → G2
+    bass808(T + 2*BEAT, 98.0, 82.4, 0.14, 0.50, 0.13);   // G2 → E2 slide
+    phrase.forEach(([s, fr, v, d, c]) => lead(T + s * S16, fr, v, d, c));
   }
 
   _introNextBar += 4 * BEAT;
-  const msUntilNext = (_introNextBar - _introCtx.currentTime - 0.15) * 1000;
+  const msUntilNext = (_introNextBar - ctx.currentTime - 0.15) * 1000;
   _introLoopId = setTimeout(() => scheduleIntroBar(barIdx + 1), Math.max(0, msUntilNext));
 }
 
 function stopIntroBeat(onDone) {
   clearTimeout(_introLoopId);
   if (_introCtx && _introMaster) {
-    _introMaster.gain.linearRampToValueAtTime(0, _introCtx.currentTime + 0.35);
+    _introMaster.gain.linearRampToValueAtTime(0, _introCtx.currentTime + 0.40);
     setTimeout(() => {
       try { _introCtx.close(); } catch(e) {}
-      _introCtx = null; _introMaster = null;
+      _introCtx = null; _introMaster = null; _introRev = null; _introRevSend = null;
+      _introBeatStarted = false; _voiceSynthed = false;
       if (onDone) onDone();
-    }, 420);
+    }, 480);
   } else {
     if (onDone) onDone();
   }
