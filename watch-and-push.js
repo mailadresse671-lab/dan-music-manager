@@ -24,6 +24,7 @@ function push() {
     updateTimestamp();
     execSync('git add .', { cwd: DIR, stdio: 'inherit' });
     execSync(`git commit -m "auto: ${new Date().toLocaleString('de-DE')}"`, { cwd: DIR, stdio: 'inherit' });
+    execSync('git pull origin main --rebase', { cwd: DIR, stdio: 'inherit' });
     execSync('git push origin main', { cwd: DIR, stdio: 'inherit' });
     console.log('✅ Online! https://mailadresse671-lab.github.io/dan-music-manager/\n');
   } catch (e) {
