@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DaN Music Manager</title>
+<title>D_a_N Studio</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -2492,6 +2492,52 @@
 
   /* ── STATION HEADERS (Phase 3) ── */
   .station-num { box-shadow: 0 0 16px rgba(0,212,255,0.3); }
+
+  /* ── ONBOARDING WIZARD ── */
+  #onboardingOverlay {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0,0,0,0.85);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+    backdrop-filter: blur(6px);
+  }
+  #onboardingOverlay.open { opacity: 1; pointer-events: all; }
+  .ob-modal {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; width: 100%; max-width: 460px;
+    overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  }
+  .ob-header {
+    background: linear-gradient(135deg, var(--purple) 0%, var(--blue) 100%);
+    padding: 24px 28px 20px;
+    position: relative;
+  }
+  .ob-app-name {
+    font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .ob-app-sub { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+  .ob-dots { display: flex; gap: 8px; margin-top: 16px; }
+  .ob-dot {
+    height: 6px; width: 6px; border-radius: 3px;
+    background: rgba(255,255,255,0.3);
+    transition: all 0.3s;
+  }
+  .ob-dot.active { width: 22px; background: white; }
+  .ob-step-counter {
+    position: absolute; top: 14px; right: 18px;
+    font-size: 11px; color: rgba(255,255,255,0.5);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .ob-body { padding: 28px; }
+  .ob-step { display: none; }
+  .ob-step.active { display: block; }
+  .ob-step-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+  .ob-step-sub { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; }
+  .ob-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+  .ob-skip { font-size: 12px; color: var(--text-muted); cursor: pointer; }
+  .ob-skip:hover { color: var(--text); }
 </style>
 <!-- Tone.js vor dem App-Script laden – Beat Lab benötigt Tone global -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
@@ -2503,8 +2549,8 @@
 <div id="intro-launch">
   <div class="launch-static"></div>
   <div class="launch-flash"></div>
-  <div class="launch-name">DaN</div>
-  <div class="launch-sub">90 Rap &nbsp;·&nbsp; Berlin</div>
+  <div class="launch-name" id="launch-artist-name">D_a_N</div>
+  <div class="launch-sub" id="launch-artist-sub">Music Studio</div>
   <div class="launch-line"></div>
   <div class="launch-press">▶ &nbsp; Drücke irgendwo</div>
 </div>
@@ -2542,8 +2588,8 @@
       <span class="intro-letter" id="il_N" style="animation-delay:1.8s;--gd:2.5s">N</span>
     </div>
 
-    <div class="intro-handle">@DaN_90_rap</div>
-    <div class="intro-tagline">Rap Artist · Berlin</div>
+    <div class="intro-handle" id="intro-artist-handle">@artist</div>
+    <div class="intro-tagline" id="intro-artist-tagline">Music Studio</div>
     <div class="intro-divider"></div>
     <div class="intro-quote">
       "Jeder Verse ein Statement.<br>
@@ -2563,9 +2609,9 @@
 <div class="topbar">
   <div class="topbar-left">
     <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
-    <div class="topbar-logo">DaN</div>
-    <span class="topbar-title">DaN Music Manager</span>
-    <span class="topbar-brand">@DaN_90_rap</span>
+    <div class="topbar-logo">D_a_N</div>
+    <span class="topbar-title">D_a_N Studio</span>
+    <span class="topbar-brand" id="topbar-artist-handle"></span>
     <span id="lastUpdated" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#00ff88;background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.18);padding:3px 10px;border-radius:4px;letter-spacing:0.5px;">▸ Stand: 12.03.2026 – 19:30</span>
     <!-- Neural Core status indicator -->
     <span style="display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(0,212,255,0.5);letter-spacing:1.5px;text-transform:uppercase;">
@@ -2875,8 +2921,8 @@
           <div class="form-group" style="flex:1;">
             <label>Song-Format</label>
             <div class="song-format-toggle" id="songFormatToggle">
-              <button class="sfmt-btn active" data-fmt="solo" onclick="setSongFormat('solo')">🎤 Solo — Nur DaN</button>
-              <button class="sfmt-btn" data-fmt="duett" onclick="setSongFormat('duett')">🎤🎙️ Duett — DaN + Frau</button>
+              <button class="sfmt-btn active" data-fmt="solo" id="sfmt-solo-btn" onclick="setSongFormat('solo')">🎤 Solo — Nur ich</button>
+              <button class="sfmt-btn" data-fmt="duett" id="sfmt-duett-btn" onclick="setSongFormat('duett')">🎤🎙️ Duett — Ich + Feature</button>
             </div>
             <input type="hidden" id="p1_song_format" value="solo">
           </div>
@@ -2888,7 +2934,7 @@
               <label>Frauenstimme — Charakter</label>
               <select id="p1_female_voice" onchange="autoSave()">
                 <option value="">-- Wählen... --</option>
-                <option value="Sanft-emotional">Sanft &amp; emotional (Kontrast zu DaN)</option>
+                <option value="Sanft-emotional">Sanft &amp; emotional (Kontrast zum Hauptpart)</option>
                 <option value="Stark-selbstbewusst">Stark &amp; selbstbewusst (auf Augenhöhe)</option>
                 <option value="Verletzlich-leise">Verletzlich &amp; leise (intim)</option>
                 <option value="Leidenschaftlich">Leidenschaftlich &amp; intensiv</option>
@@ -2899,11 +2945,11 @@
               <label>Aufteilung</label>
               <select id="p1_duett_split" onchange="autoSave()">
                 <option value="">-- Wählen... --</option>
-                <option value="Verse DaN / Hook Frau">Verse DaN · Hook Frau</option>
-                <option value="Verse DaN / Hook gemeinsam">Verse DaN · Hook gemeinsam</option>
-                <option value="Abwechselnd Verse">Abwechselnd Verse (DaN / Frau)</option>
-                <option value="DaN Rap / Frau singt Hook">DaN rappt · Frau singt Hook</option>
-                <option value="Intro Frau / Rest DaN">Intro Frau · Rest DaN</option>
+                <option value="Verse ich / Hook Feature">Verse ich · Hook Feature</option>
+                <option value="Verse ich / Hook gemeinsam">Verse ich · Hook gemeinsam</option>
+                <option value="Abwechselnd Verse">Abwechselnd Verse (ich / Feature)</option>
+                <option value="Ich rap / Feature singt Hook">Ich rapp · Feature singt Hook</option>
+                <option value="Intro Feature / Rest ich">Intro Feature · Rest ich</option>
               </select>
             </div>
           </div>
@@ -3267,7 +3313,7 @@
       <!-- SUNO PERSONA PICKER -->
       <div class="card" id="sunoPersonaCard" style="margin-bottom:12px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div class="card-title" style="margin-bottom:0;">🎙 DaN Stimm-Persona wählen</div>
+          <div class="card-title" style="margin-bottom:0;">🎙 Stimm-Persona wählen</div>
           <span id="spSelectedBadge" style="display:none;" class="voice-persona-badge"></span>
         </div>
         <div class="sp-grid" id="spGrid"><!-- filled by JS --></div>
@@ -3369,9 +3415,9 @@
           <span style="font-size:18px;">🎵</span>
           <div style="flex:1;">
             <div style="font-size:13px;font-weight:600;color:var(--text);">Dein Suno Profil</div>
-            <div style="font-size:12px;color:var(--text-muted);">suno.com/@DaN_90_rap</div>
+            <div id="suno-profile-url" style="font-size:12px;color:var(--text-muted);">suno.com</div>
           </div>
-          <button class="btn-secondary" onclick="window.open('https://suno.com/@DaN_90_rap','_blank')" style="font-size:12px;padding:6px 12px;">🔗 Öffnen</button>
+          <button class="btn-secondary" id="suno-open-btn" onclick="openSunoProfile()" style="font-size:12px;padding:6px 12px;">🔗 Öffnen</button>
           <button class="btn-secondary" onclick="window.open('https://suno.com/create','_blank')" style="font-size:12px;padding:6px 12px;border-color:rgba(16,185,129,0.4);color:#10b981;">+ Neuer Beat</button>
         </div>
 
@@ -3942,11 +3988,11 @@
         <div class="yt-channel-bar" id="ytChannelBar">
           <div class="yt-avatar">▶️</div>
           <div style="flex:1;">
-            <div class="yt-channel-name">DaN_90_rap</div>
+            <div class="yt-channel-name" id="yt-channel-name-display">Mein Kanal</div>
             <div class="yt-channel-sub" id="ytChannelSub">Kanal-Info laden → YouTube API Key eingeben</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;">
-            <button class="btn-yt" onclick="window.open('https://www.youtube.com/@DaN_90_rap','_blank')">▶ Kanal öffnen</button>
+            <button class="btn-yt" id="yt-open-channel-btn" onclick="openYouTubeChannel()">▶ Kanal öffnen</button>
             <button class="btn-yt" onclick="window.open('https://studio.youtube.com','_blank')" style="background:rgba(255,165,0,0.15);border-color:rgba(255,165,0,0.3);color:#ffa500;">🎬 YouTube Studio</button>
           </div>
         </div>
@@ -4674,14 +4720,14 @@
     <div class="modal-desc">Verbinde deine Supabase-Datenbank, damit deine Songs auf allen Geräten verfügbar sind.</div>
 
     <div class="step-label">Schritt 1 – Tabelle in Supabase erstellen (SQL Editor)</div>
-    <div class="code-block" id="setupSql">CREATE TABLE IF NOT EXISTS dan_songs (
+    <div class="code-block" id="setupSql">CREATE TABLE IF NOT EXISTS studio_songs (
   song_id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   data JSONB NOT NULL DEFAULT '{}',
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-ALTER TABLE dan_songs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "anon full access" ON dan_songs
+ALTER TABLE studio_songs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "anon full access" ON studio_songs
   FOR ALL TO anon USING (true) WITH CHECK (true);</div>
     <button class="btn-copy" style="margin-bottom:14px;" onclick="copyResult('setupSql')">📋 SQL kopieren</button>
 
@@ -4771,7 +4817,264 @@ CREATE POLICY "anon full access" ON dan_songs
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- ===== ONBOARDING WIZARD ===== -->
+<div id="onboardingOverlay">
+  <div class="ob-modal">
+    <div class="ob-header">
+      <div class="ob-app-name">D_a_N Studio</div>
+      <div class="ob-app-sub">Richte dein Künstler-Profil ein — dauert 30 Sekunden</div>
+      <div class="ob-dots">
+        <div class="ob-dot active" id="ob-dot-1"></div>
+        <div class="ob-dot" id="ob-dot-2"></div>
+        <div class="ob-dot" id="ob-dot-3"></div>
+      </div>
+      <div class="ob-step-counter">Schritt <span id="ob-current-step">1</span> von 3</div>
+    </div>
+    <div class="ob-body">
+
+      <!-- Step 1: Name + Handle -->
+      <div class="ob-step active" id="ob-step-1">
+        <div class="ob-step-title">🎤 Wie heißt du als Artist?</div>
+        <div class="ob-step-sub">Dein Name wird überall in der App und in KI-Prompts verwendet.</div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label>Artist-Name <span style="color:var(--danger)">*</span></label>
+          <input id="ob_name" type="text" class="bio-edit-input" placeholder="z.B. DaN, MC Mustermann, Lena"
+                 onkeydown="if(event.key==='Enter')obNext(1)">
+        </div>
+        <div class="form-group">
+          <label>Social Handle</label>
+          <input id="ob_handle" type="text" class="bio-edit-input" placeholder="z.B. @DaN_90_rap"
+                 onkeydown="if(event.key==='Enter')obNext(1)">
+        </div>
+        <div class="ob-footer">
+          <span class="ob-skip" onclick="obSkip()">Überspringen</span>
+          <button class="btn-primary" onclick="obNext(1)" style="min-width:110px;">Weiter →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Genre + Stadt -->
+      <div class="ob-step" id="ob-step-2">
+        <div class="ob-step-title">🎵 Dein Stil</div>
+        <div class="ob-step-sub">Hilft der KI bessere und passendere Song-Konzepte zu erstellen.</div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label>Genre / Musikstil</label>
+          <input id="ob_genre" type="text" class="bio-edit-input" placeholder="z.B. Deutscher Rap, Pop, R&B, Trap, Singer-Songwriter">
+        </div>
+        <div class="form-group">
+          <label>Stadt / Herkunft</label>
+          <input id="ob_city" type="text" class="bio-edit-input" placeholder="z.B. Berlin, Wien, Hamburg">
+        </div>
+        <div class="ob-footer">
+          <button class="btn-secondary" onclick="obBack(2)">← Zurück</button>
+          <button class="btn-primary" onclick="obNext(2)" style="min-width:110px;">Weiter →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Optionale Links -->
+      <div class="ob-step" id="ob-step-3">
+        <div class="ob-step-title">🔗 Deine Links <span style="font-size:12px;font-weight:400;color:var(--text-muted);">(optional)</span></div>
+        <div class="ob-step-sub">Ermöglicht direkte Links zu deinen Profilen in der App.</div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label>Suno Handle</label>
+          <input id="ob_suno" type="text" class="bio-edit-input" placeholder="z.B. @DaN_90_rap">
+        </div>
+        <div class="form-group">
+          <label>YouTube Handle</label>
+          <input id="ob_youtube" type="text" class="bio-edit-input" placeholder="z.B. @DaN_90_rap">
+        </div>
+        <div class="ob-footer">
+          <button class="btn-secondary" onclick="obBack(3)">← Zurück</button>
+          <button class="btn-primary" onclick="obFinish()" style="min-width:150px;">🚀 Los geht's</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
+// =============================
+// USER PROFILE SYSTEM
+// =============================
+const PROFILE_KEY = 'studio_profile';
+
+function getProfile() {
+  try {
+    const p = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+    return {
+      name:          p.name          || 'Artist',
+      handle:        p.handle        || '',
+      genre:         p.genre         || '',
+      city:          p.city          || '',
+      sunoHandle:    p.sunoHandle    || '',
+      youtubeHandle: p.youtubeHandle || ''
+    };
+  } catch { return { name: 'Artist', handle: '', genre: '', city: '', sunoHandle: '', youtubeHandle: '' }; }
+}
+
+function saveProfile(data) {
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
+}
+
+function hasProfile() {
+  try {
+    const p = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+    return !!(p.name && p.name.trim() && p.name !== 'Artist');
+  } catch { return false; }
+}
+
+// One-time migration: dan_* → studio_*
+function migrateStorageKeys() {
+  const map = {
+    'studio_music_songs':   'studio_music_songs',
+    'studio_api_key':       'studio_api_key',
+    'studio_groq_model':    'studio_groq_model',
+    'studio_yt_key':        'studio_yt_key',
+    'studio_sb_url':        'studio_sb_url',
+    'studio_sb_key':        'studio_sb_key',
+    'studio_yt_releases':   'studio_yt_releases',
+    'studio_albums':        'studio_albums',
+    'studio_bio_profile':   'studio_bio_profile',
+    'studio_voice_persona': 'studio_voice_persona',
+    'studio_tavily_key':    'studio_tavily_key',
+  };
+  Object.entries(map).forEach(([old, neu]) => {
+    const v = localStorage.getItem(old);
+    if (v !== null && localStorage.getItem(neu) === null) localStorage.setItem(neu, v);
+  });
+  // Migrate dynamic custom-option keys (dan_co_* → studio_co_*)
+  Object.keys(localStorage).filter(k => k.startsWith('studio_co_')).forEach(k => {
+    const neu = 'studio_co_' + k.slice(7);
+    if (localStorage.getItem(neu) === null) localStorage.setItem(neu, localStorage.getItem(k));
+  });
+  // SessionStorage API key
+  const sk = sessionStorage.getItem('studio_api_key');
+  if (sk && !sessionStorage.getItem('studio_api_key')) sessionStorage.setItem('studio_api_key', sk);
+  // Build initial profile from existing bio if none exists
+  if (!localStorage.getItem(PROFILE_KEY)) {
+    try {
+      const bio = JSON.parse(localStorage.getItem('studio_bio_profile') || '{}');
+      if (bio.name) {
+        saveProfile({ name: bio.name, handle: '', genre: bio.stil || '', city: bio.herkunft || '', sunoHandle: '', youtubeHandle: '' });
+      }
+    } catch {}
+  }
+}
+
+// Apply profile data to all dynamic UI elements
+function applyProfileToUI() {
+  const p = getProfile();
+  const tagline = [p.genre, p.city].filter(Boolean).join(' · ') || 'Music Studio';
+
+  // Header / intro elements
+  _setTxt('launch-artist-name',    p.name);
+  _setTxt('launch-artist-sub',     tagline);
+  _setTxt('intro-artist-handle',   p.handle || '');
+  _setTxt('intro-artist-tagline',  tagline);
+  _setTxt('topbar-artist-handle',  p.handle);
+
+  // Song format buttons
+  _setTxt('sfmt-solo-btn',  '🎤 Solo — Nur ' + p.name);
+  _setTxt('sfmt-duett-btn', '🎤🎙️ Duett — ' + p.name + ' + Feature');
+
+  // YouTube section
+  _setTxt('yt-channel-name-display', p.handle || p.name);
+  const ytBtn = document.getElementById('yt-open-channel-btn');
+  if (ytBtn) ytBtn.title = p.youtubeHandle ? 'youtube.com/' + p.youtubeHandle : 'Kein YouTube Handle eingetragen';
+
+  // Suno section
+  const sunoUrl = document.getElementById('suno-profile-url');
+  if (sunoUrl) sunoUrl.textContent = p.sunoHandle ? 'suno.com/' + p.sunoHandle : 'Kein Suno Handle eingetragen';
+
+  document.title = 'D_a_N Studio — ' + p.name;
+}
+
+function _setTxt(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+// Open Suno profile in new tab
+function openSunoProfile() {
+  const p = getProfile();
+  const handle = p.sunoHandle ? p.sunoHandle.replace(/^@/, '') : null;
+  const url = handle ? 'https://suno.com/@' + handle : 'https://suno.com';
+  window.open(url, '_blank');
+}
+
+// Open YouTube channel in new tab
+function openYouTubeChannel() {
+  const p = getProfile();
+  const handle = p.youtubeHandle ? p.youtubeHandle.replace(/^@/, '') : null;
+  const url = handle ? 'https://www.youtube.com/@' + handle : 'https://www.youtube.com';
+  window.open(url, '_blank');
+}
+
+// ── Onboarding wizard ──
+function showOnboarding() {
+  document.getElementById('onboardingOverlay').classList.add('open');
+  _obGoto(1);
+}
+function closeOnboarding() {
+  document.getElementById('onboardingOverlay').classList.remove('open');
+}
+function _obGoto(step) {
+  [1,2,3].forEach(s => {
+    document.getElementById('ob-step-' + s)?.classList.toggle('active', s === step);
+    document.getElementById('ob-dot-' + s)?.classList.toggle('active', s === step);
+  });
+  document.getElementById('ob-current-step').textContent = step;
+}
+function obNext(cur) {
+  if (cur === 1) {
+    const n = document.getElementById('ob_name').value.trim();
+    if (!n) {
+      const el = document.getElementById('ob_name');
+      el.style.borderColor = 'var(--danger)';
+      el.focus();
+      setTimeout(() => { el.style.borderColor = ''; }, 1800);
+      return;
+    }
+  }
+  if (cur < 3) _obGoto(cur + 1);
+}
+function obBack(cur) { if (cur > 1) _obGoto(cur - 1); }
+function obSkip() {
+  // Allow skipping only if a profile already exists
+  if (hasProfile()) { closeOnboarding(); return; }
+  // Save minimal placeholder so we don't re-show
+  saveProfile({ name: 'Artist', handle: '', genre: '', city: '', sunoHandle: '', youtubeHandle: '' });
+  closeOnboarding();
+  applyProfileToUI();
+}
+function obFinish() {
+  const name = document.getElementById('ob_name').value.trim();
+  if (!name) { _obGoto(1); return; }
+  const handle       = document.getElementById('ob_handle').value.trim();
+  const genre        = document.getElementById('ob_genre').value.trim();
+  const city         = document.getElementById('ob_city').value.trim();
+  const sunoHandle   = document.getElementById('ob_suno').value.trim();
+  const youtubeHandle = document.getElementById('ob_youtube').value.trim();
+  saveProfile({ name, handle, genre, city, sunoHandle, youtubeHandle });
+  // Also pre-fill bio
+  const existing = JSON.parse(localStorage.getItem('studio_bio_profile') || '{}');
+  if (!existing.name) localStorage.setItem('studio_bio_profile', JSON.stringify({ name, herkunft: city, text: '', ziele: '', stil: genre }));
+  closeOnboarding();
+  applyProfileToUI();
+  showToast('Willkommen, ' + name + '! 🎤 Profil eingerichtet.', 'success');
+}
+// Open wizard for profile editing (called from settings)
+function openProfileSettings() {
+  const p = getProfile();
+  document.getElementById('ob_name').value    = p.name !== 'Artist' ? p.name : '';
+  document.getElementById('ob_handle').value  = p.handle;
+  document.getElementById('ob_genre').value   = p.genre;
+  document.getElementById('ob_city').value    = p.city;
+  document.getElementById('ob_suno').value    = p.sunoHandle;
+  document.getElementById('ob_youtube').value = p.youtubeHandle;
+  showOnboarding();
+}
+
 // =============================
 // STATE
 // =============================
@@ -4834,6 +5137,10 @@ const OPTION_PRESETS = {
 // INIT
 // =============================
 document.addEventListener('DOMContentLoaded', () => {
+  migrateStorageKeys();   // one-time: dan_* → studio_*
+  applyProfileToUI();     // fill in profile-dependent UI elements
+  if (!hasProfile()) showOnboarding();
+
   loadFromStorage();
   updateApiStatus();
   loadCloudConfig();
@@ -4842,7 +5149,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSongList();
   initAllSelects();
 
-  const apiKey = sessionStorage.getItem('dan_api_key') || localStorage.getItem('dan_api_key');
+  const apiKey = sessionStorage.getItem('studio_api_key') || localStorage.getItem('studio_api_key');
   if (apiKey && apiKey.startsWith('gsk_')) {
     document.getElementById('apiModal').classList.add('hidden');
   }
@@ -4884,11 +5191,11 @@ document.addEventListener('DOMContentLoaded', () => {
 // CUSTOM SELECT SYSTEM
 // =============================
 function getCustomOpts(key) {
-  try { return JSON.parse(localStorage.getItem('dan_co_' + key) || '[]'); } catch { return []; }
+  try { return JSON.parse(localStorage.getItem('studio_co_' + key) || '[]'); } catch { return []; }
 }
 function saveCustomOpt(key, val) {
   const ex = getCustomOpts(key);
-  if (!ex.includes(val)) { ex.push(val); localStorage.setItem('dan_co_' + key, JSON.stringify(ex)); }
+  if (!ex.includes(val)) { ex.push(val); localStorage.setItem('studio_co_' + key, JSON.stringify(ex)); }
 }
 function buildSelect(selId, key, currentVal) {
   const el = document.getElementById(selId);
@@ -5049,14 +5356,14 @@ function initAllSelects() {
 // API
 // =============================
 function getGroqModel() {
-  return localStorage.getItem('dan_groq_model') || 'llama-3.3-70b-versatile';
+  return localStorage.getItem('studio_groq_model') || 'llama-3.3-70b-versatile';
 }
 
 function openApiModal() {
   document.getElementById('apiModal').classList.remove('hidden');
-  const existing = sessionStorage.getItem('dan_api_key') || localStorage.getItem('dan_api_key');
+  const existing = sessionStorage.getItem('studio_api_key') || localStorage.getItem('studio_api_key');
   if (existing) document.getElementById('apiKeyInput').value = existing;
-  document.getElementById('apiKeyPersist').checked = !!localStorage.getItem('dan_api_key');
+  document.getElementById('apiKeyPersist').checked = !!localStorage.getItem('studio_api_key');
   // Restore saved model selection
   const savedModel = getGroqModel();
   const radioBtn = document.querySelector(`input[name="groqModel"][value="${savedModel}"]`);
@@ -5078,14 +5385,14 @@ function saveApiKey() {
   }
   // Save selected model
   const selectedModel = document.querySelector('input[name="groqModel"]:checked')?.value || 'llama-3.3-70b-versatile';
-  localStorage.setItem('dan_groq_model', selectedModel);
+  localStorage.setItem('studio_groq_model', selectedModel);
   const persist = document.getElementById('apiKeyPersist').checked;
-  sessionStorage.setItem('dan_api_key', key);
+  sessionStorage.setItem('studio_api_key', key);
   if (persist) {
-    localStorage.setItem('dan_api_key', key);
+    localStorage.setItem('studio_api_key', key);
     showToast('API Key dauerhaft gespeichert!', 'success');
   } else {
-    localStorage.removeItem('dan_api_key');
+    localStorage.removeItem('studio_api_key');
     showToast('API Key gespeichert (nur diese Session)!', 'success');
   }
   updateApiStatus();
@@ -5093,7 +5400,7 @@ function saveApiKey() {
 }
 
 function updateApiStatus() {
-  const key = sessionStorage.getItem('dan_api_key');
+  const key = sessionStorage.getItem('studio_api_key');
   const dot = document.getElementById('apiDot');
   const text = document.getElementById('apiStatusText');
   if (key) {
@@ -5118,7 +5425,7 @@ Deine Prinzipien:
 Antworte auf Deutsch, professionell aber zugänglich.`;
 
 async function callClaude(prompt, systemPrompt = null) {
-  const apiKey = sessionStorage.getItem('dan_api_key');
+  const apiKey = sessionStorage.getItem('studio_api_key');
   if (!apiKey) {
     openApiModal();
     throw new Error('Kein API Key vorhanden');
@@ -5210,14 +5517,15 @@ function getSongFormatContext() {
   const fmt = s.p1_song_format || 'solo';
   const sprache = s.p1_sprache || 'Deutsch';
   const bezMod = s.p1_bez_modul || '';
+  const _pCtx = getProfile();
   let ctx = '';
 
   // Language
   if (sprache === 'Deutsch+Italiano') {
     const split = s.p1_sprache_split || 'Beide Sprachen durchgemischt';
-    ctx += `\nSprache: Deutsch und Italiano gemischt (${split}). DaN rappt/singt auf Deutsch, Italienische Passagen fließen natürlich ein. Kein Muttersprachler-Perfekt nötig, authentischer Akzent ist Teil des Stils.`;
+    ctx += `\nSprache: Deutsch und Italiano gemischt (${split}). ${_pCtx.name} singt/rappt auf Deutsch, Italienische Passagen fließen natürlich ein.`;
   } else if (sprache === 'Italiano') {
-    ctx += `\nSprache: Italiano. Lyrics vollständig auf Italienisch, DaN's authentischer Stil bleibt erhalten.`;
+    ctx += `\nSprache: Italiano. Lyrics vollständig auf Italienisch, ${_pCtx.name}s Stil bleibt erhalten.`;
   } else {
     ctx += `\nSprache: Deutsch.`;
   }
@@ -5225,10 +5533,10 @@ function getSongFormatContext() {
   // Song format
   if (fmt === 'duett') {
     const femVoice = s.p1_female_voice || 'Sanft-emotional';
-    const split = s.p1_duett_split || 'Verse DaN / Hook Frau';
-    ctx += `\nSong-Format: DUETT (DaN + Frauenstimme). DaN ist immer die Hauptstimme und führt alle Verse. Die Frauenstimme (${femVoice}) übernimmt: ${split}. DaN's Perspective/Stimme ist dominant und ausschlaggebend — die Frauenstimme ist Kontrast oder Ergänzung, nie Hauptfokus.`;
+    const split = (s.p1_duett_split || 'Verse ich / Hook Feature').replace(/\bich\b/g, _pCtx.name);
+    ctx += `\nSong-Format: DUETT (${_pCtx.name} + Feature-Stimme). ${_pCtx.name} ist die Hauptstimme und führt die Hauptverse. Die Feature-Stimme (${femVoice}) übernimmt: ${split}. ${_pCtx.name}s Perspective ist dominant — die Feature-Stimme ist Kontrast oder Ergänzung.`;
   } else {
-    ctx += `\nSong-Format: SOLO — ausschließlich DaN's Stimme.`;
+    ctx += `\nSong-Format: SOLO — ausschließlich ${_pCtx.name}s Stimme.`;
   }
 
   // Beziehungs-Modul
@@ -5254,7 +5562,8 @@ async function generatePhase1() {
   if (!thema && !emotion) { showToast('Bitte mindestens Thema und Emotion ausfüllen!', 'error'); return; }
 
   const fmtCtx = getSongFormatContext();
-  const prompt = `Du bist ein erfahrener Musikproduzent und A&R für deutschen Rap. Entwickle ein detailliertes Song-Konzept für @DaN_90_rap basierend auf: Thema: ${thema || 'offen'}, Emotion: ${emotion || 'offen'}, Zielgruppe: ${zielgruppe || 'allgemein'}, Stil/Einflüsse: ${stil || 'Deutscher Rap'}.${matCtx}${fmtCtx}\n\nErstelle: 3 Titel-Vorschläge, eine Storyline (3-4 Sätze), die emotionale Botschaft, Stimmungsbeschreibung, und konkrete Bild/Metapher-Vorschläge für die Lyrics.`;
+  const _p1 = getProfile();
+  const prompt = `Du bist ein erfahrener Musikproduzent und A&R. Entwickle ein detailliertes Song-Konzept für ${_p1.name}${_p1.genre ? ' (' + _p1.genre + ')' : ''} basierend auf: Thema: ${thema || 'offen'}, Emotion: ${emotion || 'offen'}, Zielgruppe: ${zielgruppe || 'allgemein'}, Stil/Einflüsse: ${stil || _p1.genre || 'Musik'}.${matCtx}${fmtCtx}\n\nErstelle: 3 Titel-Vorschläge, eine Storyline (3-4 Sätze), die emotionale Botschaft, Stimmungsbeschreibung, und konkrete Bild/Metapher-Vorschläge für die Lyrics.`;
 
   setLoading('p1_spinner_icon', 'p1_btn_text', true, '✨', 'Mit KI generieren');
   try {
@@ -5278,23 +5587,24 @@ async function generatePhase2() {
   const s = (currentSongId && songs[currentSongId]) || {};
   const fmt = s.p1_song_format || 'solo';
   const isDuett = fmt === 'duett';
-  const duettSplit = s.p1_duett_split || 'Verse DaN / Hook Frau';
+  const duettSplit = s.p1_duett_split || 'Verse ich / Hook Feature';
   const sprache = s.p1_sprache || 'Deutsch';
+  const _p2 = getProfile();
 
-  let structureNote = 'Schreibe: Intro (4 Zeilen), Verse 1 (16 Zeilen, 16er Flow), Hook (8 Zeilen, catchy und eingängig), Verse 2 (16 Zeilen), Bridge (8 Zeilen), Outro (4 Zeilen).';
+  let structureNote = 'Schreibe: Intro (4 Zeilen), Verse 1 (16 Zeilen), Hook (8 Zeilen, catchy und eingängig), Verse 2 (16 Zeilen), Bridge (8 Zeilen), Outro (4 Zeilen).';
   if (isDuett) {
-    structureNote += ` DUETT-STRUKTUR: ${duettSplit}. Markiere DaN-Passagen mit [DaN] und Frauen-Passagen mit [Frau]. DaN rappt immer die Hauptverse. Die Frauenstimme singt/rappt ihren Teil — klare Abgrenzung im Text.`;
+    structureNote += ` DUETT-STRUKTUR: ${duettSplit.replace(/ich/g, _p2.name)}. Markiere ${_p2.name}-Passagen mit [${_p2.name}] und Feature-Passagen mit [Feature]. ${_p2.name} singt/rappt die Hauptverse. Das Feature singt/rappt seinen Teil — klare Abgrenzung im Text.`;
   }
 
-  let sprachNote = 'Deutscher Rap-Stil, Reime, authentisch, keine Klischees.';
+  let sprachNote = 'Authentischer Stil, Reime, keine Klischees.';
   if (sprache === 'Deutsch+Italiano') {
     const sprSplit = s.p1_sprache_split || 'Beide Sprachen durchgemischt';
-    sprachNote = `Sprachaufteilung: ${sprSplit}. Deutsche Rap-Zeilen fließen natürlich in italienische Passagen über. Authentischer Stil, keine erzwungenen Übergänge. Reime funktionieren jeweils in der eigenen Sprache.`;
+    sprachNote = `Sprachaufteilung: ${sprSplit}. Zeilen fließen natürlich ineinander über. Reime funktionieren jeweils in der eigenen Sprache.`;
   } else if (sprache === 'Italiano') {
-    sprachNote = 'Lyrics vollständig auf Italienisch. DaNs authentischer Rap-Stil, echte Reime auf Italienisch, keine deutschen Einschübe.';
+    sprachNote = `Lyrics vollständig auf Italienisch. ${_p2.name}s authentischer Stil, echte Reime auf Italienisch.`;
   }
 
-  const prompt = `Du bist ein professioneller Texter für deutschen Rap. Schreibe komplette Song-Lyrics für @DaN_90_rap. Konzept: ${konzept}.${fmtCtx}\n\n${structureNote} ${sprachNote}`;
+  const prompt = `Du bist ein professioneller Songtexter. Schreibe komplette Song-Lyrics für ${_p2.name}${_p2.genre ? ' (' + _p2.genre + ')' : ''}. Konzept: ${konzept}.${fmtCtx}\n\n${structureNote} ${sprachNote}`;
 
   setLoading('p2_spinner_icon', 'p2_btn_text', true, '✨', 'Mit KI generieren');
   try {
@@ -5319,7 +5629,8 @@ async function addVerse() {
   if (!existingLyrics) { showToast('Erst Lyrics generieren!', 'error'); return; }
   const konzept = document.getElementById('p2_konzept').value.trim();
 
-  const prompt = `Du bist ein professioneller Texter für deutschen Rap. Hier sind bestehende Lyrics für @DaN_90_rap:\n\n${existingLyrics}\n\nKonzept: ${konzept}\n\nFüge eine weitere Strophe (Verse 3, 16 Zeilen) hinzu, die perfekt zum bestehenden Song passt. Schreibe NUR die neue Strophe mit dem Label [Verse 3] davor.`;
+  const _pAV = getProfile();
+  const prompt = `Du bist ein professioneller Songtexter. Hier sind bestehende Lyrics für ${_pAV.name}:\n\n${existingLyrics}\n\nKonzept: ${konzept}\n\nFüge eine weitere Strophe (Verse 3, 16 Zeilen) hinzu, die perfekt zum bestehenden Song passt. Schreibe NUR die neue Strophe mit dem Label [Verse 3] davor.`;
 
   const btn = document.querySelector('[onclick="addVerse()"]');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Generiere...'; }
@@ -5460,9 +5771,10 @@ async function generatePhase3() {
   const isDuett = fmt === 'duett';
   const sprache = song.p1_sprache || 'Deutsch';
   const langNote = sprache === 'Deutsch+Italiano' ? 'german-italian mixed language rap' : sprache === 'Italiano' ? 'italian rap' : 'german rap';
-  const duettNote = isDuett ? `, featuring contrasting female voice (${song.p1_female_voice || 'soft emotional'}) — DaN leads all verses, female voice on hooks/bridge only` : ', solo male vocals only';
+  const _pBeat = getProfile();
+  const duettNote = isDuett ? `, featuring contrasting female voice (${song.p1_female_voice || 'soft emotional'}) — ${_pBeat.name} leads all verses, female voice on hooks/bridge only` : ', solo vocals only';
 
-  const prompt = `Create a detailed Suno AI music prompt in English for a ${langNote} song${duettNote}. Style: ${stil || 'German Trap'}, BPM: ${bpm}, Key: ${key}, Mood: ${mood || 'dark'}, Instruments: ${instrumente || '808s, hi-hats, piano'}.${konzeptCtx}${lyricsCtx}${fmtCtx}\n\nInclude: genre tags, mood descriptors, instrument specifications, production style, vocal style guidance for DaN as lead voice${isDuett ? ' and female counterpart role' : ''}. Format it as a ready-to-paste Suno prompt.`;
+  const prompt = `Create a detailed Suno AI music prompt in English for a ${langNote} song${duettNote}. Style: ${stil || _pBeat.genre || 'Rap'}, BPM: ${bpm}, Key: ${key}, Mood: ${mood || 'dark'}, Instruments: ${instrumente || '808s, hi-hats, piano'}.${konzeptCtx}${lyricsCtx}${fmtCtx}\n\nInclude: genre tags, mood descriptors, instrument specifications, production style, vocal style guidance for the lead artist${isDuett ? ' and the feature counterpart role' : ''}. Format it as a ready-to-paste Suno prompt.`;
 
   setLoading('p3_spinner_icon', 'p3_btn_text', true, '✨', 'Suno Prompt generieren');
   try {
@@ -5566,7 +5878,8 @@ async function generatePhase4() {
   });
 
   const songName = getCurrentSongName();
-  const prompt = `Du bist ein Musikproduzent und bist beim Song "${songName}" von @DaN_90_rap. Aktueller Produktionsstand:\n\nAbgeschlossen: ${checked.join(', ') || 'Noch nichts'}\nNoch offen: ${unchecked.join(', ') || 'Alles fertig!'}\n\nGib konkrete, priorisierte Empfehlungen für die nächsten Schritte. Was sollte als nächstes gemacht werden und warum? Tipps für jeden offenen Punkt.`;
+  const _p4 = getProfile();
+  const prompt = `Du bist ein Musik-Produktionsmanager beim Song "${songName}" von ${_p4.name}. Aktueller Stand:\n\nAbgeschlossen: ${checked.join(', ') || 'Noch nichts'}\nNoch offen: ${unchecked.join(', ') || 'Alles fertig!'}\n\nGib konkrete, priorisierte Empfehlungen für die nächsten Schritte. Was sollte als nächstes gemacht werden und warum?`;
 
   setLoading('p4_spinner_icon', 'p4_btn_text', true, '🤖', 'Nächste Schritte mit KI');
   try {
@@ -5612,7 +5925,8 @@ async function generatePhase6() {
   const songName = getCurrentSongName();
   const konzept = document.getElementById('p6_konzept').value.trim();
 
-  const prompt = `Du bist ein Social Media Manager für deutschen Rap. Erstelle Promo-Content für den Song '${songName}' von @DaN_90_rap. Konzept: ${konzept || 'Deutscher Rap Song'}. Erstelle: 5 TikTok Hooks (erste 3 Sekunden, aufmerksamkeitsstark), 1 Instagram Caption (mit Emojis, Hashtags), 3 konkrete Reels-Ideen (mit Beschreibung was zu filmen ist), 1 Twitter/X Post.`;
+  const _p6 = getProfile();
+  const prompt = `Du bist ein Social Media Manager für Musik. Erstelle Promo-Content für den Song '${songName}' von ${_p6.name}${_p6.handle ? ' (' + _p6.handle + ')' : ''}. Konzept: ${konzept || 'Musik Song'}. Erstelle: 5 TikTok Hooks (erste 3 Sekunden, aufmerksamkeitsstark), 1 Instagram Caption (mit Emojis, Hashtags), 3 konkrete Reels-Ideen (mit Beschreibung was zu filmen ist), 1 Twitter/X Post.`;
 
   setLoading('p6_spinner_icon', 'p6_btn_text', true, '📣', 'Promo-Content generieren');
   try {
@@ -5636,7 +5950,9 @@ async function generatePhase7() {
   const videoMats = (song.materials||[]).filter(m=>m.type==='video');
   const vidCtx = videoMats.length ? `\n\nVorhandenes Video-Material: ${videoMats.map(m=>m.note).join(', ')}` : '';
 
-  const prompt = `Du bist ein YouTube SEO Experte für Musik. Kanal: youtube.com/@DaN_90_rap (Kanal-ID: UCc72jjvyE5AGgY4It7uLn-Q). Optimiere den Upload für '${songName}' von @DaN_90_rap. Genre: Deutscher Rap. Zusatzinfo: ${zusatz || 'kein'}.${lyricCtx}${vidCtx}\n\nErstelle: 1 optimierten Titel (max 70 Zeichen), vollständige Videobeschreibung (mit Intro-Text, Lyrics-Hinweis, YouTube-Links zum Kanal, Social Media Platzhalter, Timestamps-Vorlage), 30 relevante Tags (kommasepariert), 3 Thumbnail-Text-Ideen, und eine Posting-Zeit-Empfehlung.`;
+  const _p7 = getProfile();
+  const ytHandle = _p7.youtubeHandle || _p7.handle || _p7.name;
+  const prompt = `Du bist ein YouTube SEO Experte für Musik. Kanal: youtube.com/${ytHandle}. Optimiere den Upload für '${songName}' von ${_p7.name}${_p7.genre ? ' (Genre: ' + _p7.genre + ')' : ''}. Zusatzinfo: ${zusatz || 'kein'}.${lyricCtx}${vidCtx}\n\nErstelle: 1 optimierten Titel (max 70 Zeichen), vollständige Videobeschreibung (mit Intro-Text, Lyrics-Hinweis, YouTube-Links zum Kanal, Social Media Platzhalter, Timestamps-Vorlage), 30 relevante Tags (kommasepariert), 3 Thumbnail-Text-Ideen, und eine Posting-Zeit-Empfehlung.`;
 
   setLoading('p7_spinner_icon', 'p7_btn_text', true, '▶️', 'YouTube Content generieren');
   try {
@@ -5654,16 +5970,23 @@ async function generatePhase7() {
 // =============================
 // MANAGER SYSTEM (per phase)
 // =============================
-const MGR_PROMPTS = {
-  1: `Du bist ein erfahrener A&R Manager und Song-Konzept Experte für deutschen Rap mit 15+ Jahren Erfahrung. Du kennst die Szene, aktuelle Trends und hilfst beim Entwickeln von überzeugenden Song-Ideen, Themen, Storylines und Konzepten für @DaN_90_rap. Antworte konkret, kreativ und auf Augenhöhe.`,
-  2: `Du bist ein professioneller Rap-Texter und Punchline-Coach für deutschen Rap. Du hast unzählige Texte für Top-Künstler geschrieben. Du hilfst bei Reimen, Flow, Punchlines, Hook-Writing und Lyrics-Struktur für @DaN_90_rap. Antworte konkret mit echten Beispielen.`,
-  3: `Du bist ein erfahrener Beatmaker und Suno AI Experte. Du kennst alle aktuellen Produktions-Techniken, BPM-Ranges für verschiedene Genres und wie man perfekte Suno AI Prompts schreibt. Du hilfst @DaN_90_rap den perfekten Beat zu finden.`,
-  4: `Du bist ein erfahrener Musik-Produktionsmanager der den kompletten Workflow von der Idee bis zum Release kennt. Du hilfst @DaN_90_rap bei Zeitplanung, Workflow-Optimierung und Produktions-Entscheidungen. Priorisiere realistisch.`,
-  5: `Du bist ein Creative Director und Visual Design Experte für Musik-Artwork. Du kennst aktuelle Design-Trends, KI-Bildgenerierungs-Tools (Midjourney, DALL-E, Stable Diffusion) und hilfst @DaN_90_rap ein starkes visuelles Bild zu entwickeln.`,
-  6: `Du bist ein Social Media Manager spezialisiert auf Musik und deutschen Rap. Du kennst TikTok-Algorithmen, Instagram-Strategien und aktuelle Viral-Trends. Du hilfst @DaN_90_rap maximale Reichweite zu erzielen.`,
-  7: `Du bist ein YouTube SEO Experte und Channel-Stratege für Musik. Du kennst YouTube-Algorithmen, Thumbnail-Psychologie und Channel-Wachstums-Strategien für Rap-Künstler wie @DaN_90_rap. Gib konkrete, sofort umsetzbare Tipps.`,
-  8: `Du bist ein erfahrener Audio Engineer und Mix/Mastering Engineer mit Spezialisierung auf Rap und Hip-Hop. Du kennst alle Techniken für professionelles Vocal Recording, Mixing und Mastering für @DaN_90_rap. Verwende Fachbegriffe und erkläre sie wenn nötig.`
-};
+function getMgrPrompts() {
+  const p = getProfile();
+  const artist = p.name + (p.handle ? ' (' + p.handle + ')' : '');
+  const genre  = p.genre || 'Musik';
+  return {
+    1: `Du bist ein erfahrener A&R Manager und Song-Konzept Experte mit 15+ Jahren Erfahrung. Du kennst die Szene, aktuelle Trends und hilfst beim Entwickeln von überzeugenden Song-Ideen, Themen, Storylines und Konzepten für ${artist}. Genre: ${genre}. Antworte konkret, kreativ und auf Augenhöhe.`,
+    2: `Du bist ein professioneller Songtexter und Punchline-Coach. Du hast unzählige Texte für Top-Künstler geschrieben. Du hilfst bei Reimen, Flow, Punchlines, Hook-Writing und Lyrics-Struktur für ${artist}. Genre: ${genre}. Antworte konkret mit echten Beispielen.`,
+    3: `Du bist ein erfahrener Beatmaker und Suno AI Experte. Du kennst alle aktuellen Produktions-Techniken, BPM-Ranges für verschiedene Genres und wie man perfekte Suno AI Prompts schreibt. Du hilfst ${artist} den perfekten Beat zu finden.`,
+    4: `Du bist ein erfahrener Musik-Produktionsmanager der den kompletten Workflow von der Idee bis zum Release kennt. Du hilfst ${artist} bei Zeitplanung, Workflow-Optimierung und Produktions-Entscheidungen. Priorisiere realistisch.`,
+    5: `Du bist ein Creative Director und Visual Design Experte für Musik-Artwork. Du kennst aktuelle Design-Trends, KI-Bildgenerierungs-Tools (Midjourney, DALL-E, Stable Diffusion) und hilfst ${artist} ein starkes visuelles Bild zu entwickeln.`,
+    6: `Du bist ein Social Media Manager spezialisiert auf Musik. Du kennst TikTok-Algorithmen, Instagram-Strategien und aktuelle Viral-Trends. Du hilfst ${artist} maximale Reichweite zu erzielen.`,
+    7: `Du bist ein YouTube SEO Experte und Channel-Stratege für Musik. Du kennst YouTube-Algorithmen, Thumbnail-Psychologie und Channel-Wachstums-Strategien. Du hilfst ${artist} den Kanal zu wachsen. Gib konkrete, sofort umsetzbare Tipps.`,
+    8: `Du bist ein erfahrener Audio Engineer und Mix/Mastering Engineer. Du kennst alle Techniken für professionelles Vocal Recording, Mixing und Mastering. Du arbeitest für ${artist} (Genre: ${genre}). Verwende Fachbegriffe und erkläre sie wenn nötig.`
+  };
+}
+// Backward-compat alias for code that reads MGR_PROMPTS directly
+const MGR_PROMPTS = new Proxy({}, { get: (_, k) => getMgrPrompts()[k] });
 
 function toggleMgr(n) {
   const toggle = document.getElementById('mgrToggle'+n);
@@ -5858,7 +6181,7 @@ function openDriveLink() {
 // YOUTUBE API
 // =============================
 function loadYtKey() {
-  ytApiKey = localStorage.getItem('dan_yt_key') || '';
+  ytApiKey = localStorage.getItem('studio_yt_key') || '';
 }
 function openYtKeyModal() {
   document.getElementById('ytKeyInput').value = ytApiKey;
@@ -5871,7 +6194,7 @@ function saveYtKey() {
   const key = document.getElementById('ytKeyInput').value.trim();
   if (!key) { showToast('Bitte API Key eingeben!', 'error'); return; }
   ytApiKey = key;
-  localStorage.setItem('dan_yt_key', key);
+  localStorage.setItem('studio_yt_key', key);
   closeYtKeyModal();
   showToast('YouTube API Key gespeichert!', 'success');
   loadYouTubeChannel();
@@ -5890,7 +6213,7 @@ async function loadYouTubeChannel() {
     if (data.status !== 'ok') throw new Error(data.message || 'RSS-Fehler');
 
     const count = data.items?.length || 0;
-    if (subEl) subEl.innerHTML = `<strong>${count}</strong> neueste Videos geladen · <a href="https://www.youtube.com/@DaN_90_rap" target="_blank" style="color:var(--blue);">Kanal öffnen</a>`;
+    if (subEl) subEl.innerHTML = `<strong>${count}</strong> neueste Videos geladen · <a href="#" onclick="openYouTubeChannel();return false;" style="color:var(--blue);">Kanal öffnen</a>`;
 
     const grid = document.getElementById('ytVideoGrid');
     if (grid && data.items?.length) {
@@ -6521,7 +6844,7 @@ function saveSong() {
 
 function saveToStorage() {
   try {
-    localStorage.setItem('dan_music_songs', JSON.stringify(songs));
+    localStorage.setItem('studio_music_songs', JSON.stringify(songs));
   } catch(e) {
     showToast('Speicher-Fehler: ' + e.message, 'error');
   }
@@ -6529,7 +6852,7 @@ function saveToStorage() {
 
 function loadFromStorage() {
   try {
-    const raw = localStorage.getItem('dan_music_songs');
+    const raw = localStorage.getItem('studio_music_songs');
     if (raw) songs = JSON.parse(raw);
   } catch(e) {
     songs = {};
@@ -6615,7 +6938,7 @@ function exportSongs() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'dan-music-songs-' + new Date().toISOString().slice(0,10) + '.json';
+  a.download = 'studio-songs-' + new Date().toISOString().slice(0,10) + '.json';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -6699,8 +7022,8 @@ function getSbHeaders() {
 }
 
 function loadCloudConfig() {
-  const storedUrl = localStorage.getItem('dan_sb_url') || '';
-  const storedKey = localStorage.getItem('dan_sb_key') || '';
+  const storedUrl = localStorage.getItem('studio_sb_url') || '';
+  const storedKey = localStorage.getItem('studio_sb_key') || '';
   if (storedUrl.startsWith('https://')) sbUrl = storedUrl;
   if (storedKey) sbKey = storedKey;
   if (sbUrl && sbKey) {
@@ -6754,7 +7077,7 @@ async function saveCloudConfig() {
 
   try {
     // Test connection
-    const res = await fetch(`${url}/rest/v1/dan_songs?limit=1`, {
+    const res = await fetch(`${url}/rest/v1/studio_songs?limit=1`, {
       headers: { 'apikey': key, 'Authorization': 'Bearer ' + key }
     });
     if (!res.ok) {
@@ -6765,8 +7088,8 @@ async function saveCloudConfig() {
     sbUrl = url;
     sbKey = key;
     cloudConnected = true;
-    localStorage.setItem('dan_sb_url', url);
-    localStorage.setItem('dan_sb_key', key);
+    localStorage.setItem('studio_sb_url', url);
+    localStorage.setItem('studio_sb_key', key);
     updateCloudStatus('connected');
     document.getElementById('cloudSyncNowBtn').style.display = 'inline-flex';
     statusEl.textContent = '✓ Verbunden! Synchronisiere...';
@@ -6784,7 +7107,7 @@ async function saveCloudConfig() {
 async function pushSongToCloud(song) {
   if (!cloudConnected || !sbUrl || !sbKey) return;
   try {
-    const res = await fetch(`${sbUrl}/rest/v1/dan_songs`, {
+    const res = await fetch(`${sbUrl}/rest/v1/studio_songs`, {
       method: 'POST',
       headers: getSbHeaders(),
       body: JSON.stringify({
@@ -6806,7 +7129,7 @@ async function pushSongToCloud(song) {
 async function deleteSongFromCloud(id) {
   if (!cloudConnected || !sbUrl || !sbKey) return;
   try {
-    await fetch(`${sbUrl}/rest/v1/dan_songs?song_id=eq.${encodeURIComponent(id)}`, {
+    await fetch(`${sbUrl}/rest/v1/studio_songs?song_id=eq.${encodeURIComponent(id)}`, {
       method: 'DELETE',
       headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
     });
@@ -6826,7 +7149,7 @@ async function fullSync() {
     }
 
     // Pull remote songs not in local
-    const res = await fetch(`${sbUrl}/rest/v1/dan_songs?select=song_id,name,data,updated_at&order=updated_at.desc`, {
+    const res = await fetch(`${sbUrl}/rest/v1/studio_songs?select=song_id,name,data,updated_at&order=updated_at.desc`, {
       headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
     });
     if (res.ok) {
@@ -6868,7 +7191,7 @@ let idb = null;
 function openIDB() {
   if (idb) return Promise.resolve(idb);
   return new Promise((res, rej) => {
-    const req = indexedDB.open('dan_audio', 1);
+    const req = indexedDB.open('studio_audio', 1);
     req.onupgradeneeded = e => { e.target.result.createObjectStore('audio', {keyPath:'songId'}); };
     req.onsuccess = e => { idb = e.target.result; res(idb); };
     req.onerror = () => rej(req.error);
@@ -7142,7 +7465,7 @@ function saveBpmManual() {
 
 async function transcribeAudio() {
   if (!currentAudioFile) { showToast('Erst Audio importieren!', 'error'); return; }
-  const apiKey = sessionStorage.getItem('dan_api_key');
+  const apiKey = sessionStorage.getItem('studio_api_key');
   if (!apiKey) { openApiModal(); return; }
   const lang = document.getElementById('transcribeLang').value;
   const btn = document.getElementById('transcribeBtn');
@@ -7331,7 +7654,8 @@ async function analyzeMarkers() {
   const bpm = song.p8_bpm || song.p3_bpm || '?';
   const trSnip = song.p8_transcription ? `\n\nTranskription:\n${song.p8_transcription.substring(0, 600)}` : '';
   const lySnip = song.p2_lyrics ? `\n\nLyrics:\n${song.p2_lyrics.substring(0, 500)}` : '';
-  const prompt = `Song: "${song.name}" von @DaN_90_rap | BPM: ${bpm}${trSnip}${lySnip}
+  const _p8 = getProfile();
+  const prompt = `Song: "${song.name}" von ${_p8.name} | BPM: ${bpm}${trSnip}${lySnip}
 
 Produktions-Zeitmarken:
 ${markerText}
@@ -7362,7 +7686,7 @@ Analysiere alle Zeitmarken professionell. Für jede Marke: konkrete Vocal-Anweis
 let tavilyKey = '';
 
 function loadTavilyKey() {
-  tavilyKey = localStorage.getItem('dan_tavily_key') || '';
+  tavilyKey = localStorage.getItem('studio_tavily_key') || '';
   updateTavilyStatus();
 }
 
@@ -7387,7 +7711,7 @@ function saveTavilyKey() {
   const key = document.getElementById('tavilyKeyInput').value.trim();
   if (!key) { showToast('Bitte Key eingeben!', 'error'); return; }
   tavilyKey = key;
-  localStorage.setItem('dan_tavily_key', key);
+  localStorage.setItem('studio_tavily_key', key);
   updateTavilyStatus();
   closeTavilyModal();
   showToast('Tavily Key gespeichert!', 'success');
@@ -7486,7 +7810,7 @@ Heutiges Datum: ${new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-
 }
 
 async function callClaudeChat(messages, systemPrompt) {
-  const apiKey = sessionStorage.getItem('dan_api_key');
+  const apiKey = sessionStorage.getItem('studio_api_key');
   if (!apiKey) { openApiModal(); throw new Error('Kein API Key'); }
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
@@ -8862,7 +9186,7 @@ window.addEventListener('DOMContentLoaded', () => {
 // ARTIST BIOGRAPHY
 // =============================
 function loadBioProfile() {
-  try { return JSON.parse(localStorage.getItem('dan_bio_profile') || '{}'); }
+  try { return JSON.parse(localStorage.getItem('studio_bio_profile') || '{}'); }
   catch(e) { return {}; }
 }
 function saveBioProfile() {
@@ -8873,7 +9197,7 @@ function saveBioProfile() {
     ziele:    document.getElementById('bio_ziele')?.value.trim() || '',
     stil:     document.getElementById('bio_stil')?.value.trim() || ''
   };
-  localStorage.setItem('dan_bio_profile', JSON.stringify(bio));
+  localStorage.setItem('studio_bio_profile', JSON.stringify(bio));
   renderBioDisplay(bio);
   toggleBioEdit(true); // close edit mode
   showToast('Profil gespeichert!', 'success');
@@ -8924,7 +9248,7 @@ function initBioCard() {
 const VOICE_EMOTIONS = ['Sentimental','Melancholisch','Nachdenklich','Verletzlich','Hoffnungsvoll','Motivierend','Stolz','Kraftvoll','Kämpferisch','Entschlossen','Aggressiv','Wütend','Kalt','Drohend','Brutal'];
 
 function loadVoicePersona() {
-  try { return JSON.parse(localStorage.getItem('dan_voice_persona') || '{}'); }
+  try { return JSON.parse(localStorage.getItem('studio_voice_persona') || '{}'); }
   catch(e) { return {}; }
 }
 function openVoiceModal() {
@@ -8957,7 +9281,7 @@ function saveVoicePersona() {
     flow:          document.getElementById('vp_flow').value.trim(),
     defaultEmotion: selBtn ? selBtn.textContent.trim() : ''
   };
-  localStorage.setItem('dan_voice_persona', JSON.stringify(vp));
+  localStorage.setItem('studio_voice_persona', JSON.stringify(vp));
   closeVoiceModal();
   updateVoicePersonaBadge();
   showToast('Voice Persona gespeichert!', 'success');
@@ -8976,76 +9300,76 @@ function updateVoicePersonaBadge() {
 // =============================
 const SUNO_PERSONAS = [
   {
-    id: 'verletzlich', name: 'DaN_VERLETZLICH', emoji: '💔', bpm: 82,
+    id: 'verletzlich', name: 'VERLETZLICH', emoji: '💔', bpm: 82,
     tag: 'Verletzlich', color: '#3b82f6',
     url: 'https://suno.com/persona/30a6a4aa-c2e5-49f1-9089-bf92e634c196',
     prompt: `emotional german rap, intimate whispered delivery, breathy vocals, vulnerable tone, deep warm male vocals, minimal production, soft piano undertone, 82 BPM, melancholic strings, sparse drums, intimate storytelling, authentic pain, high-fidelity studio recording, spacious reverb on vocals, cinematic but intimate, personal confession style
 
 EXCLUDE: comedy, children music, upbeat pop, fast tempo, autotune heavy, aggressive rap, drill, female vocals, generic loops, overproduced, lo-fi, trap hi-hats`,
-    duett: `DUETT-ERWEITERUNG: soft gentle female voice as emotional counterpart, breathy and tender, high warm soprano, enters on hooks only — DaN leads all verses, female voice answers and harmonizes, never dominates, creates emotional dialogue between male pain and female empathy, terz-harmonies on chorus`
+    duett: `DUETT-ERWEITERUNG: soft gentle female voice as emotional counterpart, breathy and tender, high warm soprano, enters on hooks only — the main vocalist leads all verses, female voice answers and harmonizes, never dominates, creates emotional dialogue between male pain and female empathy, terz-harmonies on chorus`
   },
   {
-    id: 'kraftvoll', name: 'DaN_KRAFTVOLL', emoji: '💪', bpm: 95,
+    id: 'kraftvoll', name: 'KRAFTVOLL', emoji: '💪', bpm: 95,
     tag: 'Kraftvoll', color: '#10b981',
     url: 'https://suno.com/persona/eb209082-390c-43b0-b9a3-97ac2a52d41a',
     prompt: `powerful german rap, resonant baritone vocals, determined delivery, resilient tone, deep chest voice, 808 bass, punchy drums, cinematic strings, building intensity, anthemic hip hop ballad, strong conviction, unwavering confidence, mid-tempo 95 BPM, polished studio mix, high-fidelity, motivational undercurrent, overcome-struggle narrative, steady rhythm, powerful hook delivery
 
 EXCLUDE: comedy, children music, upbeat pop, lo-fi, trap hi-hats, generic loops, overproduced, female vocals, drill, fast tempo, autotune heavy`,
-    duett: `DUETT-ERWEITERUNG: strong confident female voice, stands her ground, equal energy to DaN but higher register, powerful chest voice, female rapper or singer on hook — DaN raps verses with full authority, shared hook creates unstoppable unified front, no weakness, both voices push forward`
+    duett: `DUETT-ERWEITERUNG: strong confident female voice, stands her ground, equal energy to the main vocalist but higher register, powerful chest voice, female rapper or singer on hook — main vocalist raps verses with full authority, shared hook creates unstoppable unified front, no weakness, both voices push forward`
   },
   {
-    id: 'aggressiv', name: 'DaN_AGGRESSIV', emoji: '🔥', bpm: 130,
+    id: 'aggressiv', name: 'AGGRESSIV', emoji: '🔥', bpm: 130,
     tag: 'Aggressiv', color: '#ef4444',
     url: 'https://suno.com/persona/477c5ba4-c710-49d8-adac-e4125aa57592',
     prompt: `aggressive german rap, harsh gritty vocals, dominant delivery, hard-hitting 808 bass, trap drums with heavy kick, dark cinematic beat, 130 BPM, minor key, street anthem energy, powerful confident tone, commanding presence, raw emotion, intense build, no-filter honesty, brutal storytelling, spacious high-fidelity mix, dangerous vibe
 
 EXCLUDE: comedy, children music, upbeat pop, soft vocals, lo-fi, generic loops, female vocals, slow tempo, autotune heavy, drill (keep aggressive rap)`,
-    duett: `DUETT-ERWEITERUNG: cold distant female voice, icy and restrained, sharp contrast to DaN's aggression — she sings the hook with controlled intensity, no warmth, represents the opposing force or the reason for the anger, dissonant echo effect on her vocals, she never matches his aggression but cuts deeper with calmness`
+    duett: `DUETT-ERWEITERUNG: cold distant female voice, icy and restrained, sharp contrast to the main vocalist's aggression — she sings the hook with controlled intensity, no warmth, represents the opposing force or the reason for the anger, dissonant echo effect on her vocals, she never matches his aggression but cuts deeper with calmness`
   },
   {
-    id: 'hoffnungsvoll', name: 'DaN_HOFFNUNGSVOLL', emoji: '🌅', bpm: 110,
+    id: 'hoffnungsvoll', name: 'HOFFNUNGSVOLL', emoji: '🌅', bpm: 110,
     tag: 'Hoffnungsvoll', color: '#f59e0b',
     url: 'https://suno.com/persona/c9187840-631b-4a9f-ab7b-685caeca47ce',
     prompt: `uplifting german rap, warm inspiring vocals, hopeful delivery, bright undertone, mid-range tenor voice, major key progression, 110 BPM, uplifting strings, positive energy without being fake, authentic optimism, motivational message, cinematic production, building crescendo, powerful chorus, light but substantial, high-fidelity studio recording, warm reverb, inspiring but grounded
 
 EXCLUDE: comedy, children music, generic pop, autotune heavy, drill, female vocals, aggressive rap, fast tempo, lo-fi, trap hi-hats`,
-    duett: `DUETT-ERWEITERUNG: warm uplifting female voice, bright and clear, gospel-influenced tone, adds light to DaN's message — she sings the chorus as an emotional peak, harmonizes in thirds, voice radiates safety and shared optimism, no autotune, natural vibrato, they build something together`
+    duett: `DUETT-ERWEITERUNG: warm uplifting female voice, bright and clear, gospel-influenced tone, adds light to the main artist's message — she sings the chorus as an emotional peak, harmonizes in thirds, voice radiates safety and shared optimism, no autotune, natural vibrato, they build something together`
   },
   {
-    id: 'melancholisch', name: 'DaN_MELANCHOLISCH', emoji: '🌧️', bpm: 75,
+    id: 'melancholisch', name: 'MELANCHOLISCH', emoji: '🌧️', bpm: 75,
     tag: 'Melancholisch', color: '#6366f1',
     url: '',
     prompt: `melancholic german rap, sad introspective vocals, slow-tempo 75 BPM, deep emotional male vocals, bittersweet tone, dark piano, cinematic strings, minor key, reflective delivery, thoughtful pacing, atmospheric production, vinyl crackle intro, sparse drums, intimate whispered moments, nostalgia and pain mixed, authentic sadness, high-fidelity, spacious mix, story-driven narrative
 
 EXCLUDE: comedy, children music, upbeat pop, fast tempo, aggressive rap, autotune heavy, drill, female vocals, generic loops, lo-fi, trap hi-hats`,
-    duett: `DUETT-ERWEITERUNG: melancholic female voice, fragile and broken, slight breathiness, enters only on bridge and final chorus — she represents the other side of the same pain, mirror to DaN's sadness, they don't sing together but after each other, call-and-response of shared grief, much reverb on her voice, almost ghost-like presence`
+    duett: `DUETT-ERWEITERUNG: melancholic female voice, fragile and broken, slight breathiness, enters only on bridge and final chorus — she represents the other side of the same pain, mirror to the main vocalist's sadness, they don't sing together but after each other, call-and-response of shared grief, much reverb on her voice, almost ghost-like presence`
   },
   {
-    id: 'kuehl', name: 'DaN_KÜHL', emoji: '🧊', bpm: 100,
+    id: 'kuehl', name: 'KÜHL', emoji: '🧊', bpm: 100,
     tag: 'Kühl', color: '#94a3b8',
     url: '',
     prompt: `detached german rap, narrative-focused vocals, clear diction, cool delivery, mid-range tenor, factual storytelling without over-emotion, 100 BPM, minimal production, sparse instrumentation, direct communication style, authentic but restrained, cinematic but understated, high-fidelity studio, tight drums, focused bass, no reverb excess, professional documentary vibe, substance over style, street-smart intelligence
 
 EXCLUDE: comedy, children music, upbeat pop, autotune heavy, drill, female vocals, aggressive rap, fast tempo, lo-fi, trap hi-hats, overly emotional`,
-    duett: `DUETT-ERWEITERUNG: neutral observing female voice, matter-of-fact delivery, speaks or sings with calm authority, not emotional — she provides a second perspective or commentary to DaN's narrative, equal distance from emotion, clean vocal with no effects, journalistic presence, minimal harmonies`
+    duett: `DUETT-ERWEITERUNG: neutral observing female voice, matter-of-fact delivery, speaks or sings with calm authority, not emotional — she provides a second perspective or commentary to the main vocalist's narrative, equal distance from emotion, clean vocal with no effects, journalistic presence, minimal harmonies`
   },
   {
-    id: 'stolz', name: 'DaN_STOLZ', emoji: '👑', bpm: 115,
+    id: 'stolz', name: 'STOLZ', emoji: '👑', bpm: 115,
     tag: 'Stolz', color: '#eab308',
     url: '',
     prompt: `confident german rap, proud commanding vocals, strong dominant delivery, deep resonant voice, assertive tone, 115 BPM, powerful 808 bass, cinematic orchestral strings, major key, self-assured flow, unwavering conviction, street-smart intelligence, earned respect vibe, substantial bars, high-fidelity production, punchy drums, powerful presence, no arrogance just strength, authentic self-belief, inspiring through confidence
 
 EXCLUDE: comedy, children music, upbeat pop, autotune heavy, drill, female vocals, weak vocals, fast tempo, lo-fi, trap hi-hats, self-doubt vibes`,
-    duett: `DUETT-ERWEITERUNG: proud powerful female voice, strong and regal, she matches DaN's confidence from her own position — sings the hook as a celebration, never subordinate, represents the woman who stands beside a strong man with equal strength, rich mezzo-soprano, orchestral feel on her vocals`
+    duett: `DUETT-ERWEITERUNG: proud powerful female voice, strong and regal, she matches the main vocalist's confidence from her own position — sings the hook as a celebration, never subordinate, rich mezzo-soprano, orchestral feel on her vocals`
   },
   {
-    id: 'wuetend', name: 'DaN_WÜTEND', emoji: '⚡', bpm: 140,
+    id: 'wuetend', name: 'WÜTEND', emoji: '⚡', bpm: 140,
     tag: 'Wütend', color: '#f97316',
     url: '',
     prompt: `raw intense german rap, explosive powerful vocals, intense aggressive delivery, harsh gritty tone, 140 BPM, heavy hard-hitting 808 bass, aggressive trap drums, dark cinematic beat, no filter raw emotion, brutal honesty, fighting spirit, dangerous edge without cartoon villainy, authentic anger not performed, high-fidelity raw mix, intense strings, minor key, explosive potential, street credibility, real pain not fake rage
 
 EXCLUDE: comedy, children music, upbeat pop, soft vocals, lo-fi, generic loops, female vocals, autotune, slow tempo, drill, trap hi-hats`,
-    duett: `DUETT-ERWEITERUNG: fierce sharp female voice, her calmness amplifies the danger — she delivers a single bridge or spoken word section, controlled anger, low register for a woman, no screaming, the contrast between her control and DaN's explosion creates maximum tension, she is the eye of the storm`
+    duett: `DUETT-ERWEITERUNG: fierce sharp female voice, her calmness amplifies the danger — she delivers a single bridge or spoken word section, controlled anger, low register for a woman, no screaming, the contrast between her control and the main vocalist's explosion creates maximum tension, she is the eye of the storm`
   }
 ];
 
@@ -9061,7 +9385,7 @@ function initSunoPersonaPicker() {
          style="--sp-color:${p.color}"
          onclick="selectSunoPersona('${p.id}')">
       <div class="sp-card-emoji">${p.emoji}</div>
-      <div class="sp-card-name">${p.name.replace('DaN_','')}</div>
+      <div class="sp-card-name">${p.tag || p.id.toUpperCase()}</div>
       <div class="sp-card-bpm">${p.bpm} BPM</div>
       <div class="sp-card-tag" style="color:${p.color};border-color:${p.color}44;background:${p.color}11;">${p.tag}</div>
       <button class="sp-preview-btn" onclick="event.stopPropagation();previewPersonaVoice('${p.id}')" title="Stimme vorhören">▶</button>
@@ -9263,10 +9587,10 @@ function buildIntroParticles() {
 let ytReleases = [];
 
 function loadYtReleases() {
-  try { ytReleases = JSON.parse(localStorage.getItem('dan_yt_releases')||'[]'); } catch(e){ytReleases=[];}
+  try { ytReleases = JSON.parse(localStorage.getItem('studio_yt_releases')||'[]'); } catch(e){ytReleases=[];}
 }
 function saveYtReleases() {
-  localStorage.setItem('dan_yt_releases', JSON.stringify(ytReleases));
+  localStorage.setItem('studio_yt_releases', JSON.stringify(ytReleases));
 }
 function extractYtId(url) {
   const m = url.match(/(?:youtu\.be\/|v=|\/embed\/)([A-Za-z0-9_-]{11})/);
@@ -9345,9 +9669,9 @@ let albums = [];
 let discFilter = 'all';
 
 function loadAlbums() {
-  try { albums = JSON.parse(localStorage.getItem('dan_albums')||'[]'); } catch(e){albums=[];}
+  try { albums = JSON.parse(localStorage.getItem('studio_albums')||'[]'); } catch(e){albums=[];}
 }
-function saveAlbums() { localStorage.setItem('dan_albums', JSON.stringify(albums)); }
+function saveAlbums() { localStorage.setItem('studio_albums', JSON.stringify(albums)); }
 
 function openCreateAlbum() {
   const picker = document.getElementById('albumSongPicker');
