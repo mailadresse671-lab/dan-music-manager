@@ -442,9 +442,65 @@
     .topbar-title { font-size: 15px; }
   }
   @media (max-width: 600px) {
-    .sidebar { position: fixed; left: -220px; top: 60px; bottom: 0; z-index: 200; transition: left 0.3s; }
+    .sidebar { position: fixed; left: -260px; top: 60px; bottom: 0; z-index: 200; transition: left 0.3s; width: 260px; }
     .sidebar.open { left: 0; }
-    .main-content { padding: 14px; }
+    .main-content { padding: 12px; }
+    .topbar { padding: 0 12px; }
+    /* Hide non-essential topbar items on mobile */
+    .topbar-meta-hide { display: none !important; }
+    .topbar-brand { display: none !important; }
+    .topbar-title { font-size: 14px; }
+    /* Show only key action buttons, hide secondary ones */
+    .btn-mobile-hide { display: none !important; }
+  }
+  /* Sidebar backdrop for mobile */
+  .sidebar-backdrop {
+    display: none; position: fixed; inset: 0; top: 60px;
+    background: rgba(0,0,0,0.6); z-index: 199; backdrop-filter: blur(2px);
+  }
+  .sidebar-backdrop.visible { display: block; }
+  /* Mobile overflow menu */
+  .mobile-more-btn {
+    display: none; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3);
+    color: var(--purple-light); border-radius: 6px; padding: 6px 10px;
+    font-size: 16px; cursor: pointer; line-height: 1;
+  }
+  @media (max-width: 600px) { .mobile-more-btn { display: flex; align-items: center; } }
+  .mobile-menu-dropdown {
+    display: none; position: fixed; top: 60px; right: 0;
+    background: var(--sidebar); border: 1px solid var(--border); border-top: none;
+    border-radius: 0 0 0 10px; z-index: 300; min-width: 180px;
+    flex-direction: column; padding: 8px;
+    box-shadow: -4px 4px 20px rgba(0,0,0,0.5);
+  }
+  .mobile-menu-dropdown.open { display: flex; }
+  .mobile-menu-dropdown button,
+  .mobile-menu-dropdown label {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; border-radius: 6px; border: none;
+    background: none; color: var(--text); font-size: 13px; cursor: pointer;
+    text-align: left; transition: background 0.15s;
+  }
+  .mobile-menu-dropdown button:hover,
+  .mobile-menu-dropdown label:hover { background: rgba(255,255,255,0.06); }
+  /* Additional mobile tweaks */
+  @media (max-width: 600px) {
+    .phase-header { margin-bottom: 16px; }
+    .phase-title { font-size: 18px; }
+    .card { padding: 14px; }
+    .phase-icon { width: 36px; height: 36px; font-size: 16px; }
+    /* Prevent horizontal overflow in result boxes */
+    .result-box, .card { overflow-wrap: break-word; word-break: break-word; }
+    /* Full-width buttons on mobile */
+    .btn-full-mobile { width: 100%; }
+    /* Checklist on mobile */
+    .checklist-grid { grid-template-columns: 1fr !important; }
+    /* Suno persona grid */
+    .sp-grid { grid-template-columns: 1fr 1fr !important; }
+    /* Overview grid */
+    .ov-grid { grid-template-columns: 1fr !important; }
+    /* Beat studio controls */
+    .bs-controls { flex-direction: column; }
   }
   /* TAG BADGES */
   .tags-preview {
@@ -2394,9 +2450,9 @@
     <div class="topbar-logo">D_a_N</div>
     <span class="topbar-title">D_a_N Studio</span>
     <span class="topbar-brand" id="topbar-artist-handle"></span>
-    <span id="lastUpdated" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#00ff88;background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.18);padding:3px 10px;border-radius:4px;letter-spacing:0.5px;">▸ Stand: 12.03.2026 – 19:30</span>
+    <span id="lastUpdated" class="topbar-meta-hide" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#00ff88;background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.18);padding:3px 10px;border-radius:4px;letter-spacing:0.5px;">▸ Stand: 12.03.2026 – 19:30</span>
     <!-- Neural Core status indicator -->
-    <span style="display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(0,212,255,0.5);letter-spacing:1.5px;text-transform:uppercase;">
+    <span class="topbar-meta-hide" style="display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(0,212,255,0.5);letter-spacing:1.5px;text-transform:uppercase;">
       <span style="width:5px;height:5px;border-radius:50%;background:#00d4ff;box-shadow:0 0 8px #00d4ff;animation:pulse 2s ease-in-out infinite;"></span>
       NEURAL CORE
     </span>
@@ -2406,15 +2462,17 @@
       <div class="api-dot" id="apiDot"></div>
       <span id="apiStatusText" style="font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;">KEIN API</span>
     </div>
-    <button class="btn-cloud" id="cloudBtn" onclick="openCloudModal()" title="Supabase Cloud-Sync">
+    <button class="btn-cloud btn-mobile-hide" id="cloudBtn" onclick="openCloudModal()" title="Supabase Cloud-Sync">
       <div class="cloud-dot" id="cloudDot"></div>
       <span id="cloudBtnText">⬡ SYNC</span>
     </button>
-    <button class="btn-api" onclick="exportSongs()" title="Songs als JSON exportieren">↓ EXPORT</button>
-    <label class="btn-api" style="cursor:pointer;" title="Songs aus JSON importieren">↑ IMPORT<input type="file" accept=".json" onchange="importSongs(event)" style="display:none"></label>
-    <button class="btn-tavily" onclick="openTavilyModal()" title="Tavily Web-Suche Key">⌖ WEB</button>
-    <button class="btn-voice" onclick="openVoiceModal()" title="Voice Persona – deine Stimme & Tonlage">◈ VOICE</button>
-    <button class="btn-api" onclick="openApiModal()">⚿ API</button>
+    <button class="btn-api btn-mobile-hide" onclick="exportSongs()" title="Songs als JSON exportieren">↓ EXPORT</button>
+    <label class="btn-api btn-mobile-hide" style="cursor:pointer;" title="Songs aus JSON importieren">↑ IMPORT<input type="file" accept=".json" onchange="importSongs(event)" style="display:none"></label>
+    <button class="btn-tavily btn-mobile-hide" onclick="openTavilyModal()" title="Tavily Web-Suche Key">⌖ WEB</button>
+    <button class="btn-voice btn-mobile-hide" onclick="openVoiceModal()" title="Voice Persona – deine Stimme & Tonlage">◈ VOICE</button>
+    <button class="btn-api btn-mobile-hide" onclick="openApiModal()">⚿ API</button>
+    <!-- Mobile overflow menu -->
+    <button class="mobile-more-btn" onclick="toggleMobileMenu()" aria-label="Mehr Optionen">⋯</button>
   </div>
 </div>
 
@@ -2453,6 +2511,19 @@
     </div>
   </div>
 </div>
+
+<!-- Mobile overflow menu dropdown -->
+<div class="mobile-menu-dropdown" id="mobileMenuDropdown">
+  <button onclick="openApiModal();closeMobileMenu()">⚿ API Key</button>
+  <button onclick="openVoiceModal();closeMobileMenu()">◈ Voice Persona</button>
+  <button onclick="openCloudModal();closeMobileMenu()">⬡ Cloud Sync</button>
+  <button onclick="openTavilyModal();closeMobileMenu()">⌖ Web Search</button>
+  <button onclick="exportSongs();closeMobileMenu()">↓ Export</button>
+  <label style="cursor:pointer;">↑ Import<input type="file" accept=".json" onchange="importSongs(event);closeMobileMenu()" style="display:none"></label>
+</div>
+
+<!-- Sidebar backdrop (mobile) -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
 <!-- MAIN LAYOUT -->
 <div class="app-layout">
@@ -6116,6 +6187,8 @@ function switchPhase(num) {
   }
 
   currentPhase = num;
+  // Close sidebar on mobile after navigation
+  if (window.innerWidth <= 600) closeSidebar();
 
   // Nav items
   document.querySelectorAll('.nav-item').forEach(el => {
@@ -6443,10 +6516,19 @@ function showToast(message, type = 'info') {
 function toggleSidebar() {
   sidebarOpen = !sidebarOpen;
   document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
+  document.getElementById('sidebarBackdrop').classList.toggle('visible', sidebarOpen);
+  closeMobileMenu();
 }
 function closeSidebar() {
   sidebarOpen = false;
   document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('visible');
+}
+function toggleMobileMenu() {
+  document.getElementById('mobileMenuDropdown').classList.toggle('open');
+}
+function closeMobileMenu() {
+  document.getElementById('mobileMenuDropdown').classList.remove('open');
 }
 
 // =============================
@@ -7880,11 +7962,16 @@ function copySunoPrompt() {
   });
 }
 
-// Close suno dropdowns on outside click
-document.addEventListener('click', function() {
+// Close suno dropdowns + mobile menu on outside click
+document.addEventListener('click', function(e) {
   const vdd = document.getElementById('suno_version_dd');
   if (vdd) vdd.classList.remove('open');
   closeSunoAudioDd();
+  // Close mobile overflow menu if click is outside
+  const mdd = document.getElementById('mobileMenuDropdown');
+  if (mdd && !mdd.contains(e.target) && !e.target.closest('.mobile-more-btn')) {
+    closeMobileMenu();
+  }
 });
 
 // =============================
