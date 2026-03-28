@@ -1345,65 +1345,6 @@
   .song-item:hover { background:rgba(124,58,237,0.08) !important; border-color:rgba(124,58,237,0.2) !important; }
   .song-item.active { border-left:2px solid var(--purple) !important; }
 
-  /* ===== YOUTUBE RELEASES PHASE ===== */
-  .yt-release-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
-  .yt-release-card {
-    background:var(--card2); border:1px solid var(--border); border-radius:10px;
-    overflow:hidden; cursor:pointer; transition:all 0.2s; position:relative;
-  }
-  .yt-release-card:hover { border-color:rgba(239,68,68,0.4); transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,0.4); }
-  .yt-thumb { width:100%; aspect-ratio:16/9; object-fit:cover; background:#1a1a2e; display:flex; align-items:center; justify-content:center; }
-  .yt-thumb-placeholder { width:100%; aspect-ratio:16/9; background:linear-gradient(135deg,#1a1a2e,#0f0f1a); display:flex; align-items:center; justify-content:center; font-size:32px; }
-  .yt-release-info { padding:10px 12px; }
-  .yt-release-title { font-size:12px; font-weight:600; color:var(--text); margin-bottom:4px; line-height:1.3; }
-  .yt-release-meta  { font-size:10px; color:var(--text-muted); display:flex; gap:8px; }
-  .yt-release-badge { font-size:9px; padding:2px 6px; border-radius:3px; font-weight:700; }
-  .yt-badge-live { background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); }
-  .yt-badge-linked { background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); }
-  .yt-add-form { display:flex; gap:8px; margin-bottom:16px; }
-  .yt-add-input { flex:1; background:var(--card2); border:1px solid var(--border); border-radius:6px; padding:9px 12px; color:var(--text); font-size:13px; }
-  .yt-add-input:focus { outline:none; border-color:rgba(239,68,68,0.5); }
-  .yt-add-btn { padding:9px 16px; border-radius:6px; border:none; background:#ef4444; color:#fff; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
-  .yt-add-btn:hover { background:#dc2626; }
-  .yt-stats-bar { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
-  .yt-stat { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:10px 16px; text-align:center; flex:1; min-width:80px; }
-  .yt-stat-num { font-size:20px; font-weight:800; color:var(--text); }
-  .yt-stat-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
-
-  /* ===== SINGLES & ALBUMS PHASE ===== */
-  .discography-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:8px; }
-  .album-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; margin-bottom:24px; }
-  .album-card {
-    background:var(--card2); border:1px solid var(--border); border-radius:10px;
-    overflow:hidden; cursor:pointer; transition:all 0.2s;
-  }
-  .album-card:hover { border-color:rgba(124,58,237,0.4); transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,0.4); }
-  .album-cover {
-    width:100%; aspect-ratio:1; display:flex; align-items:center; justify-content:center;
-    font-size:40px; background:linear-gradient(135deg,var(--card2),#0a0a0f);
-  }
-  .album-info { padding:10px 12px; }
-  .album-name { font-size:12px; font-weight:700; color:var(--text); margin-bottom:2px; }
-  .album-meta { font-size:10px; color:var(--text-muted); }
-  .singles-list { display:flex; flex-direction:column; gap:6px; }
-  .single-item {
-    display:flex; align-items:center; gap:12px;
-    background:var(--card2); border:1px solid var(--border); border-radius:8px;
-    padding:10px 14px; cursor:pointer; transition:all 0.2s;
-  }
-  .single-item:hover { border-color:rgba(124,58,237,0.3); background:rgba(124,58,237,0.05); }
-  .single-num { font-size:11px; color:var(--text-muted); width:20px; text-align:center; }
-  .single-info { flex:1; }
-  .single-title { font-size:13px; font-weight:600; color:var(--text); }
-  .single-meta  { font-size:11px; color:var(--text-muted); margin-top:1px; }
-  .single-badge { font-size:9px; padding:2px 6px; border-radius:3px; font-weight:700; }
-  .sb-single { background:rgba(124,58,237,0.15); color:var(--purple-light); border:1px solid rgba(124,58,237,0.3); }
-  .sb-album  { background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
-  .sb-released { background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); }
-  .release-type-toggle { display:flex; gap:6px; }
-  .rt-btn { padding:5px 12px; border-radius:5px; border:1px solid var(--border); background:var(--card2); color:var(--text-muted); font-size:11px; cursor:pointer; transition:all 0.15s; }
-  .rt-btn.active { border-color:var(--purple); color:var(--purple-light); background:rgba(124,58,237,0.1); }
-
   /* ===== ARTIST BIOGRAPHY CARD ===== */
   .bio-card { margin-bottom:12px; }
   .bio-display { display:flex; flex-direction:column; gap:10px; }
@@ -1689,150 +1630,6 @@
   }
   .bs-play-btn:hover { box-shadow:0 0 40px rgba(124,58,237,0.55); transform:scale(1.06); }
   .bs-play-btn.playing { background:linear-gradient(135deg,#ef4444,#dc2626); }
-
-  /* ===== BEAT LAB (Phase 12 – Tone.js) ===== */
-  .bl-section { margin-bottom: 20px; }
-  /* Metronome */
-  .metro-wrap {
-    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
-  }
-  .metro-beat-flash {
-    width: 52px; height: 52px; border-radius: 50%;
-    background: var(--card2); border: 2px solid var(--border);
-    transition: background 0.05s, box-shadow 0.05s;
-    flex-shrink: 0;
-  }
-  .metro-beat-flash.on {
-    background: var(--purple-light);
-    box-shadow: 0 0 22px rgba(157,95,243,0.8);
-  }
-  .metro-beat-flash.on.accent {
-    background: #fff;
-    box-shadow: 0 0 28px rgba(255,255,255,0.9);
-  }
-  .metro-controls { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 200px; }
-  .metro-bpm-row { display: flex; align-items: center; gap: 12px; }
-  .metro-bpm-num {
-    font-size: 36px; font-weight: 800;
-    color: var(--purple-light); min-width: 70px; text-align: center;
-    font-variant-numeric: tabular-nums;
-  }
-  .metro-bpm-sub { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: -4px; }
-  .metro-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
-  .metro-start-btn {
-    padding: 10px 24px; border-radius: 8px; border: none; cursor: pointer;
-    font-size: 14px; font-weight: 700; transition: all 0.2s;
-    background: linear-gradient(135deg, var(--purple), #5b21b6);
-    color: white;
-  }
-  .metro-start-btn:hover { opacity: 0.9; }
-  .metro-start-btn.running { background: linear-gradient(135deg, #ef4444, #dc2626); }
-  .tap-btn {
-    padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--card2); color: var(--text); cursor: pointer;
-    font-size: 13px; font-weight: 600; transition: all 0.15s;
-  }
-  .tap-btn:active { background: var(--purple); color: white; border-color: var(--purple); transform: scale(0.96); }
-  .metro-beats-row { display: flex; gap: 6px; }
-  .metro-dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--card2); border: 1px solid var(--border);
-    transition: all 0.05s;
-  }
-  .metro-dot.beat-on { background: var(--purple-light); box-shadow: 0 0 8px rgba(157,95,243,0.6); }
-  .metro-dot.beat-acc { background: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.7); }
-  /* Step Sequencer */
-  .seq-grid { display: flex; flex-direction: column; gap: 6px; }
-  .seq-row { display: flex; align-items: center; gap: 6px; }
-  .seq-label {
-    width: 56px; font-size: 11px; font-weight: 700; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; text-align: right;
-  }
-  .seq-steps { display: flex; gap: 3px; flex: 1; }
-  .seq-step {
-    flex: 1; height: 32px; border-radius: 5px; border: 1px solid var(--border);
-    background: var(--card2); cursor: pointer; transition: all 0.1s;
-    min-width: 0;
-  }
-  .seq-step.on { background: var(--purple); border-color: var(--purple-light); box-shadow: 0 0 8px rgba(124,58,237,0.5); }
-  .seq-step.beat4 { border-left: 2px solid rgba(124,58,237,0.3); }
-  .seq-step.playing { box-shadow: 0 0 14px rgba(255,255,255,0.5) !important; filter: brightness(1.4); }
-  .seq-step.on.playing { background: #fff; }
-  .seq-vol-col { width: 60px; display: flex; align-items: center; gap: 4px; }
-  .seq-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
-  .seq-bpm-sync { font-size: 12px; color: var(--text-muted); }
-  /* Chord Piano */
-  .chord-root-grid {
-    display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 10px;
-  }
-  @media(max-width:600px){ .chord-root-grid { grid-template-columns: repeat(4,1fr); } }
-  .chord-root-btn {
-    padding: 8px 4px; border-radius: 7px; border: 1px solid var(--border);
-    background: var(--card2); color: var(--text); cursor: pointer;
-    font-size: 12px; font-weight: 700; text-align: center; transition: all 0.15s;
-  }
-  .chord-root-btn:hover { border-color: var(--purple); color: var(--purple-light); }
-  .chord-root-btn.active { background: var(--purple); border-color: var(--purple-light); color: white; box-shadow: 0 0 12px rgba(124,58,237,0.4); }
-  .chord-type-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-  .chord-type-btn {
-    padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);
-    background: var(--card2); color: var(--text-muted); cursor: pointer;
-    font-size: 12px; font-weight: 600; transition: all 0.15s;
-  }
-  .chord-type-btn:hover { color: var(--text); border-color: var(--purple); }
-  .chord-type-btn.active { background: rgba(124,58,237,0.2); border-color: var(--purple); color: var(--purple-light); }
-  .chord-play-area {
-    background: var(--card2); border: 1px solid var(--border); border-radius: 10px;
-    padding: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-  }
-  .chord-name { font-size: 24px; font-weight: 800; color: var(--purple-light); min-width: 80px; }
-  .chord-notes { font-size: 13px; color: var(--text-muted); }
-  .chord-play-btn {
-    padding: 12px 28px; border-radius: 8px; border: none;
-    background: linear-gradient(135deg, var(--purple), #5b21b6);
-    color: white; font-size: 15px; font-weight: 700; cursor: pointer;
-    transition: all 0.15s;
-  }
-  .chord-play-btn:hover { opacity: 0.9; transform: scale(1.02); }
-  .chord-play-btn:active { transform: scale(0.97); }
-  .chord-scale-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-  .chord-scale-btn {
-    padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border);
-    background: var(--card2); color: var(--text-muted); cursor: pointer; font-size: 11px; font-weight: 600;
-    transition: all 0.15s;
-  }
-  .chord-scale-btn:hover { color: var(--blue); border-color: var(--blue); }
-  /* Mini Keyboard */
-  .keyboard-wrap { position: relative; height: 90px; display: flex; margin-bottom: 10px; user-select: none; overflow: hidden; border-radius: 8px; border: 1px solid var(--border); }
-  .key-white {
-    flex: 1; height: 100%; background: #e8e8f0; border-right: 1px solid #888;
-    cursor: pointer; position: relative; border-radius: 0 0 5px 5px; transition: background 0.07s;
-    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px;
-  }
-  .key-white:last-child { border-right: none; }
-  .key-white:hover, .key-white.pressed { background: #c5b8f8; }
-  .key-white .key-label { font-size: 9px; font-weight: 700; color: #555; pointer-events: none; }
-  .key-black {
-    position: absolute; top: 0; width: 7%; height: 60%; background: #1a1a2e;
-    border-radius: 0 0 4px 4px; cursor: pointer; z-index: 2; border: 1px solid #000;
-    transition: background 0.07s;
-  }
-  .key-black:hover, .key-black.pressed { background: var(--purple); }
-  /* Effects */
-  .fx-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-  @media(max-width:500px){ .fx-grid { grid-template-columns: 1fr 1fr; } }
-  .fx-knob-wrap {
-    background: var(--card2); border: 1px solid var(--border); border-radius: 8px;
-    padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px;
-  }
-  .fx-knob-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
-  .fx-val { font-size: 16px; font-weight: 800; color: var(--purple-light); }
-  /* Visualizer */
-  .bl-visualizer {
-    width: 100%; height: 80px; border-radius: 8px;
-    background: var(--card2); border: 1px solid var(--border);
-    display: block;
-  }
 
   /* ================================================================
      ██████   AI NEURAL CORE — DESIGN SYSTEM v2
@@ -2417,19 +2214,6 @@
   /* ── OVERVIEW ── */
   .ov-copy-box { font-family: var(--font-tech); font-size: 12px; background: rgba(4,4,14,0.9); }
 
-  /* ── YT & DISCOGRAPHY ── */
-  .yt-stat { background: rgba(8,8,18,0.9); border-color: rgba(124,58,237,0.1); }
-  .yt-stat-num { font-family: var(--font-head); }
-
-  /* ── BEAT LAB FX KNOBS ── */
-  .fx-val { font-family: var(--font-head); color: var(--cyan); }
-  .fx-knob-label { font-family: var(--font-tech); color: rgba(0,212,255,0.4); }
-  .fx-knob-wrap {
-    background: rgba(6,6,16,0.9);
-    border: 1px solid rgba(124,58,237,0.12);
-  }
-  .bl-visualizer { background: rgba(4,4,12,0.95); border-color: rgba(0,212,255,0.1); }
-
   /* ── SUNO TOGGLE BUTTONS ── */
   .suno-toggle-btn { font-family: var(--font-tech); font-size: 11px; }
   .suno-toggle-btn.sel { border-color: var(--cyan); color: var(--cyan); background: rgba(0,212,255,0.07); }
@@ -2539,8 +2323,6 @@
   .ob-skip { font-size: 12px; color: var(--text-muted); cursor: pointer; }
   .ob-skip:hover { color: var(--text); }
 </style>
-<!-- Tone.js vor dem App-Script laden – Beat Lab benötigt Tone global -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 
 </head>
 <body>
@@ -2678,64 +2460,48 @@
   <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-section">
-      <div class="sidebar-section-title">// MODULE.CORE</div>
+      <div class="sidebar-section-title">WORKFLOW</div>
       <div class="nav-item" data-phase="0" onclick="switchPhase(0)">
-        <div class="phase-num" style="background:rgba(0,212,255,0.15);color:#00d4ff;font-size:9px;letter-spacing:0.5px;">HQ</div>
-        <span>Übersicht & Suno</span>
+        <div class="phase-num" style="background:rgba(0,212,255,0.1);font-size:14px;border:none;">🏠</div>
+        <span>Start</span>
       </div>
       <div class="nav-item active" data-phase="1" onclick="switchPhase(1)">
-        <div class="phase-num">1</div>
-        <span>Song-Idee & Konzept</span>
+        <div class="phase-num" style="font-size:14px;border:none;">💡</div>
+        <span>Konzept</span>
       </div>
       <div class="nav-item" data-phase="2" onclick="switchPhase(2)">
-        <div class="phase-num">2</div>
-        <span>Lyrics schreiben</span>
+        <div class="phase-num" style="font-size:14px;border:none;">✍️</div>
+        <span>Lyrics</span>
       </div>
       <div class="nav-item" data-phase="3" onclick="switchPhase(3)">
-        <div class="phase-num">3</div>
-        <span>Beat-Briefing Suno</span>
+        <div class="phase-num" style="font-size:14px;border:none;">🎹</div>
+        <span>Beat & Sound</span>
       </div>
       <div class="nav-item" data-phase="4" onclick="switchPhase(4)">
-        <div class="phase-num">4</div>
+        <div class="phase-num" style="font-size:14px;border:none;">✅</div>
         <span>Produktions-Check</span>
       </div>
       <div class="nav-item" data-phase="5" onclick="switchPhase(5)">
-        <div class="phase-num">5</div>
-        <span>Cover & Artwork</span>
+        <div class="phase-num" style="font-size:14px;border:none;">🎨</div>
+        <span>Artwork</span>
       </div>
       <div class="nav-item" data-phase="6" onclick="switchPhase(6)">
-        <div class="phase-num">6</div>
-        <span>Promo-Texte</span>
+        <div class="phase-num" style="font-size:14px;border:none;">📱</div>
+        <span>Promo</span>
       </div>
       <div class="nav-item" data-phase="7" onclick="switchPhase(7)">
-        <div class="phase-num">7</div>
+        <div class="phase-num" style="font-size:14px;border:none;">▶️</div>
         <span>YouTube Upload</span>
       </div>
       <hr class="sidebar-divider">
-      <div class="sidebar-section-title" style="padding:8px 4px 4px;">// MODULE.STUDIO</div>
+      <div class="sidebar-section-title" style="padding:8px 4px 4px;">TOOLS</div>
       <div class="nav-item" data-phase="8" onclick="switchPhase(8)">
-        <div class="phase-num" style="background:rgba(245,158,11,0.15);color:#f59e0b;font-size:9px;">8</div>
+        <div class="phase-num" style="font-size:14px;border:none;">🎧</div>
         <span>Audio Studio</span>
       </div>
       <div class="nav-item" data-phase="9" onclick="switchPhase(9)">
-        <div class="phase-num" style="background:rgba(0,255,136,0.12);color:#00ff88;font-size:9px;">9</div>
+        <div class="phase-num" style="font-size:14px;border:none;">💬</div>
         <span>Producer Chat</span>
-      </div>
-      <hr class="sidebar-divider">
-      <div class="sidebar-section-title" style="padding:8px 4px 4px;">// MODULE.RELEASE</div>
-      <div class="nav-item" data-phase="10" onclick="switchPhase(10)">
-        <div class="phase-num" style="background:rgba(239,68,68,0.15);color:#ef4444;font-size:9px;letter-spacing:0.5px;">YT</div>
-        <span>YouTube Releases</span>
-      </div>
-      <div class="nav-item" data-phase="11" onclick="switchPhase(11)">
-        <div class="phase-num" style="background:rgba(234,179,8,0.15);color:#eab308;font-size:13px;">💿</div>
-        <span>Singles & Alben</span>
-      </div>
-      <hr class="sidebar-divider">
-      <div class="sidebar-section-title" style="padding:8px 4px 4px;">// MODULE.LAB</div>
-      <div class="nav-item" data-phase="12" onclick="switchPhase(12)">
-        <div class="phase-num" style="background:rgba(236,72,153,0.15);color:#ec4899;font-size:13px;">🎹</div>
-        <span>Beat Lab</span>
       </div>
     </div>
 
@@ -2743,15 +2509,18 @@
 
     <div class="song-management">
       <button class="btn-new-song" onclick="createNewSong()">⊕ NEUER TRACK</button>
-      <div class="sidebar-section-title" style="margin-bottom:8px;">// TRACKS</div>
+      <div class="sidebar-section-title" style="margin-bottom:8px;">TRACKS</div>
       <div class="song-list" id="songList"></div>
     </div>
 
     <!-- AI Status Footer -->
     <div style="padding:10px 14px 14px;margin-top:auto;border-top:1px solid rgba(0,212,255,0.05);">
-      <div style="display:flex;align-items:center;gap:7px;">
-        <span style="width:6px;height:6px;border-radius:50%;background:#00d4ff;box-shadow:0 0 8px #00d4ff;animation:pulse 2.5s ease-in-out infinite;flex-shrink:0;"></span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:rgba(0,212,255,0.35);letter-spacing:1.5px;text-transform:uppercase;">GROQ AI READY</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <span style="width:6px;height:6px;border-radius:50%;background:#00d4ff;box-shadow:0 0 8px #00d4ff;animation:pulse 2.5s ease-in-out infinite;flex-shrink:0;"></span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:rgba(0,212,255,0.35);letter-spacing:1.5px;text-transform:uppercase;">GROQ AI READY</span>
+        </div>
+        <button onclick="openProfileSettings()" title="Profil bearbeiten" style="background:none;border:none;color:rgba(255,255,255,0.25);cursor:pointer;font-size:14px;padding:2px 4px;" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">⚙️</button>
       </div>
     </div>
   </div>
@@ -2773,8 +2542,8 @@
       <div class="phase-header">
         <div class="phase-icon">📊</div>
         <div>
-          <div class="phase-title">Übersicht & Suno-Cockpit</div>
-          <div class="phase-subtitle">Alle Einstellungen auf einen Blick – direkt kopierbar</div>
+          <div class="phase-title">Start</div>
+          <div class="phase-subtitle">Dein Artist-Profil & Suno-Einstellungen</div>
         </div>
       </div>
 
@@ -2866,8 +2635,8 @@
       <div class="phase-header">
         <div class="phase-icon">💡</div>
         <div>
-          <div class="phase-title">Song-Idee & Konzept</div>
-          <div class="phase-subtitle">Entwickle dein Song-Konzept mit KI-Unterstützung</div>
+          <div class="phase-title">Konzept</div>
+          <div class="phase-subtitle">Entwickle deine Song-Idee mit KI-Unterstützung</div>
         </div>
       </div>
 
@@ -3071,7 +2840,7 @@
       <div class="phase-header">
         <div class="phase-icon">✍️</div>
         <div>
-          <div class="phase-title">Lyrics schreiben</div>
+          <div class="phase-title">Lyrics</div>
           <div class="phase-subtitle">Generiere und bearbeite deine Song-Texte</div>
         </div>
       </div>
@@ -3197,8 +2966,8 @@
       <div class="phase-header">
         <div class="phase-icon" style="background:rgba(59,130,246,0.2);color:#60a5fa;">🎹</div>
         <div>
-          <div class="phase-title">Beat Studio</div>
-          <div class="phase-subtitle">Beats bauen · Suno Prompts erstellen · Persona wählen</div>
+          <div class="phase-title">Beat & Sound</div>
+          <div class="phase-subtitle">Suno Prompt erstellen · Stil wählen · Persona</div>
         </div>
       </div>
 
@@ -3826,8 +3595,8 @@
       <div class="phase-header">
         <div class="phase-icon">🎨</div>
         <div>
-          <div class="phase-title">Cover & Artwork</div>
-          <div class="phase-subtitle">Generiere Bildprompts für Midjourney und DALL-E</div>
+          <div class="phase-title">Artwork</div>
+          <div class="phase-subtitle">Bildprompts für Midjourney und DALL-E generieren</div>
         </div>
       </div>
       <div class="card">
@@ -3914,7 +3683,7 @@
       <div class="phase-header">
         <div class="phase-icon">📱</div>
         <div>
-          <div class="phase-title">Promo-Texte</div>
+          <div class="phase-title">Promo</div>
           <div class="phase-subtitle">Social Media Content für TikTok, Instagram, Twitter/X</div>
         </div>
       </div>
@@ -4281,229 +4050,6 @@
       </div>
     </div>
 
-    <!-- PHASE 10: YouTube Releases -->
-    <div class="phase-panel" id="phase10">
-      <div class="phase-header">
-        <div class="phase-icon" style="background:rgba(239,68,68,0.15);color:#ef4444;">▶</div>
-        <div>
-          <div class="phase-title">YouTube Releases</div>
-          <div class="phase-subtitle">Deine Songs die bereits online sind – Übersicht & Stats</div>
-        </div>
-      </div>
-      <div class="yt-stats-bar" id="ytStatsBar">
-        <div class="yt-stat"><div class="yt-stat-num" id="ytTotalReleases">0</div><div class="yt-stat-label">Releases</div></div>
-        <div class="yt-stat"><div class="yt-stat-num" id="ytTotalViews">–</div><div class="yt-stat-label">Views (gesamt)</div></div>
-        <div class="yt-stat"><div class="yt-stat-num" id="ytLinkedSongs">0</div><div class="yt-stat-label">Verknüpfte Songs</div></div>
-      </div>
-      <div class="card" style="margin-bottom:12px;">
-        <div class="card-title">▶ YouTube Video hinzufügen</div>
-        <div class="yt-add-form">
-          <input class="yt-add-input" id="ytAddUrl" placeholder="https://www.youtube.com/watch?v=... oder youtu.be/..." onkeydown="if(event.key==='Enter')addYtRelease()">
-          <button class="yt-add-btn" onclick="addYtRelease()">+ Hinzufügen</button>
-        </div>
-        <div style="font-size:11px;color:var(--text-muted);">Füge deine bereits auf YouTube veröffentlichten Songs hinzu. Titel & Thumbnail werden automatisch geladen.</div>
-      </div>
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div class="card-title" style="margin-bottom:0;">🎬 Meine Releases</div>
-          <button class="btn-secondary" onclick="refreshAllYtData()" style="font-size:11px;padding:5px 10px;">↻ Aktualisieren</button>
-        </div>
-        <div class="yt-release-grid" id="ytReleaseGrid">
-          <div style="color:var(--text-muted);font-size:13px;grid-column:1/-1;padding:20px 0;text-align:center;">
-            Noch keine Releases. Füge deine YouTube-Links oben hinzu.
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PHASE 11: Singles & Albums -->
-    <div class="phase-panel" id="phase11">
-      <div class="phase-header">
-        <div class="phase-icon" style="background:rgba(234,179,8,0.15);color:#eab308;">💿</div>
-        <div>
-          <div class="phase-title">Singles & Alben</div>
-          <div class="phase-subtitle">Deine Diskografie – verwalte Releases, Singles und Alben</div>
-        </div>
-      </div>
-
-      <!-- Albums -->
-      <div class="card" style="margin-bottom:12px;">
-        <div class="discography-header">
-          <div class="card-title" style="margin-bottom:0;">🗂 Alben</div>
-          <button class="btn-ai" onclick="openCreateAlbum()" style="padding:7px 16px;font-size:12px;">+ Neues Album</button>
-        </div>
-        <div class="album-grid" id="albumGrid">
-          <div style="color:var(--text-muted);font-size:12px;grid-column:1/-1;">Noch keine Alben. Erstelle dein erstes Album.</div>
-        </div>
-      </div>
-
-      <!-- Singles / Tracklist -->
-      <div class="card">
-        <div class="discography-header">
-          <div class="card-title" style="margin-bottom:0;">🎵 Diskografie</div>
-          <div class="release-type-toggle">
-            <button class="rt-btn active" onclick="filterDisc(this,'all')">Alle</button>
-            <button class="rt-btn" onclick="filterDisc(this,'single')">Singles</button>
-            <button class="rt-btn" onclick="filterDisc(this,'album')">Album-Tracks</button>
-            <button class="rt-btn" onclick="filterDisc(this,'unreleased')">Unveröffentlicht</button>
-          </div>
-        </div>
-        <div class="singles-list" id="discList">
-          <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0;">
-            Erstelle Songs (Phase 1) und markiere sie als Single oder Album-Track.
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PHASE 12: Beat Lab (Tone.js) -->
-    <div class="phase-panel" id="phase12">
-      <div class="phase-header">
-        <div class="phase-icon" style="background:rgba(236,72,153,0.15);color:#ec4899;">🎹</div>
-        <div>
-          <div class="phase-title">Beat Lab</div>
-          <div class="phase-subtitle">Metronom · Step Sequencer · Akkord-Piano · Melodie-Synth · Effects</div>
-        </div>
-      </div>
-
-      <!-- METRONOME -->
-      <div class="card bl-section">
-        <div class="card-title">Metronom</div>
-        <div class="metro-wrap">
-          <div>
-            <div class="metro-beat-flash" id="metroBeatFlash"></div>
-            <div class="metro-beats-row" id="metroDotsRow" style="margin-top:8px;justify-content:center;"></div>
-          </div>
-          <div class="metro-controls">
-            <div class="metro-bpm-row">
-              <div>
-                <div class="metro-bpm-num" id="metroBpmNum">120</div>
-                <div class="metro-bpm-sub">BPM</div>
-              </div>
-              <div style="flex:1;">
-                <input type="range" id="metroBpmSlider" min="40" max="240" value="120" oninput="updateMetroBpm(this.value)" style="width:100%;">
-                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:2px;"><span>40</span><span>240</span></div>
-              </div>
-            </div>
-            <div class="metro-btn-row">
-              <button class="metro-start-btn" id="metroStartBtn" onclick="toggleMetronome()">▶ Start</button>
-              <button class="tap-btn" onclick="tapTempo()" title="Tap-Tempo">TAP</button>
-              <button class="btn-secondary" onclick="syncMetroFromPhase8()" style="font-size:12px;padding:8px 12px;" title="BPM aus Phase 8 laden">🔄 Sync BPM</button>
-              <select id="metroTimeSig" onchange="updateMetroTimeSig()" style="padding:6px 10px;font-size:12px;width:auto;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);">
-                <option value="4">4/4</option>
-                <option value="3">3/4</option>
-                <option value="2">2/4</option>
-                <option value="6">6/8</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- STEP SEQUENCER -->
-      <div class="card bl-section">
-        <div class="seq-top-row">
-          <div class="card-title" style="margin-bottom:0;">16-Step Sequencer</div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <span class="seq-bpm-sync" id="seqBpmDisplay">120 BPM</span>
-            <button class="metro-start-btn" id="seqStartBtn" onclick="toggleSequencer()" style="padding:7px 18px;font-size:13px;">▶ Play</button>
-            <button class="tap-btn" onclick="clearSeq()" style="font-size:12px;padding:7px 12px;">✕ Clear</button>
-            <button class="tap-btn" onclick="randomizeSeq()" style="font-size:12px;padding:7px 12px;">🎲 Zufall</button>
-          </div>
-        </div>
-        <div class="seq-grid" id="seqGrid">
-          <!-- rows generated by JS -->
-        </div>
-        <canvas class="bl-visualizer" id="seqVisualizer" style="margin-top:12px;height:60px;"></canvas>
-      </div>
-
-      <!-- CHORD PIANO -->
-      <div class="card bl-section">
-        <div class="card-title">Akkord-Piano</div>
-        <div class="chord-root-grid" id="chordRootGrid"></div>
-        <div class="chord-type-row" id="chordTypeRow"></div>
-        <div class="chord-play-area">
-          <div>
-            <div class="chord-name" id="chordNameDisplay">C maj</div>
-            <div class="chord-notes" id="chordNotesDisplay">C4 · E4 · G4</div>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-            <select id="chordOctave" style="padding:6px 10px;font-size:12px;width:auto;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);">
-              <option value="3">Oktave 3</option>
-              <option value="4" selected>Oktave 4</option>
-              <option value="5">Oktave 5</option>
-            </select>
-            <button class="chord-play-btn" onclick="playCurrentChord()">▶ Akkord spielen</button>
-            <button class="tap-btn" onclick="playArpeggio()" style="padding:10px 16px;font-size:13px;">🎵 Arpeggio</button>
-          </div>
-        </div>
-        <div style="margin-top:10px;">
-          <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Skala spielen</div>
-          <div class="chord-scale-row" id="chordScaleRow"></div>
-        </div>
-      </div>
-
-      <!-- MELODIE SYNTH + KEYBOARD -->
-      <div class="card bl-section">
-        <div class="seq-top-row">
-          <div class="card-title" style="margin-bottom:0;">Melodie-Synth</div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <select id="synthType" onchange="updateSynthType()" style="padding:6px 10px;font-size:12px;width:auto;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);">
-              <option value="synth">Synth</option>
-              <option value="fm">FM Synth</option>
-              <option value="am">AM Synth</option>
-              <option value="pluck">Pluck</option>
-              <option value="metal">Metal</option>
-            </select>
-            <select id="synthOctave" style="padding:6px 10px;font-size:12px;width:auto;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);">
-              <option value="3">Okt 3</option>
-              <option value="4" selected>Okt 4</option>
-              <option value="5">Okt 5</option>
-            </select>
-          </div>
-        </div>
-        <div class="keyboard-wrap" id="miniKeyboard"></div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">Klicken zum Spielen · Computer-Tastatur: A S D F G H J = C D E F G A B</div>
-      </div>
-
-      <!-- EFFECTS RACK -->
-      <div class="card bl-section">
-        <div class="card-title">Effects Rack</div>
-        <div class="fx-grid">
-          <div class="fx-knob-wrap">
-            <div class="fx-knob-label">Reverb</div>
-            <div class="fx-val" id="fxReverbVal">30%</div>
-            <input type="range" min="0" max="100" value="30" oninput="setFxReverb(this.value)" style="width:100%;">
-          </div>
-          <div class="fx-knob-wrap">
-            <div class="fx-knob-label">Delay</div>
-            <div class="fx-val" id="fxDelayVal">0%</div>
-            <input type="range" min="0" max="100" value="0" oninput="setFxDelay(this.value)" style="width:100%;">
-          </div>
-          <div class="fx-knob-wrap">
-            <div class="fx-knob-label">Distortion</div>
-            <div class="fx-val" id="fxDistVal">0%</div>
-            <input type="range" min="0" max="100" value="0" oninput="setFxDist(this.value)" style="width:100%;">
-          </div>
-          <div class="fx-knob-wrap">
-            <div class="fx-knob-label">Chorus</div>
-            <div class="fx-val" id="fxChorusVal">0%</div>
-            <input type="range" min="0" max="100" value="0" oninput="setFxChorus(this.value)" style="width:100%;">
-          </div>
-          <div class="fx-knob-wrap">
-            <div class="fx-knob-label">Pitch Shift</div>
-            <div class="fx-val" id="fxPitchVal">0</div>
-            <input type="range" min="-12" max="12" value="0" oninput="setFxPitch(this.value)" style="width:100%;">
-          </div>
-          <div class="fx-knob-wrap">
-            <div class="fx-knob-label">Master Vol</div>
-            <div class="fx-val" id="fxVolVal">80%</div>
-            <input type="range" min="0" max="100" value="80" oninput="setMasterVol(this.value)" style="width:100%;">
-          </div>
-        </div>
-      </div>
-
-    </div>
 
   </div>
 </div>
@@ -4806,13 +4352,6 @@ CREATE POLICY "anon full access" ON studio_songs
   </div>
 </div>
 
-<!-- ===== PHASE 10: YouTube Releases ===== -->
-<div style="display:none" id="phase10_placeholder">
-  <!-- injected into mainContent by switchPhase -->
-</div>
-
-<!-- ===== PHASE 11: Singles & Albums ===== -->
-<div style="display:none" id="phase11_placeholder"></div>
 
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
@@ -6562,31 +6101,17 @@ function applyBezModulPreset(mod) {
 function switchPhase(num) {
   if (num === 0) { updateDashboard(); updateSunoCockpit(); }
   if (num === 3) { setTimeout(() => { initSunoPersonaPicker(); initBeatStudio(); updateBsBpm(); updateSunoLyricsCounter(); updateSunoCockpit(); }, 0); }
-  if (num === 10) { loadYtReleases(); renderYtReleases(); }
-  if (num === 11) { loadAlbums(); renderDiscography(); }
-  if (num === 12) { if (!window._blInit) { initBeatLab(); window._blInit = true; } }
-
-  // Phases 10/11/12 work without a song selected
-  if (num === 10 || num === 11 || num === 12) {
-    currentPhase = num;
-    document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
-    const panel = document.getElementById('phase' + num);
-    if (panel) panel.classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', parseInt(el.dataset.phase) === num));
-    if (window.innerWidth <= 600) closeSidebar();
-    return;
-  }
 
   if (!currentSongId) return;
 
-  // Phase-Sperre: Phase 2 nur wenn Phase 1 vollständig
+  // Phase-Sperre: Lyrics nur wenn Konzept vollständig
   if (num === 2 && !isPhase1Complete()) {
-    showToast('⚠️ Bitte erst Phase 1 vollständig ausfüllen (Thema, Emotion, Sprache, Tonalität).', 'error');
+    showToast('⚠️ Bitte erst Konzept vollständig ausfüllen (Thema, Emotion, Sprache, Tonalität).', 'error');
     return;
   }
-  // Phase-Sperre: Phase 3 nur wenn Phase 2 Lyrics vorhanden
+  // Phase-Sperre: Beat nur wenn Lyrics vorhanden
   if (num === 3 && !isPhase2Complete()) {
-    showToast('⚠️ Bitte erst die Lyrics in Phase 2 schreiben.', 'error');
+    showToast('⚠️ Bitte erst die Lyrics schreiben.', 'error');
     return;
   }
 
@@ -9582,790 +9107,12 @@ function buildIntroParticles() {
 }
 
 // =============================
-// YOUTUBE RELEASES (Phase 10)
-// =============================
-let ytReleases = [];
-
-function loadYtReleases() {
-  try { ytReleases = JSON.parse(localStorage.getItem('studio_yt_releases')||'[]'); } catch(e){ytReleases=[];}
-}
-function saveYtReleases() {
-  localStorage.setItem('studio_yt_releases', JSON.stringify(ytReleases));
-}
-function extractYtId(url) {
-  const m = url.match(/(?:youtu\.be\/|v=|\/embed\/)([A-Za-z0-9_-]{11})/);
-  return m ? m[1] : null;
-}
-async function addYtRelease() {
-  const url = document.getElementById('ytAddUrl').value.trim();
-  if (!url) { showToast('Bitte YouTube-URL eingeben!','error'); return; }
-  const vid = extractYtId(url);
-  if (!vid) { showToast('Ungültige YouTube-URL!','error'); return; }
-  if (ytReleases.find(r=>r.vid===vid)) { showToast('Bereits vorhanden!','error'); return; }
-  showToast('Lade Video-Infos...','success');
-  let title = '', thumb = `https://img.youtube.com/vi/${vid}/mqdefault.jpg`;
-  try {
-    const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${vid}&format=json`);
-    if (res.ok) { const d = await res.json(); title = d.title || ''; }
-  } catch(e) {}
-  const release = { vid, title: title || url, url:`https://youtu.be/${vid}`, thumb, addedAt: new Date().toISOString(), linkedSongId: null };
-  ytReleases.unshift(release);
-  saveYtReleases();
-  document.getElementById('ytAddUrl').value = '';
-  renderYtReleases();
-  showToast('Release hinzugefügt!','success');
-}
-function renderYtReleases() {
-  const grid = document.getElementById('ytReleaseGrid');
-  if (!grid) return;
-  updateYtStats();
-  if (!ytReleases.length) {
-    grid.innerHTML = '<div style="color:var(--text-muted);font-size:13px;grid-column:1/-1;padding:20px 0;text-align:center;">Noch keine Releases. Füge deine YouTube-Links oben hinzu.</div>';
-    return;
-  }
-  grid.innerHTML = ytReleases.map((r,i) => `
-    <div class="yt-release-card" title="${escHtml(r.title)}">
-      <div class="yt-thumb-placeholder">${r.thumb ? `<img src="${r.thumb}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentNode.innerHTML='▶'">` : '▶'}</div>
-      <div class="yt-release-info">
-        <div class="yt-release-title">${escHtml(r.title||r.url)}</div>
-        <div class="yt-release-meta">
-          <span class="yt-release-badge yt-badge-live">▶ YouTube</span>
-          ${r.linkedSongId&&songs[r.linkedSongId] ? `<span class="yt-release-badge yt-badge-linked">🔗 ${escHtml(songs[r.linkedSongId].name||'')}</span>` : ''}
-        </div>
-        <div style="display:flex;gap:6px;margin-top:8px;">
-          <a href="${r.url}" target="_blank" style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(239,68,68,0.15);color:#ef4444;text-decoration:none;border:1px solid rgba(239,68,68,0.3);">▶ Öffnen</a>
-          <button onclick="linkYtToSong(${i})" style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.3);cursor:pointer;">🔗 Song</button>
-          <button onclick="removeYtRelease(${i})" style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(239,68,68,0.05);color:#ef4444;border:1px solid rgba(239,68,68,0.2);cursor:pointer;">✕</button>
-        </div>
-      </div>
-    </div>`).join('');
-}
-function removeYtRelease(i) {
-  if (!confirm('Release entfernen?')) return;
-  ytReleases.splice(i,1); saveYtReleases(); renderYtReleases();
-}
-function linkYtToSong(i) {
-  const songIds = Object.keys(songs);
-  if (!songIds.length) { showToast('Keine Songs vorhanden','error'); return; }
-  const options = songIds.map(id => songs[id].name).join('\n');
-  const choice = prompt(`Mit welchem Song verknüpfen?\n\n${options}\n\nSong-Namen eingeben:`);
-  if (!choice) return;
-  const found = songIds.find(id => songs[id].name.toLowerCase().includes(choice.toLowerCase()));
-  if (found) { ytReleases[i].linkedSongId = found; saveYtReleases(); renderYtReleases(); showToast('Verknüpft!','success'); }
-  else showToast('Song nicht gefunden','error');
-}
-function updateYtStats() {
-  const total = document.getElementById('ytTotalReleases');
-  const linked = document.getElementById('ytLinkedSongs');
-  if (total) total.textContent = ytReleases.length;
-  if (linked) linked.textContent = ytReleases.filter(r=>r.linkedSongId).length;
-}
-function refreshAllYtData() { renderYtReleases(); showToast('Aktualisiert!','success'); }
-
-// =============================
-// SINGLES & ALBUMS (Phase 11)
-// =============================
-let albums = [];
-let discFilter = 'all';
-
-function loadAlbums() {
-  try { albums = JSON.parse(localStorage.getItem('studio_albums')||'[]'); } catch(e){albums=[];}
-}
-function saveAlbums() { localStorage.setItem('studio_albums', JSON.stringify(albums)); }
-
-function openCreateAlbum() {
-  const picker = document.getElementById('albumSongPicker');
-  if (picker) {
-    picker.innerHTML = Object.entries(songs).map(([id,s]) =>
-      `<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;background:var(--card2);border:1px solid var(--border);cursor:pointer;font-size:12px;">
-        <input type="checkbox" value="${id}" style="accent-color:var(--purple);">
-        <span>${escHtml(s.name||'Unbenannt')}</span>
-      </label>`
-    ).join('') || '<div style="color:var(--text-muted);font-size:12px;">Keine Songs vorhanden</div>';
-  }
-  document.getElementById('albumTitle').value='';
-  document.getElementById('albumDate').value='';
-  document.getElementById('albumEmoji').value='💿';
-  document.getElementById('albumModal').classList.remove('hidden');
-}
-function saveAlbum() {
-  const title = document.getElementById('albumTitle').value.trim();
-  if (!title) { showToast('Bitte Album-Titel eingeben!','error'); return; }
-  const date  = document.getElementById('albumDate').value;
-  const emoji = document.getElementById('albumEmoji').value.trim() || '💿';
-  const songIds = [...document.querySelectorAll('#albumSongPicker input:checked')].map(el=>el.value);
-  albums.push({ id:'alb_'+Date.now(), title, date, emoji, songIds, createdAt:new Date().toISOString() });
-  saveAlbums();
-  document.getElementById('albumModal').classList.add('hidden');
-  renderDiscography();
-  showToast(`Album "${title}" erstellt!`,'success');
-}
-function deleteAlbum(id) {
-  if (!confirm('Album löschen?')) return;
-  albums = albums.filter(a=>a.id!==id);
-  saveAlbums(); renderDiscography();
-}
-function filterDisc(btn, type) {
-  discFilter = type;
-  document.querySelectorAll('.rt-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderDiscList();
-}
-function markRelease(songId, type) {
-  if (!songs[songId]) return;
-  songs[songId].releaseType = type;
-  if (!songs[songId].releaseDate && type !== 'unreleased') songs[songId].releaseDate = new Date().toISOString().split('T')[0];
-  saveToStorage();
-  renderDiscography();
-  showToast(type==='single'?'Als Single markiert!':type==='album'?'Als Album-Track markiert!':'Markierung entfernt','success');
-}
-function renderDiscography() {
-  renderAlbumGrid();
-  renderDiscList();
-}
-function renderAlbumGrid() {
-  const grid = document.getElementById('albumGrid');
-  if (!grid) return;
-  if (!albums.length) {
-    grid.innerHTML='<div style="color:var(--text-muted);font-size:12px;grid-column:1/-1;">Noch keine Alben.</div>';
-    return;
-  }
-  grid.innerHTML = albums.map(a => {
-    const trackCount = a.songIds?.length || 0;
-    const yr = a.date ? a.date.split('-')[0] : '';
-    return `<div class="album-card" onclick="showAlbumDetail('${a.id}')">
-      <div class="album-cover">${a.emoji}</div>
-      <div class="album-info">
-        <div class="album-name">${escHtml(a.title)}</div>
-        <div class="album-meta">${yr}${yr&&trackCount?' · ':''}${trackCount?trackCount+' Tracks':''}</div>
-        <button onclick="event.stopPropagation();deleteAlbum('${a.id}')" style="margin-top:6px;font-size:10px;padding:2px 6px;border-radius:3px;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.3);cursor:pointer;">✕ Löschen</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-function showAlbumDetail(id) {
-  const alb = albums.find(a=>a.id===id);
-  if (!alb) return;
-  const tracks = (alb.songIds||[]).map(sid=>songs[sid]?.name||'Unbekannt');
-  showToast(`${alb.emoji} ${alb.title}: ${tracks.join(', ')||'Keine Tracks'}`, 'success');
-}
-function renderDiscList() {
-  const list = document.getElementById('discList');
-  if (!list) return;
-  const all = Object.entries(songs).map(([id,s])=>({id,...s}));
-  const filtered = discFilter==='all' ? all
-    : discFilter==='single'     ? all.filter(s=>s.releaseType==='single')
-    : discFilter==='album'      ? all.filter(s=>s.releaseType==='album')
-    : all.filter(s=>!s.releaseType||s.releaseType==='unreleased');
-  if (!filtered.length) {
-    list.innerHTML='<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0;">Keine Songs in dieser Kategorie.</div>';
-    return;
-  }
-  list.innerHTML = filtered.map((s,i) => {
-    const type = s.releaseType||'unreleased';
-    const badgeCls = type==='single'?'sb-single':type==='album'?'sb-album':'';
-    const badgeTxt = type==='single'?'Single':type==='album'?'Album-Track':'Unveröffentlicht';
-    const ytLink = ytReleases.find(r=>r.linkedSongId===s.id);
-    return `<div class="single-item">
-      <div class="single-num">${i+1}</div>
-      <div class="single-info">
-        <div class="single-title">${escHtml(s.name||'Unbenannt')}</div>
-        <div class="single-meta">${s.releaseDate?'📅 '+s.releaseDate:''}${ytLink?` · <a href="${ytLink.url}" target="_blank" style="color:#ef4444;text-decoration:none;">▶ YouTube</a>`:''}</div>
-      </div>
-      ${badgeCls?`<span class="single-badge ${badgeCls}">${badgeTxt}</span>`:`<span class="single-badge" style="background:rgba(100,116,139,0.1);color:#64748b;border:1px solid rgba(100,116,139,0.2);">${badgeTxt}</span>`}
-      <div style="display:flex;gap:4px;">
-        <button onclick="markRelease('${s.id}','single')" title="Als Single markieren" style="font-size:10px;padding:3px 7px;border-radius:4px;background:rgba(124,58,237,0.1);color:var(--purple-light);border:1px solid rgba(124,58,237,0.3);cursor:pointer;">💿 Single</button>
-        <button onclick="markRelease('${s.id}','album')" title="Als Album-Track markieren" style="font-size:10px;padding:3px 7px;border-radius:4px;background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.3);cursor:pointer;">📀 Album</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ====================================================
-// BEAT LAB — Tone.js (Phase 12)
-// ====================================================
-let toneReady = false;
-let metronomePlaying = false;
-let sequencerPlaying = false;
-let metroCurrentBeat = 0;
-let metroTimeSig = 4;
-let metroBpm = 120;
-let tapTimes = [];
-
-// Tone objects (lazy-init after first user gesture)
-let blSynth = null;
-let blFmSynth = null;
-let blAmSynth = null;
-let blPluck = null;
-let blMetal = null;
-let activeSynth = null;
-let blReverb = null;
-let blDelay = null;
-let blDist = null;
-let blChorus = null;
-let blPitchShift = null;
-let blMasterVol = null;
-let blDrums = {};
-let blMetroSeq = null;
-let blStepSeq = null;
-let blAnalyser = null;
-let blVizAnimId = null;
-
-const SEQ_ROWS = [
-  { id: 'kick',  label: 'Kick',  note: 'C1',  color: '#ef4444' },
-  { id: 'snare', label: 'Snare', note: 'D1',  color: '#f59e0b' },
-  { id: 'hihat', label: 'HiHat', note: 'F#1', color: '#10b981' },
-  { id: 'clap',  label: 'Clap',  note: 'E1',  color: '#3b82f6' },
-  { id: 'open',  label: 'Open',  note: 'A#1', color: '#8b5cf6' },
-  { id: 'bass',  label: 'Bass',  note: 'C2',  color: '#ec4899' },
-];
-// 16 steps per row
-const seqSteps = {};
-SEQ_ROWS.forEach(r => { seqSteps[r.id] = Array(16).fill(false); });
-let seqCurrentStep = 0;
-
-// Chord data
-const NOTES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-const CHORD_TYPES = {
-  'maj':   { label: 'Dur',        intervals: [0,4,7] },
-  'min':   { label: 'Moll',       intervals: [0,3,7] },
-  '7':     { label: 'Dom 7',      intervals: [0,4,7,10] },
-  'maj7':  { label: 'Maj 7',      intervals: [0,4,7,11] },
-  'min7':  { label: 'Moll 7',     intervals: [0,3,7,10] },
-  'sus2':  { label: 'Sus2',       intervals: [0,2,7] },
-  'sus4':  { label: 'Sus4',       intervals: [0,5,7] },
-  'dim':   { label: 'Dim',        intervals: [0,3,6] },
-  'aug':   { label: 'Aug',        intervals: [0,4,8] },
-  'add9':  { label: 'Add9',       intervals: [0,4,7,14] },
-};
-const SCALES = {
-  'major':      { label: 'Dur',           intervals: [0,2,4,5,7,9,11] },
-  'minor':      { label: 'Moll',          intervals: [0,2,3,5,7,8,10] },
-  'pent_maj':   { label: 'Pentatonik Dur',intervals: [0,2,4,7,9] },
-  'pent_min':   { label: 'Pentatonik Moll',intervals:[0,3,5,7,10] },
-  'blues':      { label: 'Blues',         intervals: [0,3,5,6,7,10] },
-  'dorian':     { label: 'Dorisch',       intervals: [0,2,3,5,7,9,10] },
-  'phrygian':   { label: 'Phrygisch',     intervals: [0,1,3,5,7,8,10] },
-  'mixolydian': { label: 'Mixolydisch',   intervals: [0,2,4,5,7,9,10] },
-};
-let chordRoot = 'C';
-let chordType = 'maj';
-let chordOctave = 4;
-
-// Polyphonic synth for chords
-let blPolySynth = null;
-
-async function initTone() {
-  if (toneReady) return;
-  await Tone.start();
-
-  // Master
-  blMasterVol = new Tone.Volume(-4).toDestination();
-
-  // Effects chain (synth → fx → master)
-  blReverb   = new Tone.Reverb({ decay: 2.5, wet: 0.3 }).connect(blMasterVol);
-  blDelay    = new Tone.FeedbackDelay('8n', 0.3).connect(blReverb);
-  blDelay.wet.value = 0;
-  blDist     = new Tone.Distortion(0).connect(blDelay);
-  blChorus   = new Tone.Chorus(4, 2.5, 0.3).connect(blDist).start();
-  blChorus.wet.value = 0;
-  blPitchShift = new Tone.PitchShift(0).connect(blChorus);
-  blAnalyser = new Tone.Analyser('waveform', 256);
-  blMasterVol.connect(blAnalyser);
-
-  // Synths
-  blSynth  = new Tone.Synth({ oscillator:{type:'sawtooth'}, envelope:{attack:0.02,decay:0.1,sustain:0.3,release:0.8} }).connect(blPitchShift);
-  blFmSynth= new Tone.FMSynth().connect(blPitchShift);
-  blAmSynth= new Tone.AMSynth().connect(blPitchShift);
-  blPluck  = new Tone.PluckSynth().connect(blPitchShift);
-  blMetal  = new Tone.MetalSynth({ frequency:400, envelope:{attack:0.001,decay:0.4,release:0.2}, harmonicity:5.1, modulationIndex:32, resonance:4000, octaves:1.5 }).connect(blPitchShift);
-  activeSynth = blSynth;
-
-  blPolySynth = new Tone.PolySynth(Tone.Synth, {
-    oscillator: { type: 'triangle' },
-    envelope: { attack: 0.02, decay: 0.3, sustain: 0.4, release: 1.2 }
-  }).connect(blPitchShift);
-
-  // Drums (MembraneSynth + MetalSynth)
-  blDrums = {
-    kick:  new Tone.MembraneSynth({ pitchDecay:0.05, octaves:10, envelope:{attack:0.001,decay:0.4,sustain:0,release:0.2} }).connect(blMasterVol),
-    snare: new Tone.NoiseSynth({ noise:{type:'white'}, envelope:{attack:0.001,decay:0.2,sustain:0,release:0.1} }).connect(blMasterVol),
-    hihat: new Tone.MetalSynth({ frequency:400, envelope:{attack:0.001,decay:0.1,release:0.01}, harmonicity:5.1, modulationIndex:32, resonance:4000, octaves:1.5 }).connect(blMasterVol),
-    clap:  new Tone.NoiseSynth({ noise:{type:'pink'}, envelope:{attack:0.001,decay:0.15,sustain:0,release:0.08} }).connect(blMasterVol),
-    open:  new Tone.MetalSynth({ frequency:200, envelope:{attack:0.001,decay:0.6,release:0.3}, harmonicity:5.1, modulationIndex:16, resonance:3000, octaves:1.5 }).connect(blMasterVol),
-    bass:  new Tone.MembraneSynth({ pitchDecay:0.08, octaves:4, envelope:{attack:0.001,decay:0.3,sustain:0.1,release:0.3} }).connect(blMasterVol),
-  };
-
-  toneReady = true;
-  startVisualizerLoop();
-}
-
-// ── METRONOME ──────────────────────────────────────────
-function toggleMetronome() {
-  initTone().then(() => {
-    if (metronomePlaying) {
-      stopMetronome();
-    } else {
-      startMetronome();
-    }
-  });
-}
-let blMetroClickAccent = null;
-let blMetroClickNorm   = null;
-
-function startMetronome() {
-  Tone.Transport.bpm.value = metroBpm;
-  metroCurrentBeat = 0;
-  if (blMetroSeq) { blMetroSeq.dispose(); }
-  // Reuse two fixed synths instead of creating a new one per tick
-  if (!blMetroClickAccent) {
-    blMetroClickAccent = new Tone.Synth({ oscillator:{type:'triangle'}, envelope:{attack:0.001,decay:0.08,sustain:0,release:0.05} }).connect(blMasterVol);
-    blMetroClickNorm   = new Tone.Synth({ oscillator:{type:'sine'},     envelope:{attack:0.001,decay:0.08,sustain:0,release:0.05} }).connect(blMasterVol);
-  }
-  const timeSig = parseInt(document.getElementById('metroTimeSig').value) || 4;
-  metroTimeSig = timeSig;
-  buildMetroDots();
-  blMetroSeq = new Tone.Sequence((time, beat) => {
-    const isAccent = beat === 0;
-    // Click sound — use pre-built synths
-    const click = isAccent ? blMetroClickAccent : blMetroClickNorm;
-    click.triggerAttackRelease(isAccent ? 1200 : 800, '16n', time);
-    // Visual
-    Tone.Draw.schedule(() => {
-      flashMetroBeat(beat, isAccent);
-    }, time);
-    metroCurrentBeat = (beat + 1) % timeSig;
-  }, [...Array(timeSig).keys()], '4n');
-  blMetroSeq.start(0);
-  Tone.Transport.start();
-  metronomePlaying = true;
-  document.getElementById('metroStartBtn').textContent = '■ Stop';
-  document.getElementById('metroStartBtn').classList.add('running');
-}
-function stopMetronome() {
-  if (blMetroSeq) { blMetroSeq.stop(); blMetroSeq.dispose(); blMetroSeq = null; }
-  if (!sequencerPlaying) Tone.Transport.stop();
-  metronomePlaying = false;
-  document.getElementById('metroStartBtn').textContent = '▶ Start';
-  document.getElementById('metroStartBtn').classList.remove('running');
-  document.getElementById('metroBeatFlash').classList.remove('on','accent');
-  document.querySelectorAll('.metro-dot').forEach(d => d.classList.remove('beat-on','beat-acc'));
-}
-function flashMetroBeat(beat, accent) {
-  const el = document.getElementById('metroBeatFlash');
-  el.classList.add('on');
-  if (accent) el.classList.add('accent');
-  else el.classList.remove('accent');
-  document.querySelectorAll('.metro-dot').forEach((d,i) => {
-    d.classList.toggle('beat-on', i === beat);
-    d.classList.toggle('beat-acc', i === beat && accent);
-  });
-  clearTimeout(el._t);
-  el._t = setTimeout(() => { el.classList.remove('on','accent'); }, 100);
-}
-function buildMetroDots() {
-  const row = document.getElementById('metroDotsRow');
-  const n = parseInt(document.getElementById('metroTimeSig').value) || 4;
-  row.innerHTML = Array(n).fill(0).map((_,i) => `<div class="metro-dot" id="mdot${i}"></div>`).join('');
-}
-function updateMetroBpm(val) {
-  metroBpm = parseInt(val);
-  document.getElementById('metroBpmNum').textContent = val;
-  document.getElementById('seqBpmDisplay').textContent = val + ' BPM';
-  if (toneReady) Tone.Transport.bpm.value = metroBpm;
-}
-function updateMetroTimeSig() {
-  metroTimeSig = parseInt(document.getElementById('metroTimeSig').value) || 4;
-  buildMetroDots();
-  if (metronomePlaying) { stopMetronome(); startMetronome(); }
-}
-function syncMetroFromPhase8() {
-  const manualBpm = document.getElementById('bpmManual')?.value;
-  const detectedBpm = document.getElementById('bpmValue')?.textContent;
-  let bpm = parseInt(manualBpm) || parseInt(detectedBpm) || 120;
-  if (bpm < 40 || bpm > 240) bpm = 120;
-  document.getElementById('metroBpmSlider').value = bpm;
-  updateMetroBpm(bpm);
-  showToast(`BPM aus Audio Studio geladen: ${bpm}`, 'success');
-}
-// Tap tempo
-function tapTempo() {
-  const now = performance.now();
-  tapTimes.push(now);
-  if (tapTimes.length > 8) tapTimes.shift();
-  if (tapTimes.length >= 2) {
-    const diffs = [];
-    for (let i = 1; i < tapTimes.length; i++) diffs.push(tapTimes[i] - tapTimes[i-1]);
-    const avg = diffs.reduce((a,b) => a+b, 0) / diffs.length;
-    const bpm = Math.round(60000 / avg);
-    if (bpm >= 40 && bpm <= 240) {
-      document.getElementById('metroBpmSlider').value = bpm;
-      updateMetroBpm(bpm);
-    }
-  }
-  // Reset tap after 2s
-  clearTimeout(window._tapReset);
-  window._tapReset = setTimeout(() => { tapTimes = []; }, 2000);
-}
-
-// ── STEP SEQUENCER ─────────────────────────────────────
-function buildSeqGrid() {
-  const grid = document.getElementById('seqGrid');
-  grid.innerHTML = SEQ_ROWS.map(row => `
-    <div class="seq-row" id="seqRow_${row.id}">
-      <div class="seq-label" style="color:${row.color};">${row.label}</div>
-      <div class="seq-steps" id="seqSteps_${row.id}">
-        ${Array(16).fill(0).map((_,i) => `
-          <div class="seq-step${i%4===0?' beat4':''}" id="seqBtn_${row.id}_${i}"
-               onclick="toggleSeqStep('${row.id}',${i})"
-               onmouseenter="if(window._seqDrag)toggleSeqStep('${row.id}',${i},window._seqDragVal)">
-          </div>
-        `).join('')}
-      </div>
-      <div class="seq-vol-col">
-        <input type="range" min="0" max="100" value="80"
-          oninput="setDrumVol('${row.id}',this.value)"
-          title="${row.label} Lautstärke"
-          style="writing-mode:horizontal-tb;width:50px;height:4px;">
-      </div>
-    </div>
-  `).join('');
-  // Drag support
-  grid.addEventListener('mousedown', () => { window._seqDrag = false; });
-  grid.addEventListener('mousemove', e => {
-    if (e.buttons === 1) window._seqDrag = true;
-  });
-  grid.addEventListener('mouseup', () => { window._seqDrag = false; });
-}
-function toggleSeqStep(row, idx, forceVal) {
-  if (forceVal !== undefined) {
-    seqSteps[row][idx] = forceVal;
-  } else {
-    seqSteps[row][idx] = !seqSteps[row][idx];
-    window._seqDragVal = seqSteps[row][idx];
-  }
-  const btn = document.getElementById(`seqBtn_${row}_${idx}`);
-  btn.classList.toggle('on', seqSteps[row][idx]);
-}
-function setDrumVol(id, val) {
-  if (!toneReady || !blDrums[id]) return;
-  blDrums[id].volume.value = Tone.gainToDb(val / 100);
-}
-function toggleSequencer() {
-  initTone().then(() => {
-    if (sequencerPlaying) {
-      stopSequencer();
-    } else {
-      startSequencer();
-    }
-  });
-}
-function startSequencer() {
-  Tone.Transport.bpm.value = metroBpm;
-  seqCurrentStep = 0;
-  if (blStepSeq) { blStepSeq.dispose(); }
-  blStepSeq = new Tone.Sequence((time, step) => {
-    SEQ_ROWS.forEach(row => {
-      if (seqSteps[row.id][step]) {
-        const drum = blDrums[row.id];
-        if (drum) {
-          if (row.id === 'snare' || row.id === 'clap') drum.triggerAttackRelease('16n', time);
-          else drum.triggerAttackRelease(row.note, '8n', time);
-        }
-      }
-    });
-    Tone.Draw.schedule(() => {
-      highlightSeqStep(step);
-    }, time);
-  }, [...Array(16).keys()], '16n');
-  blStepSeq.start(0);
-  Tone.Transport.start();
-  sequencerPlaying = true;
-  document.getElementById('seqStartBtn').textContent = '■ Stop';
-  document.getElementById('seqStartBtn').classList.add('running');
-}
-function stopSequencer() {
-  if (blStepSeq) { blStepSeq.stop(); blStepSeq.dispose(); blStepSeq = null; }
-  if (!metronomePlaying) Tone.Transport.stop();
-  sequencerPlaying = false;
-  document.getElementById('seqStartBtn').textContent = '▶ Play';
-  document.getElementById('seqStartBtn').classList.remove('running');
-  // Clear highlights
-  document.querySelectorAll('.seq-step').forEach(el => el.classList.remove('playing'));
-}
-function highlightSeqStep(step) {
-  document.querySelectorAll('.seq-step').forEach(el => el.classList.remove('playing'));
-  SEQ_ROWS.forEach(row => {
-    const btn = document.getElementById(`seqBtn_${row.id}_${step}`);
-    if (btn) btn.classList.add('playing');
-  });
-}
-function clearSeq() {
-  SEQ_ROWS.forEach(row => {
-    seqSteps[row.id] = Array(16).fill(false);
-    for (let i = 0; i < 16; i++) {
-      const btn = document.getElementById(`seqBtn_${row.id}_${i}`);
-      if (btn) btn.classList.remove('on');
-    }
-  });
-}
-function randomizeSeq() {
-  SEQ_ROWS.forEach(row => {
-    seqSteps[row.id] = Array(16).fill(0).map((_,i) => {
-      // Kick: more on 1,5,9,13; Snare: on 5,13; HiHat: every other
-      if (row.id === 'kick') return [0,4,8,12].includes(i) ? Math.random()>0.2 : Math.random()>0.75;
-      if (row.id === 'snare') return [4,12].includes(i) ? Math.random()>0.1 : Math.random()>0.85;
-      if (row.id === 'hihat') return Math.random() > 0.35;
-      return Math.random() > 0.7;
-    });
-    for (let i = 0; i < 16; i++) {
-      const btn = document.getElementById(`seqBtn_${row.id}_${i}`);
-      if (btn) btn.classList.toggle('on', seqSteps[row.id][i]);
-    }
-  });
-}
-
-// ── CHORD PIANO ────────────────────────────────────────
-function buildChordPiano() {
-  // Root grid
-  const rg = document.getElementById('chordRootGrid');
-  rg.innerHTML = NOTES.map(n => `
-    <button class="chord-root-btn${n===chordRoot?' active':''}" onclick="selectChordRoot('${n}')">${n}</button>
-  `).join('');
-  // Chord types
-  const ct = document.getElementById('chordTypeRow');
-  ct.innerHTML = Object.entries(CHORD_TYPES).map(([k,v]) => `
-    <button class="chord-type-btn${k===chordType?' active':''}" onclick="selectChordType('${k}')">${v.label}</button>
-  `).join('');
-  // Scales
-  const sc = document.getElementById('chordScaleRow');
-  sc.innerHTML = Object.entries(SCALES).map(([k,v]) => `
-    <button class="chord-scale-btn" onclick="playScale('${k}')">${v.label}</button>
-  `).join('');
-  updateChordDisplay();
-}
-function selectChordRoot(root) {
-  chordRoot = root;
-  document.querySelectorAll('.chord-root-btn').forEach(b => b.classList.toggle('active', b.textContent === root));
-  updateChordDisplay();
-}
-function selectChordType(type) {
-  chordType = type;
-  document.querySelectorAll('.chord-type-btn').forEach((b,i) => {
-    b.classList.toggle('active', Object.keys(CHORD_TYPES)[i] === type);
-  });
-  updateChordDisplay();
-}
-function getChordNotes(root, type, octave) {
-  const rootIdx = NOTES.indexOf(root);
-  const intervals = CHORD_TYPES[type].intervals;
-  return intervals.map(interval => {
-    const noteIdx = (rootIdx + interval) % 12;
-    const noteOct = octave + Math.floor((rootIdx + interval) / 12);
-    return NOTES[noteIdx] + noteOct;
-  });
-}
-function updateChordDisplay() {
-  const oct = parseInt(document.getElementById('chordOctave').value) || 4;
-  chordOctave = oct;
-  const notes = getChordNotes(chordRoot, chordType, chordOctave);
-  document.getElementById('chordNameDisplay').textContent = `${chordRoot} ${CHORD_TYPES[chordType].label}`;
-  document.getElementById('chordNotesDisplay').textContent = notes.join(' · ');
-}
-function playCurrentChord() {
-  initTone().then(() => {
-    const oct = parseInt(document.getElementById('chordOctave').value) || 4;
-    chordOctave = oct;
-    const notes = getChordNotes(chordRoot, chordType, chordOctave);
-    blPolySynth.triggerAttackRelease(notes, '2n');
-  });
-}
-function playArpeggio() {
-  initTone().then(() => {
-    const oct = parseInt(document.getElementById('chordOctave').value) || 4;
-    const notes = getChordNotes(chordRoot, chordType, oct);
-    const pattern = new Tone.Pattern((time, note) => {
-      blPolySynth.triggerAttackRelease(note, '8n', time);
-    }, notes, 'up');
-    pattern.iterations = notes.length * 2;
-    pattern.start(Tone.now());
-    Tone.Transport.start();
-    setTimeout(() => { pattern.dispose(); }, notes.length * 2 * (60000 / Tone.Transport.bpm.value / 2) + 200);
-  });
-}
-function playScale(scaleKey) {
-  initTone().then(() => {
-    const oct = parseInt(document.getElementById('chordOctave').value) || 4;
-    const rootIdx = NOTES.indexOf(chordRoot);
-    const intervals = SCALES[scaleKey].intervals;
-    const notes = intervals.map(interval => {
-      const noteIdx = (rootIdx + interval) % 12;
-      const noteOct = oct + Math.floor((rootIdx + interval) / 12);
-      return NOTES[noteIdx] + noteOct;
-    });
-    // Play ascending then root octave up
-    notes.push(chordRoot + (oct + 1));
-    const now = Tone.now();
-    notes.forEach((n, i) => {
-      activeSynth.triggerAttackRelease(n, '8n', now + i * (60 / metroBpm / 2));
-    });
-  });
-}
-
-// ── MINI KEYBOARD ──────────────────────────────────────
-const KB_WHITES = ['C','D','E','F','G','A','B'];
-const KB_BLACKS = { 0:'C#', 1:'D#', 3:'F#', 4:'G#', 5:'A#' }; // white-index → black note
-function buildMiniKeyboard() {
-  const kb = document.getElementById('miniKeyboard');
-  const octaves = 2;
-  let html = '';
-  for (let o = 0; o < octaves; o++) {
-    KB_WHITES.forEach((n,i) => {
-      const oct = (parseInt(document.getElementById('synthOctave')?.value) || 4) + o;
-      html += `<div class="key-white" id="kw_${n}${oct}" onmousedown="playNote('${n}${oct}')" onmouseup="stopNote('${n}${oct}')" onmouseleave="stopNote('${n}${oct}')">
-        <span class="key-label">${i===0?n+oct:''}</span>
-      </div>`;
-    });
-  }
-  kb.innerHTML = html;
-  // Black keys overlay (positioned absolutely)
-  const whites = kb.querySelectorAll('.key-white');
-  const whiteW = 100 / (KB_WHITES.length * octaves);
-  for (let o = 0; o < octaves; o++) {
-    Object.entries(KB_BLACKS).forEach(([wi, note]) => {
-      const idx = o * KB_WHITES.length + parseInt(wi);
-      const left = (idx + 0.65) * whiteW;
-      const oct = (parseInt(document.getElementById('synthOctave')?.value) || 4) + o;
-      const fullNote = note + oct;
-      const bk = document.createElement('div');
-      bk.className = 'key-black';
-      bk.id = `kb_${fullNote}`;
-      bk.style.left = left + '%';
-      bk.onmousedown = (e) => { e.stopPropagation(); playNote(fullNote); };
-      bk.onmouseup = () => stopNote(fullNote);
-      bk.onmouseleave = () => stopNote(fullNote);
-      kb.appendChild(bk);
-    });
-  }
-}
-function playNote(note) {
-  initTone().then(() => {
-    if (!activeSynth) return;
-    activeSynth.triggerAttack(note);
-    const el = document.getElementById('kw_' + note) || document.getElementById('kb_' + note);
-    if (el) el.classList.add('pressed');
-  });
-}
-function stopNote(note) {
-  if (!toneReady || !activeSynth) return;
-  if (activeSynth !== blPluck && activeSynth !== blMetal) {
-    try { activeSynth.triggerRelease(); } catch(e) {}
-  }
-  const el = document.getElementById('kw_' + note) || document.getElementById('kb_' + note);
-  if (el) el.classList.remove('pressed');
-}
-// Computer keyboard → piano
-// QWERTY: y=G# / QWERTZ (DE): z=G# — beide werden unterstützt
-const KB_MAP = { a:'C',s:'D',d:'E',f:'F',g:'G',h:'A',j:'B',w:'C#',e:'D#',t:'F#',y:'G#',z:'G#',u:'A#' };
-document.addEventListener('keydown', e => {
-  if (e.repeat) return;
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  const noteBase = KB_MAP[e.key.toLowerCase()];
-  if (noteBase && document.getElementById('phase12')?.classList.contains('active')) {
-    const oct = parseInt(document.getElementById('synthOctave')?.value) || 4;
-    playNote(noteBase + oct);
-  }
-});
-document.addEventListener('keyup', e => {
-  const noteBase = KB_MAP[e.key.toLowerCase()];
-  if (noteBase && document.getElementById('phase12')?.classList.contains('active')) {
-    const oct = parseInt(document.getElementById('synthOctave')?.value) || 4;
-    stopNote(noteBase + oct);
-  }
-});
-function updateSynthType() {
-  const type = document.getElementById('synthType').value;
-  activeSynth = { synth: blSynth, fm: blFmSynth, am: blAmSynth, pluck: blPluck, metal: blMetal }[type] || blSynth;
-}
-
-// ── EFFECTS ────────────────────────────────────────────
-function setFxReverb(val) {
-  document.getElementById('fxReverbVal').textContent = val + '%';
-  if (toneReady && blReverb) blReverb.wet.value = val / 100;
-}
-function setFxDelay(val) {
-  document.getElementById('fxDelayVal').textContent = val + '%';
-  if (toneReady && blDelay) blDelay.wet.value = val / 100;
-}
-function setFxDist(val) {
-  document.getElementById('fxDistVal').textContent = val + '%';
-  if (toneReady && blDist) blDist.distortion = val / 100;
-}
-function setFxChorus(val) {
-  document.getElementById('fxChorusVal').textContent = val + '%';
-  if (toneReady && blChorus) blChorus.wet.value = val / 100;
-}
-function setFxPitch(val) {
-  document.getElementById('fxPitchVal').textContent = val;
-  if (toneReady && blPitchShift) blPitchShift.pitch = parseInt(val);
-}
-function setMasterVol(val) {
-  document.getElementById('fxVolVal').textContent = val + '%';
-  if (toneReady && blMasterVol) blMasterVol.volume.value = Tone.gainToDb(val / 100);
-}
-
-// ── VISUALIZER ─────────────────────────────────────────
-function startVisualizerLoop() {
-  const canvas = document.getElementById('seqVisualizer');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  function draw() {
-    blVizAnimId = requestAnimationFrame(draw);
-    if (!blAnalyser || !document.getElementById('phase12')?.classList.contains('active')) return;
-    const data = blAnalyser.getValue();
-    const w = canvas.width = canvas.offsetWidth;
-    const h = canvas.height = canvas.offsetHeight;
-    ctx.clearRect(0,0,w,h);
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgba(157,95,243,0.8)';
-    ctx.lineWidth = 1.5;
-    for (let i = 0; i < data.length; i++) {
-      const x = (i / data.length) * w;
-      const y = ((data[i] + 1) / 2) * h;
-      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-    // Gradient fill
-    const grad = ctx.createLinearGradient(0,0,0,h);
-    grad.addColorStop(0,'rgba(124,58,237,0.15)');
-    grad.addColorStop(1,'rgba(124,58,237,0)');
-    ctx.fillStyle = grad;
-    ctx.fill();
-  }
-  draw();
-}
-
-// ── INIT PHASE 12 ──────────────────────────────────────
-function initBeatLab() {
-  buildSeqGrid();
-  buildChordPiano();
-  buildMetroDots();
-  buildMiniKeyboard();
-  document.getElementById('chordOctave').addEventListener('change', updateChordDisplay);
-  document.getElementById('synthOctave').addEventListener('change', buildMiniKeyboard);
-}
-
-// Hook Phase 10/11 init into switchPhase
-// =============================
 // INIT
 // =============================
 window.addEventListener('DOMContentLoaded', () => {
   initBioCard();
   updateVoicePersonaBadge();
   buildIntroParticles();
-  loadYtReleases();
-  loadAlbums();
-  if (!window._blInit) { initBeatLab(); window._blInit = true; }
 });
 </script>
 </body>
