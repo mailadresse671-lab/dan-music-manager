@@ -2472,6 +2472,116 @@
   }
   .pp-manage-btn:hover { color: var(--text); }
   .pp-manage-btn.active { color: var(--danger); }
+
+  /* ===== SONG PICKER ===== */
+  #songPicker {
+    position: fixed; inset: 0; z-index: 10001;
+    background: #060608;
+    display: none; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding-top: 60px; overflow-y: auto;
+    transition: opacity 0.4s ease;
+  }
+  #songPicker.visible { display: flex; }
+  #songPicker.hiding { opacity: 0; pointer-events: none; }
+  .sp-back {
+    position: absolute; top: 20px; left: 24px;
+    background: none; border: none; color: var(--text-muted);
+    font-size: 13px; cursor: pointer; display: flex;
+    align-items: center; gap: 6px; padding: 6px 10px;
+    border-radius: 6px; transition: all 0.15s;
+  }
+  .sp-back:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .sp-profile-badge {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .sp-profile-dot {
+    width: 24px; height: 24px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 800; color: white;
+    font-family: 'Orbitron', sans-serif;
+  }
+  .sp-headline {
+    font-size: 20px; font-weight: 700; color: var(--text);
+    margin-bottom: 8px; text-align: center;
+  }
+  .sp-sub {
+    font-size: 13px; color: var(--text-muted);
+    margin-bottom: 36px; text-align: center;
+  }
+  .sp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px; width: 100%; max-width: 760px;
+    padding: 0 20px 60px;
+  }
+  .sp-song-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 16px;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; flex-direction: column; gap: 8px;
+    min-height: 110px;
+  }
+  .sp-song-card:hover {
+    border-color: rgba(124,58,237,0.45);
+    background: rgba(124,58,237,0.06);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  .sp-song-title {
+    font-size: 14px; font-weight: 700; color: var(--text);
+    line-height: 1.3;
+  }
+  .sp-song-meta {
+    font-size: 11px; color: var(--text-muted);
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .sp-song-phase {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 10px;
+    background: rgba(124,58,237,0.15);
+    color: var(--purple-light);
+    border: 1px solid rgba(124,58,237,0.25);
+    width: fit-content; margin-top: auto;
+  }
+  .sp-new-card {
+    background: rgba(124,58,237,0.04);
+    border: 2px dashed rgba(124,58,237,0.25);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+    min-height: 110px;
+  }
+  .sp-new-card:hover {
+    border-color: rgba(124,58,237,0.6);
+    background: rgba(124,58,237,0.09);
+  }
+  .sp-new-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: rgba(124,58,237,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: var(--purple-light);
+  }
+  .sp-new-label { font-size: 13px; font-weight: 600; color: var(--purple-light); }
+  /* Inline new-song form inside song picker */
+  #spNewForm {
+    display: none; width: 100%; max-width: 400px;
+    padding: 0 20px; margin-bottom: 30px;
+  }
+  #spNewForm.visible { display: block; }
+  .sp-new-input {
+    width: 100%; background: var(--card2); border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 8px; padding: 12px 14px; color: var(--text);
+    font-size: 15px; outline: none; margin-bottom: 10px;
+  }
+  .sp-new-input:focus { border-color: var(--purple); }
+  .sp-new-actions { display: flex; gap: 8px; }
+  @media (max-width: 600px) {
+    .sp-grid { grid-template-columns: 1fr 1fr; }
+    #songPicker { padding-top: 50px; }
+    .sp-headline { font-size: 16px; }
+  }
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -2489,6 +2599,26 @@
   <div class="pp-footer">
     <button class="pp-manage-btn" id="ppManageBtn" onclick="togglePpManage()">⚙ Verwalten</button>
   </div>
+</div>
+
+<!-- ===== SONG PICKER ===== -->
+<div id="songPicker">
+  <button class="sp-back" onclick="showProfilePicker()">← Profil wechseln</button>
+  <div class="sp-profile-badge">
+    <div class="sp-profile-dot" id="spProfileDot"></div>
+    <span id="spProfileName"></span>
+  </div>
+  <div class="sp-headline">Was möchtest du bearbeiten?</div>
+  <div class="sp-sub">Wähle einen Song oder starte einen neuen.</div>
+  <!-- Inline new song form -->
+  <div id="spNewForm">
+    <input type="text" class="sp-new-input" id="spNewTitle" placeholder="Song-Titel eingeben..." onkeydown="if(event.key==='Enter')spConfirmNew()">
+    <div class="sp-new-actions">
+      <button class="btn-primary" onclick="spConfirmNew()" style="flex:1;">✅ Erstellen &amp; Öffnen</button>
+      <button class="btn-secondary" onclick="spCancelNew()" style="padding:10px 16px;">Abbrechen</button>
+    </div>
+  </div>
+  <div class="sp-grid" id="spGrid"></div>
 </div>
 
 <!-- ===== LAUNCH GATE (first click unlocks audio – required by all browsers) ===== -->
@@ -4714,13 +4844,18 @@ function renderProfilePicker() {
 function selectProfileAndEnter(id) {
   if (document.getElementById('profilePicker')?.classList.contains('pp-manage-mode')) return;
   localStorage.setItem('studio_active_profile', id);
+
+  // Load songs for this profile so we can show them
+  const pid = id;
+  let profileSongs = {};
+  try { profileSongs = JSON.parse(localStorage.getItem('studio_music_songs_' + pid) || '{}'); } catch {}
+
   const picker = document.getElementById('profilePicker');
   picker.classList.add('hiding');
   setTimeout(() => {
     picker.style.display = 'none';
-    const launch = document.getElementById('intro-launch');
-    if (launch) launch.style.display = '';
-    initAfterProfile();
+    picker.classList.remove('hiding');
+    showSongPicker(id, profileSongs);
   }, 480);
 }
 
@@ -4752,12 +4887,167 @@ function togglePpManage() {
 
 // Show profile picker overlay (for switching profiles from within the app)
 function switchProfile() {
+  // Save current state first
+  if (currentSongId) autoSave();
   renderProfilePicker();
   const picker = document.getElementById('profilePicker');
   picker.style.display = '';
   picker.style.opacity = '0';
   picker.classList.remove('hiding', 'pp-manage-mode');
   requestAnimationFrame(() => { picker.style.transition = 'opacity 0.3s'; picker.style.opacity = '1'; });
+}
+
+// ── Song Picker ──────────────────────────────────────
+function showSongPicker(profileId, profileSongs) {
+  const sp = document.getElementById('songPicker');
+  sp.classList.add('visible');
+  sp.style.opacity = '0';
+  requestAnimationFrame(() => { sp.style.transition = 'opacity 0.35s'; sp.style.opacity = '1'; });
+
+  // Show current profile badge
+  const profiles = getProfiles();
+  const profile = profiles.find(p => p.id === profileId) || {};
+  const dot = document.getElementById('spProfileDot');
+  if (dot) { dot.style.background = profile.color || '#7c3aed'; dot.textContent = getInitials(profile.name || 'A'); }
+  const nameEl = document.getElementById('spProfileName');
+  if (nameEl) nameEl.textContent = profile.name || 'Artist';
+
+  // Hide new form
+  document.getElementById('spNewForm').classList.remove('visible');
+  document.getElementById('spNewTitle').value = '';
+
+  // Render song cards
+  const grid = document.getElementById('spGrid');
+  const songIds = Object.keys(profileSongs);
+
+  let html = `
+    <div class="sp-song-card sp-new-card" onclick="spShowNewForm()">
+      <div class="sp-new-icon">+</div>
+      <div class="sp-new-label">Neues Lied</div>
+    </div>`;
+
+  if (songIds.length > 0) {
+    songIds.slice().reverse().forEach(id => {
+      const s = profileSongs[id];
+      const phase = spGetPhaseLabel(s);
+      const date = s.createdAt ? new Date(s.createdAt).toLocaleDateString('de-DE', { day:'2-digit', month:'short', year:'2-digit' }) : '';
+      html += `
+        <div class="sp-song-card" onclick="spSelectSong('${id}')">
+          <div class="sp-song-title">${escHtml(s.name || 'Unbekannt')}</div>
+          <div class="sp-song-meta">
+            ${date ? `<span>📅 ${date}</span>` : ''}
+            ${s.p3_bpm ? `<span>🎵 ${s.p3_bpm} BPM</span>` : ''}
+          </div>
+          <div class="sp-song-phase">${phase}</div>
+        </div>`;
+    });
+  }
+
+  grid.innerHTML = html;
+  // Store songs ref for use by spSelectSong
+  sp._profileSongs = profileSongs;
+}
+
+function spGetPhaseLabel(song) {
+  if (!song) return 'Neu';
+  if (song.p2_lyrics && song.p2_lyrics.trim()) {
+    if (song.p3_stil || song.p3_bpm !== 140) return '🎹 Beat & Sound';
+    return '✍️ Lyrics';
+  }
+  if (song.p1_thema && song.p1_thema.trim()) return '💡 Konzept';
+  return '🆕 Neu';
+}
+
+function spSelectSong(songId) {
+  const sp = document.getElementById('songPicker');
+  const profileSongs = sp._profileSongs || {};
+  // Load this profile's songs into global songs object
+  songs = profileSongs;
+  sp.classList.add('hiding');
+  setTimeout(() => {
+    sp.classList.remove('visible', 'hiding');
+    sp.style.opacity = '';
+    enterFromSongPicker(songId);
+  }, 350);
+}
+
+function spShowNewForm() {
+  const form = document.getElementById('spNewForm');
+  form.classList.add('visible');
+  document.getElementById('spNewTitle').focus();
+  // Scroll to top
+  document.getElementById('songPicker').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function spCancelNew() {
+  document.getElementById('spNewForm').classList.remove('visible');
+}
+
+function spConfirmNew() {
+  const raw = document.getElementById('spNewTitle').value.trim();
+  if (!raw) {
+    document.getElementById('spNewTitle').style.borderColor = 'var(--danger)';
+    setTimeout(() => { document.getElementById('spNewTitle').style.borderColor = ''; }, 1500);
+    return;
+  }
+  // Load profile songs first so createSong works correctly
+  const sp = document.getElementById('songPicker');
+  songs = sp._profileSongs || {};
+
+  // Create song directly (bypass modal)
+  const id = 'song_' + Date.now();
+  const name = raw;
+  songs[id] = {
+    id, name,
+    createdAt: new Date().toISOString(),
+    p1_thema:'', p1_emotion:'', p1_sprache:'', p1_tonalitaet:'', p1_zielgruppe:'', p1_stil:'', p1_ai_result:'',
+    p1_song_format:'solo', p1_female_voice:'', p1_duett_split:'', p1_sprache_split:'', p1_bez_modul:'',
+    p2_konzept:'', p2_lyrics:'',
+    p3_bpm:140, p3_key:'G minor', p3_stil:'', p3_mood:'', p3_instrumente:'', p3_ai_result:'', p3_suno_link:'', p3_feedback:'', p3_versions:[],
+    p4_checklist:{}, p4_ai_result:'',
+    p5_stimmung:'', p5_stil:'', p5_farben:'', p5_motiv:'', p5_ai_result:'',
+    p6_konzept:'', p6_ai_result:'',
+    p7_zusatz:'', p7_ai_result:'',
+    song_notes:'', drive_link:'', materials:[],
+    p8_audio_filename:'', p8_bpm:null, p8_transcription:'', p8_markers:[], p8_ai_result:'',
+    p9_messages:[]
+  };
+  saveToStorage();
+
+  sp.classList.add('hiding');
+  setTimeout(() => {
+    sp.classList.remove('visible', 'hiding');
+    sp.style.opacity = '';
+    enterFromSongPicker(id);
+  }, 350);
+}
+
+function enterFromSongPicker(songId) {
+  // Run app init then select the song
+  initAfterProfile();
+  // Select song after init renders the list
+  requestAnimationFrame(() => {
+    if (songs[songId]) selectSong(songId);
+  });
+  // Show intro launch gate
+  const launch = document.getElementById('intro-launch');
+  if (launch) launch.style.display = '';
+}
+
+function showProfilePicker() {
+  // Hide song picker, show profile picker
+  const sp = document.getElementById('songPicker');
+  sp.classList.add('hiding');
+  setTimeout(() => {
+    sp.classList.remove('visible', 'hiding');
+    sp.style.opacity = '';
+  }, 350);
+  renderProfilePicker();
+  const picker = document.getElementById('profilePicker');
+  picker.style.display = '';
+  picker.style.opacity = '0';
+  picker.classList.remove('hiding');
+  requestAnimationFrame(() => { picker.style.transition = 'opacity 0.35s'; picker.style.opacity = '1'; });
 }
 
 // Apply profile data to all dynamic UI elements
