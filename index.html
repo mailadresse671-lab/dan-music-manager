@@ -2386,14 +2386,113 @@
   .ob-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
   .ob-skip { font-size: 12px; color: var(--text-muted); cursor: pointer; }
   .ob-skip:hover { color: var(--text); }
+
+  /* ===== PROFILE PICKER ===== */
+  #profilePicker {
+    position: fixed; inset: 0; z-index: 10001;
+    background: #060608;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.5s ease;
+  }
+  #profilePicker.hiding { opacity: 0; pointer-events: none; }
+  .pp-logo {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 48px;
+  }
+  .pp-logo-box {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px; color: white;
+    box-shadow: 0 0 30px rgba(124,58,237,0.4);
+  }
+  .pp-logo-title { font-size: 22px; font-weight: 700; color: var(--text); }
+  .pp-headline {
+    font-size: 15px; color: var(--text-muted); margin-bottom: 40px;
+    letter-spacing: 0.5px;
+  }
+  .pp-grid {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    justify-content: center; max-width: 700px; padding: 0 20px;
+  }
+  .pp-card {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    cursor: pointer; padding: 20px 16px; border-radius: 14px;
+    border: 1px solid transparent; transition: all 0.2s;
+    min-width: 110px;
+  }
+  .pp-card:hover {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.08);
+    transform: translateY(-3px);
+  }
+  .pp-avatar {
+    width: 72px; height: 72px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 800; color: white;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    transition: box-shadow 0.2s;
+    font-family: 'Orbitron', sans-serif;
+  }
+  .pp-card:hover .pp-avatar { box-shadow: 0 6px 30px rgba(0,0,0,0.6); }
+  .pp-name { font-size: 13px; font-weight: 600; color: var(--text); text-align: center; }
+  .pp-handle { font-size: 11px; color: var(--text-muted); text-align: center; }
+  .pp-add-card .pp-avatar {
+    background: rgba(255,255,255,0.04);
+    border: 2px dashed rgba(255,255,255,0.15);
+    color: var(--text-muted); font-size: 32px; font-family: inherit;
+  }
+  .pp-add-card:hover .pp-avatar {
+    border-color: rgba(124,58,237,0.5);
+    color: var(--purple-light);
+    background: rgba(124,58,237,0.06);
+  }
+  .pp-add-card .pp-name { color: var(--text-muted); }
+  .pp-add-card:hover .pp-name { color: var(--purple-light); }
+  .pp-card .pp-delete {
+    display: none; position: absolute; top: -6px; right: -6px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--danger); color: white; font-size: 11px;
+    align-items: center; justify-content: center; cursor: pointer;
+    border: 2px solid #060608; line-height: 1;
+  }
+  .pp-card { position: relative; }
+  .pp-manage-mode .pp-card:not(.pp-add-card) .pp-delete { display: flex; }
+  .pp-manage-mode .pp-card:not(.pp-add-card) { cursor: default; }
+  .pp-manage-mode .pp-card:not(.pp-add-card):hover { transform: none; }
+  .pp-footer {
+    margin-top: 48px; display: flex; gap: 16px; align-items: center;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .pp-manage-btn {
+    background: none; border: none; color: var(--text-muted);
+    font-size: 12px; cursor: pointer; padding: 4px 8px; border-radius: 4px;
+    transition: color 0.15s;
+  }
+  .pp-manage-btn:hover { color: var(--text); }
+  .pp-manage-btn.active { color: var(--danger); }
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
+<!-- ===== PROFILE PICKER ===== -->
+<div id="profilePicker">
+  <div class="pp-logo">
+    <div class="pp-logo-box">D</div>
+    <div class="pp-logo-title">D_a_N Studio</div>
+  </div>
+  <div class="pp-headline">Wer bist du?</div>
+  <div class="pp-grid" id="ppGrid"></div>
+  <div class="pp-footer">
+    <button class="pp-manage-btn" id="ppManageBtn" onclick="togglePpManage()">⚙ Verwalten</button>
+  </div>
+</div>
+
 <!-- ===== LAUNCH GATE (first click unlocks audio – required by all browsers) ===== -->
-<div id="intro-launch">
+<div id="intro-launch" style="display:none;">
   <div class="launch-static"></div>
   <div class="launch-flash"></div>
   <div class="launch-name" id="launch-artist-name">D_a_N</div>
@@ -2602,7 +2701,10 @@
           <span style="width:6px;height:6px;border-radius:50%;background:#00d4ff;box-shadow:0 0 8px #00d4ff;animation:pulse 2.5s ease-in-out infinite;flex-shrink:0;"></span>
           <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:rgba(0,212,255,0.35);letter-spacing:1.5px;text-transform:uppercase;">GROQ AI READY</span>
         </div>
-        <button onclick="openProfileSettings()" title="Profil bearbeiten" style="background:none;border:none;color:rgba(255,255,255,0.25);cursor:pointer;font-size:14px;padding:2px 4px;" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">⚙️</button>
+        <div style="display:flex;gap:4px;">
+          <button onclick="switchProfile()" title="Profil wechseln" style="background:none;border:none;color:rgba(255,255,255,0.25);cursor:pointer;font-size:14px;padding:2px 4px;" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">👤</button>
+          <button onclick="openProfileSettings()" title="Profil bearbeiten" style="background:none;border:none;color:rgba(255,255,255,0.25);cursor:pointer;font-size:14px;padding:2px 4px;" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">⚙️</button>
+        </div>
       </div>
     </div>
   </div>
@@ -4515,71 +4617,147 @@ CREATE POLICY "anon full access" ON studio_songs
 
 <script>
 // =============================
-// USER PROFILE SYSTEM
+// MULTI-PROFILE SYSTEM
 // =============================
-const PROFILE_KEY = 'studio_profile';
+const PP_COLORS = ['#7c3aed','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899'];
+let _newProfileMode = false;
+
+function getProfiles() {
+  try { return JSON.parse(localStorage.getItem('studio_profiles') || '[]'); } catch { return []; }
+}
+
+function getActiveProfileId() {
+  return localStorage.getItem('studio_active_profile') || '';
+}
 
 function getProfile() {
-  try {
-    const p = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
-    return {
-      name:          p.name          || 'Artist',
-      handle:        p.handle        || '',
-      genre:         p.genre         || '',
-      city:          p.city          || '',
-      sunoHandle:    p.sunoHandle    || '',
-      youtubeHandle: p.youtubeHandle || ''
-    };
-  } catch { return { name: 'Artist', handle: '', genre: '', city: '', sunoHandle: '', youtubeHandle: '' }; }
+  const profiles = getProfiles();
+  const activeId = getActiveProfileId();
+  const p = profiles.find(pr => pr.id === activeId) || profiles[0] || {};
+  return {
+    name:          p.name          || 'Artist',
+    handle:        p.handle        || '',
+    genre:         p.genre         || '',
+    city:          p.city          || '',
+    sunoHandle:    p.sunoHandle    || '',
+    youtubeHandle: p.youtubeHandle || ''
+  };
 }
 
 function saveProfile(data) {
-  localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
+  const profiles = getProfiles();
+  const activeId = getActiveProfileId();
+  const idx = profiles.findIndex(p => p.id === activeId);
+  if (idx >= 0) {
+    profiles[idx] = { ...profiles[idx], ...data };
+  } else {
+    const id = 'p_' + Date.now();
+    profiles.push({ id, color: PP_COLORS[0], createdAt: new Date().toISOString(), ...data });
+    localStorage.setItem('studio_active_profile', id);
+  }
+  localStorage.setItem('studio_profiles', JSON.stringify(profiles));
 }
 
 function hasProfile() {
-  try {
-    const p = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
-    return !!(p.name && p.name.trim() && p.name !== 'Artist');
-  } catch { return false; }
+  const p = getProfile();
+  return !!(p.name && p.name.trim() && p.name !== 'Artist');
 }
 
-// One-time migration: dan_* → studio_*
+function getInitials(name) {
+  return (name || '?').split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+}
+
+// One-time migration: single-profile → multi-profile
 function migrateStorageKeys() {
-  const map = {
-    'studio_music_songs':   'studio_music_songs',
-    'studio_api_key':       'studio_api_key',
-    'studio_groq_model':    'studio_groq_model',
-    'studio_yt_key':        'studio_yt_key',
-    'studio_sb_url':        'studio_sb_url',
-    'studio_sb_key':        'studio_sb_key',
-    'studio_yt_releases':   'studio_yt_releases',
-    'studio_albums':        'studio_albums',
-    'studio_bio_profile':   'studio_bio_profile',
-    'studio_voice_persona': 'studio_voice_persona',
-    'studio_tavily_key':    'studio_tavily_key',
-  };
-  Object.entries(map).forEach(([old, neu]) => {
-    const v = localStorage.getItem(old);
-    if (v !== null && localStorage.getItem(neu) === null) localStorage.setItem(neu, v);
-  });
-  // Migrate dynamic custom-option keys (dan_co_* → studio_co_*)
-  Object.keys(localStorage).filter(k => k.startsWith('studio_co_')).forEach(k => {
-    const neu = 'studio_co_' + k.slice(7);
-    if (localStorage.getItem(neu) === null) localStorage.setItem(neu, localStorage.getItem(k));
-  });
-  // SessionStorage API key
-  const sk = sessionStorage.getItem('studio_api_key');
-  if (sk && !sessionStorage.getItem('studio_api_key')) sessionStorage.setItem('studio_api_key', sk);
-  // Build initial profile from existing bio if none exists
-  if (!localStorage.getItem(PROFILE_KEY)) {
-    try {
-      const bio = JSON.parse(localStorage.getItem('studio_bio_profile') || '{}');
-      if (bio.name) {
-        saveProfile({ name: bio.name, handle: '', genre: bio.stil || '', city: bio.herkunft || '', sunoHandle: '', youtubeHandle: '' });
-      }
-    } catch {}
+  // Migrate to multi-profile structure if not done yet
+  if (!localStorage.getItem('studio_profiles')) {
+    const oldProfile = localStorage.getItem('studio_profile');
+    const oldSongs = localStorage.getItem('studio_music_songs');
+    const pid = 'p_default';
+    let pd = { name: 'Artist', handle: '', genre: '', city: '', sunoHandle: '', youtubeHandle: '' };
+    if (oldProfile) {
+      try { pd = { ...pd, ...JSON.parse(oldProfile) }; } catch {}
+    } else {
+      try {
+        const bio = JSON.parse(localStorage.getItem('studio_bio_profile') || '{}');
+        if (bio.name) { pd.name = bio.name; pd.genre = bio.stil || ''; pd.city = bio.herkunft || ''; }
+      } catch {}
+    }
+    const profile = { id: pid, color: PP_COLORS[0], createdAt: new Date().toISOString(), ...pd };
+    localStorage.setItem('studio_profiles', JSON.stringify([profile]));
+    if (oldSongs) localStorage.setItem('studio_music_songs_' + pid, oldSongs);
+    localStorage.setItem('studio_active_profile', pid);
   }
+}
+
+// ── Profile Picker UI ──
+function renderProfilePicker() {
+  const profiles = getProfiles();
+  const grid = document.getElementById('ppGrid');
+  if (!grid) return;
+  let html = profiles.map(p => `
+    <div class="pp-card" onclick="selectProfileAndEnter('${p.id}')">
+      <div class="pp-delete" onclick="event.stopPropagation();deleteProfile('${p.id}')">✕</div>
+      <div class="pp-avatar" style="background:linear-gradient(135deg,${p.color},${p.color}99)">
+        ${getInitials(p.name)}
+      </div>
+      <div class="pp-name">${escHtml ? escHtml(p.name) : p.name}</div>
+      ${p.handle ? `<div class="pp-handle">${p.handle}</div>` : ''}
+    </div>`).join('');
+  html += `<div class="pp-card pp-add-card" onclick="addNewProfile()">
+    <div class="pp-avatar">+</div>
+    <div class="pp-name">Neues Profil</div>
+  </div>`;
+  grid.innerHTML = html;
+}
+
+function selectProfileAndEnter(id) {
+  if (document.getElementById('profilePicker')?.classList.contains('pp-manage-mode')) return;
+  localStorage.setItem('studio_active_profile', id);
+  const picker = document.getElementById('profilePicker');
+  picker.classList.add('hiding');
+  setTimeout(() => {
+    picker.style.display = 'none';
+    const launch = document.getElementById('intro-launch');
+    if (launch) launch.style.display = '';
+    initAfterProfile();
+  }, 480);
+}
+
+function addNewProfile() {
+  _newProfileMode = true;
+  // Close manage mode first
+  document.getElementById('profilePicker')?.classList.remove('pp-manage-mode');
+  document.getElementById('ppManageBtn') && (document.getElementById('ppManageBtn').textContent = '⚙ Verwalten');
+  document.getElementById('ppManageBtn')?.classList.remove('active');
+  showOnboarding();
+}
+
+function deleteProfile(id) {
+  const profiles = getProfiles();
+  if (profiles.length <= 1) { showToast && showToast('Mindestens ein Profil muss vorhanden sein.', 'error'); return; }
+  if (!confirm('Profil löschen? Alle Songs dieses Profils gehen verloren.')) return;
+  localStorage.setItem('studio_profiles', JSON.stringify(profiles.filter(p => p.id !== id)));
+  localStorage.removeItem('studio_music_songs_' + id);
+  renderProfilePicker();
+}
+
+function togglePpManage() {
+  const picker = document.getElementById('profilePicker');
+  const btn = document.getElementById('ppManageBtn');
+  const isManage = picker.classList.toggle('pp-manage-mode');
+  btn.classList.toggle('active', isManage);
+  btn.textContent = isManage ? '✕ Fertig' : '⚙ Verwalten';
+}
+
+// Show profile picker overlay (for switching profiles from within the app)
+function switchProfile() {
+  renderProfilePicker();
+  const picker = document.getElementById('profilePicker');
+  picker.style.display = '';
+  picker.style.opacity = '0';
+  picker.classList.remove('hiding', 'pp-manage-mode');
+  requestAnimationFrame(() => { picker.style.transition = 'opacity 0.3s'; picker.style.opacity = '1'; });
 }
 
 // Apply profile data to all dynamic UI elements
@@ -4671,18 +4849,41 @@ function obSkip() {
 function obFinish() {
   const name = document.getElementById('ob_name').value.trim();
   if (!name) { _obGoto(1); return; }
-  const handle       = document.getElementById('ob_handle').value.trim();
-  const genre        = document.getElementById('ob_genre').value.trim();
-  const city         = document.getElementById('ob_city').value.trim();
-  const sunoHandle   = document.getElementById('ob_suno').value.trim();
+  const handle        = document.getElementById('ob_handle').value.trim();
+  const genre         = document.getElementById('ob_genre').value.trim();
+  const city          = document.getElementById('ob_city').value.trim();
+  const sunoHandle    = document.getElementById('ob_suno').value.trim();
   const youtubeHandle = document.getElementById('ob_youtube').value.trim();
-  saveProfile({ name, handle, genre, city, sunoHandle, youtubeHandle });
-  // Also pre-fill bio
-  const existing = JSON.parse(localStorage.getItem('studio_bio_profile') || '{}');
-  if (!existing.name) localStorage.setItem('studio_bio_profile', JSON.stringify({ name, herkunft: city, text: '', ziele: '', stil: genre }));
-  closeOnboarding();
-  applyProfileToUI();
-  showToast('Willkommen, ' + name + '! 🎤 Profil eingerichtet.', 'success');
+
+  if (_newProfileMode) {
+    // Create brand-new profile entry
+    const profiles = getProfiles();
+    const color = PP_COLORS[profiles.length % PP_COLORS.length];
+    const id = 'p_' + Date.now();
+    profiles.push({ id, name, handle, genre, city, sunoHandle, youtubeHandle, color, createdAt: new Date().toISOString() });
+    localStorage.setItem('studio_profiles', JSON.stringify(profiles));
+    _newProfileMode = false;
+    closeOnboarding();
+    // If we're still on the picker (not yet in app), select and enter
+    const picker = document.getElementById('profilePicker');
+    if (picker && picker.style.display !== 'none') {
+      renderProfilePicker();
+      selectProfileAndEnter(id);
+    } else {
+      // Already in app — switch to new profile
+      localStorage.setItem('studio_active_profile', id);
+      songs = {}; renderSongList(); applyProfileToUI();
+      showToast('Neues Profil "' + name + '" erstellt! 🎤', 'success');
+    }
+  } else {
+    // Edit existing active profile
+    saveProfile({ name, handle, genre, city, sunoHandle, youtubeHandle });
+    const existing = JSON.parse(localStorage.getItem('studio_bio_profile') || '{}');
+    if (!existing.name) localStorage.setItem('studio_bio_profile', JSON.stringify({ name, herkunft: city, text: '', ziele: '', stil: genre }));
+    closeOnboarding();
+    applyProfileToUI();
+    showToast('Willkommen, ' + name + '! 🎤 Profil eingerichtet.', 'success');
+  }
 }
 // Open wizard for profile editing (called from settings)
 function openProfileSettings() {
@@ -4758,10 +4959,28 @@ const OPTION_PRESETS = {
 // INIT
 // =============================
 document.addEventListener('DOMContentLoaded', () => {
-  migrateStorageKeys();   // one-time: dan_* → studio_*
-  applyProfileToUI();     // fill in profile-dependent UI elements
-  if (!hasProfile()) showOnboarding();
+  migrateStorageKeys();  // migrate to multi-profile if needed
+  renderProfilePicker(); // show profile picker first
 
+  // Keyboard shortcut (registered once globally)
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      if (currentSongId) { saveSong(); showToast('Song gespeichert!', 'success'); }
+    }
+  });
+
+  // Wire up step2 material checkboxes
+  ['Audio','Video','Image','Drive'].forEach(t => {
+    const cb = document.getElementById('matHas'+t);
+    const inp = document.getElementById('mat'+t+'Note') || document.getElementById('mat'+t.charAt(0).toUpperCase()+t.slice(1)+'Link');
+    if (cb && inp) cb.addEventListener('change', () => { inp.style.display = cb.checked ? 'block' : 'none'; });
+  });
+});
+
+// Called after a profile is selected in the picker
+function initAfterProfile() {
+  applyProfileToUI();
   loadFromStorage();
   updateApiStatus();
   loadCloudConfig();
@@ -4772,41 +4991,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const apiKey = sessionStorage.getItem('studio_api_key') || localStorage.getItem('studio_api_key');
   if (apiKey && apiKey.startsWith('gsk_')) {
-    document.getElementById('apiModal').classList.add('hidden');
+    document.getElementById('apiModal')?.classList.add('hidden');
   }
 
-  // Wire up step2 material checkboxes
-  ['Audio','Video','Image','Drive'].forEach(t => {
-    const cb = document.getElementById('matHas'+t);
-    const inp = document.getElementById('mat'+t+'Note') || document.getElementById('mat'+t.charAt(0).toUpperCase()+t.slice(1)+'Link');
-    if(cb && inp) cb.addEventListener('change', () => { inp.style.display = cb.checked ? 'block' : 'none'; });
-  });
-
-  // Load first song if exists
   const songIds = Object.keys(songs);
-  if (songIds.length > 0) {
-    selectSong(songIds[0]);
-  }
+  if (songIds.length > 0) selectSong(songIds[0]);
 
-  // Auto-sync from cloud on start
   if (cloudConnected) {
     fullSync().then(() => {
       const ids = Object.keys(songs);
       if (ids.length > 0 && !currentSongId) selectSong(ids[0]);
     });
   }
-
-  // Keyboard shortcut
-  document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-      e.preventDefault();
-      if (currentSongId) {
-        saveSong();
-        showToast('Song gespeichert!', 'success');
-      }
-    }
-  });
-});
+}
 
 // =============================
 // CUSTOM SELECT SYSTEM
@@ -6452,17 +6649,19 @@ function saveSong() {
 }
 
 function saveToStorage() {
+  const pid = getActiveProfileId() || 'p_default';
   try {
-    localStorage.setItem('studio_music_songs', JSON.stringify(songs));
+    localStorage.setItem('studio_music_songs_' + pid, JSON.stringify(songs));
   } catch(e) {
     showToast('Speicher-Fehler: ' + e.message, 'error');
   }
 }
 
 function loadFromStorage() {
+  const pid = getActiveProfileId() || 'p_default';
   try {
-    const raw = localStorage.getItem('studio_music_songs');
-    if (raw) songs = JSON.parse(raw);
+    const raw = localStorage.getItem('studio_music_songs_' + pid);
+    songs = raw ? JSON.parse(raw) : {};
   } catch(e) {
     songs = {};
   }
