@@ -2343,7 +2343,7 @@
 
   /* ── ONBOARDING WIZARD ── */
   #onboardingOverlay {
-    position: fixed; inset: 0; z-index: 10000;
+    position: fixed; inset: 0; z-index: 10003;
     background: rgba(0,0,0,0.85);
     display: flex; align-items: center; justify-content: center;
     opacity: 0; pointer-events: none;
@@ -5129,6 +5129,8 @@ function obNext(cur) {
 }
 function obBack(cur) { if (cur > 1) _obGoto(cur - 1); }
 function obSkip() {
+  // In new-profile mode, skip just cancels without creating
+  if (_newProfileMode) { _newProfileMode = false; closeOnboarding(); return; }
   // Allow skipping only if a profile already exists
   if (hasProfile()) { closeOnboarding(); return; }
   // Save minimal placeholder so we don't re-show
