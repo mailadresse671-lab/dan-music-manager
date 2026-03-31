@@ -4870,21 +4870,27 @@ function addNewProfile() {
 
 function deleteProfile(id) {
   const profiles = getProfiles();
-  if (profiles.length <= 1) {
-    alert('Mindestens ein Profil muss vorhanden sein.');
-    return;
-  }
   const profile = profiles.find(p => p.id === id);
   const name = profile ? profile.name : 'dieses Profil';
   if (!confirm(`"${name}" löschen?\n\nAlle Songs dieses Profils gehen verloren.`)) return;
-  localStorage.setItem('studio_profiles', JSON.stringify(profiles.filter(p => p.id !== id)));
+
+  const remaining = profiles.filter(p => p.id !== id);
+  localStorage.setItem('studio_profiles', JSON.stringify(remaining));
   localStorage.removeItem('studio_music_songs_' + id);
-  // If deleted profile was active, switch to first remaining
-  if (getActiveProfileId() === id) {
-    const remaining = getProfiles();
-    if (remaining.length > 0) localStorage.setItem('studio_active_profile', remaining[0].id);
+
+  if (remaining.length === 0) {
+    // No profiles left → clear active and show onboarding to create new one
+    localStorage.removeItem('studio_active_profile');
+    renderProfilePicker();
+    _newProfileMode = true;
+    showOnboarding();
+  } else {
+    // Switch active profile if deleted one was active
+    if (getActiveProfileId() === id) {
+      localStorage.setItem('studio_active_profile', remaining[0].id);
+    }
+    renderProfilePicker();
   }
-  renderProfilePicker();
 }
 
 // Show profile picker overlay (for switching profiles from within the app)
