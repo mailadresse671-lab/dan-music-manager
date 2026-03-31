@@ -2420,7 +2420,7 @@
     display: flex; flex-direction: column; align-items: center; gap: 12px;
     cursor: pointer; padding: 20px 16px; border-radius: 14px;
     border: 1px solid transparent; transition: all 0.2s;
-    min-width: 110px;
+    min-width: 110px; position: relative;
   }
   .pp-card:hover {
     background: rgba(255,255,255,0.04);
@@ -2451,14 +2451,18 @@
   .pp-add-card .pp-name { color: var(--text-muted); }
   .pp-add-card:hover .pp-name { color: var(--purple-light); }
   .pp-card .pp-delete {
-    display: none; position: absolute; top: -6px; right: -6px;
-    width: 20px; height: 20px; border-radius: 50%;
-    background: var(--danger); color: white; font-size: 11px;
-    align-items: center; justify-content: center; cursor: pointer;
-    border: 2px solid #060608; line-height: 1;
+    display: flex; position: absolute; top: 6px; right: 6px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(239,68,68,0); color: rgba(255,255,255,0.25);
+    font-size: 12px; align-items: center; justify-content: center;
+    cursor: pointer; border: none;
+    transition: background 0.15s, color 0.15s;
+    line-height: 1;
   }
-  .pp-card { position: relative; }
-  .pp-manage-mode .pp-card:not(.pp-add-card) .pp-delete { display: flex; }
+  .pp-card:hover .pp-delete { color: rgba(255,255,255,0.5); }
+  .pp-card .pp-delete:hover { background: rgba(239,68,68,0.85) !important; color: white !important; }
+  .pp-add-card .pp-delete { display: none !important; }
+  /* hide manage-mode specific rules — no longer needed */
   .pp-manage-mode .pp-card:not(.pp-add-card) { cursor: default; }
   .pp-manage-mode .pp-card:not(.pp-add-card):hover { transform: none; }
   .pp-footer {
@@ -2597,7 +2601,7 @@
   <div class="pp-headline">Wer bist du?</div>
   <div class="pp-grid" id="ppGrid"></div>
   <div class="pp-footer">
-    <button class="pp-manage-btn" id="ppManageBtn" onclick="togglePpManage()">⚙ Verwalten</button>
+    <span style="font-size:11px;color:rgba(255,255,255,0.2);">Klicke auf ein Profil um es zu öffnen — ✕ zum Löschen</span>
   </div>
 </div>
 
@@ -4870,19 +4874,21 @@ function addNewProfile() {
 
 function deleteProfile(id) {
   const profiles = getProfiles();
-  if (profiles.length <= 1) { showToast && showToast('Mindestens ein Profil muss vorhanden sein.', 'error'); return; }
-  if (!confirm('Profil löschen? Alle Songs dieses Profils gehen verloren.')) return;
+  if (profiles.length <= 1) {
+    alert('Mindestens ein Profil muss vorhanden sein.');
+    return;
+  }
+  const profile = profiles.find(p => p.id === id);
+  const name = profile ? profile.name : 'dieses Profil';
+  if (!confirm(`"${name}" löschen?\n\nAlle Songs dieses Profils gehen verloren.`)) return;
   localStorage.setItem('studio_profiles', JSON.stringify(profiles.filter(p => p.id !== id)));
   localStorage.removeItem('studio_music_songs_' + id);
+  // If deleted profile was active, switch to first remaining
+  if (getActiveProfileId() === id) {
+    const remaining = getProfiles();
+    if (remaining.length > 0) localStorage.setItem('studio_active_profile', remaining[0].id);
+  }
   renderProfilePicker();
-}
-
-function togglePpManage() {
-  const picker = document.getElementById('profilePicker');
-  const btn = document.getElementById('ppManageBtn');
-  const isManage = picker.classList.toggle('pp-manage-mode');
-  btn.classList.toggle('active', isManage);
-  btn.textContent = isManage ? '✕ Fertig' : '⚙ Verwalten';
 }
 
 // Show profile picker overlay (for switching profiles from within the app)
