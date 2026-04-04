@@ -6370,20 +6370,45 @@ function getCurrentSongName() {
 }
 
 function createNewSong() {
-  document.getElementById('newSongName').value = '';
-  document.getElementById('newSongStep1').style.display = 'block';
-  document.getElementById('newSongStep2').style.display = 'none';
-  document.getElementById('stepDot1').className = 'step-dot active';
-  document.getElementById('stepDot2').className = 'step-dot';
-  document.getElementById('stepLine1').className = 'step-line';
-  ['matAudioNote','matVideoNote','matImageNote','matDriveLink'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.style.display = 'none';
-  });
-  ['matHasAudio','matHasVideo','matHasImage','matHasDrive'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.checked = false;
-  });
-  document.getElementById('newSongModal').classList.remove('hidden');
-  document.getElementById('newSongName').focus();
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const PREFIX = 'D_a_N - ';
+  const baseName = `Song vom ${day}.${month}.`;
+
+  // Check if a song with that name already exists, add counter if needed
+  const existingNames = Object.values(songs).map(s => s.name);
+  let name = PREFIX + baseName;
+  let counter = 2;
+  while (existingNames.includes(name)) {
+    name = PREFIX + baseName + ' (' + counter + ')';
+    counter++;
+  }
+
+  const id = 'song_' + Date.now();
+  songs[id] = {
+    id, name,
+    createdAt: now.toISOString(),
+    p1_thema: '', p1_emotion: '', p1_sprache: '', p1_tonalitaet: '', p1_zielgruppe: '', p1_stil: '', p1_ai_result: '',
+    p1_song_format: 'solo', p1_female_voice: '', p1_duett_split: '', p1_sprache_split: '', p1_bez_modul: '',
+    p2_konzept: '', p2_lyrics: '',
+    p3_bpm: 140, p3_key: 'G minor', p3_stil: '', p3_mood: '', p3_instrumente: '', p3_ai_result: '', p3_suno_link: '', p3_feedback: '', p3_versions: [],
+    p4_checklist: {}, p4_ai_result: '',
+    p5_stimmung: '', p5_stil: '', p5_farben: '', p5_motiv: '', p5_ai_result: '',
+    p6_konzept: '', p6_ai_result: '',
+    p7_zusatz: '', p7_ai_result: '',
+    song_notes: '',
+    drive_link: '',
+    materials: [],
+    p8_audio_filename: '', p8_bpm: null, p8_transcription: '',
+    p8_markers: [], p8_ai_result: '',
+    p9_messages: []
+  };
+
+  saveToStorage();
+  renderSongList();
+  selectSong(id);
+  showToast(`Song erstellt – gib ihm später einen Namen!`, 'success');
 }
 
 function newSongStep2() {
