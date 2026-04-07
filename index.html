@@ -5758,6 +5758,18 @@ Deine Prinzipien:
 
 Antworte auf Deutsch, professionell aber zugänglich.`;
 
+function buildAutoSearchQuery(prompt) {
+  // Extrahiere Kern-Keywords aus dem Prompt für eine relevante Suchanfrage
+  const heute = new Date().getFullYear();
+  const keywords = prompt
+    .replace(/[^\w\säöüÄÖÜß]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 4)
+    .slice(0, 5)
+    .join(' ');
+  return `${keywords} deutsch rap hip-hop ${heute} aktuell trend`;
+}
+
 async function callClaude(prompt, systemPrompt = null) {
   const apiKey = sessionStorage.getItem('studio_api_key');
   if (!apiKey) {
@@ -5781,6 +5793,22 @@ async function callClaude(prompt, systemPrompt = null) {
       `---`
     ].filter(Boolean).join('\n');
     fullSystem = baseSystem + vpBlock;
+  }
+
+  // Automatische Web-Recherche wenn Tavily Key vorhanden
+  if (tavilyKey) {
+    const searchQuery = buildAutoSearchQuery(prompt);
+    const webData = await searchWeb(searchQuery);
+    if (webData) {
+      const today = new Date().toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
+      let webCtx = `\n\n---\n🌐 AKTUELLE WEB-RECHERCHE (${today}):\n`;
+      if (webData.answer) webCtx += webData.answer + '\n';
+      if (webData.results?.length) {
+        webCtx += '\nQuellen:\n' + webData.results.slice(0, 3).map(r => `- ${r.title}: ${r.content?.substring(0, 180)}`).join('\n');
+      }
+      webCtx += '\n---\nNutze diese aktuellen Infos in deiner Antwort. Keine veralteten Infos aus dem Training.';
+      fullSystem = fullSystem + webCtx;
+    }
   }
 
   const messages = [
@@ -8562,8 +8590,16 @@ function loadTavilyKey() {
 function updateTavilyStatus() {
   const el = document.getElementById('tavilyStatus');
   if (!el) return;
-  if (tavilyKey) { el.textContent = '(aktiv)'; el.style.color = 'var(--success)'; }
-  else { el.textContent = '(kein Key)'; el.style.color = 'var(--danger)'; }
+  const toggle = document.getElementById('useWebSearch');
+  if (tavilyKey) {
+    el.textContent = '(aktiv – automatisch)';
+    el.style.color = 'var(--success)';
+    if (toggle) { toggle.checked = true; toggle.disabled = true; }
+  } else {
+    el.textContent = '(kein Key)';
+    el.style.color = 'var(--danger)';
+    if (toggle) { toggle.checked = false; toggle.disabled = false; }
+  }
 }
 
 function openTavilyModal() {
@@ -8639,7 +8675,7 @@ async function sendChatMessage() {
 
     let searchCtx = '';
     if (useSearch && tavilyKey) {
-      const results = await searchWeb(msg + ' deutsch rap musikproduktion 2025');
+      const results = await searchWeb(msg + ` deutsch rap musikproduktion ${new Date().getFullYear()}`);
       if (results) {
         if (results.answer) searchCtx = `\n\n## Aktuelle Web-Recherche:\n${results.answer}`;
         if (results.results?.length) searchCtx += '\n\nQuellen:\n' + results.results.slice(0,3).map(r => `- ${r.title}: ${r.content?.substring(0,200)}`).join('\n');
