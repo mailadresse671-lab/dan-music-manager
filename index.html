@@ -2838,7 +2838,7 @@
     <div class="topbar-logo">D_a_N</div>
     <span class="topbar-title">D_a_N Studio</span>
     <span class="topbar-brand" id="topbar-artist-handle"></span>
-    <span id="lastUpdated" class="topbar-meta-hide" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#00ff88;background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.18);padding:3px 10px;border-radius:4px;letter-spacing:0.5px;">▸ Stand: 12.03.2026 – 19:30</span>
+    <span id="lastUpdated" class="topbar-meta-hide" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#00ff88;background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.18);padding:3px 10px;border-radius:4px;letter-spacing:0.5px;">▸ Stand: 07.04.2026 – aktuell</span>
     <!-- Neural Core status indicator -->
     <span class="topbar-meta-hide" style="display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(0,212,255,0.5);letter-spacing:1.5px;text-transform:uppercase;">
       <span style="width:5px;height:5px;border-radius:50%;background:#00d4ff;box-shadow:0 0 8px #00d4ff;animation:pulse 2s ease-in-out infinite;"></span>
@@ -5499,6 +5499,14 @@ function initAfterProfile() {
   applyProfileToUI();
   loadFromStorage();
   updateApiStatus();
+  // Datum dynamisch setzen
+  const el = document.getElementById('lastUpdated');
+  if (el) {
+    const now = new Date();
+    const d = now.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
+    const t = now.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+    el.textContent = `▸ Stand: ${d} – ${t}`;
+  }
   loadCloudConfig();
   loadTavilyKey();
   loadYtKey();
