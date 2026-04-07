@@ -1229,6 +1229,15 @@
     from { box-shadow: 0 0 0 2px rgba(124,58,237,0.3); }
     to   { box-shadow: 0 0 0 8px rgba(124,58,237,0.0); }
   }
+  .field-needs-attention {
+    animation: fieldPulse 0.7s ease 0s 5 alternate;
+    outline: 2px solid var(--success) !important;
+    outline-offset: 2px;
+  }
+  @keyframes fieldPulse {
+    from { outline-color: var(--success); box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+    to   { outline-color: rgba(16,185,129,0.3); box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+  }
   .iw-done-row { display: flex; gap: 10px; flex-wrap: wrap; }
   .iw-apply-btn {
     padding: 10px 22px; background: linear-gradient(135deg, var(--success), #059669);
@@ -6780,9 +6789,21 @@ async function sendIdeenAntwort() {
 }
 
 function iwExtractKonzept(text) {
-  const m = text.match(/\[\[KONZEPT\]\]([\s\S]*?)\[\[\/KONZEPT\]\]/);
-  if (!m) return null;
-  try { return JSON.parse(m[1].trim()); } catch(e) { return null; }
+  // Accept both single and double brackets: [[KONZEPT]] or [KONZEPT]
+  let m = text.match(/\[{1,2}KONZEPT\]{1,2}([\s\S]*?)\[{1,2}\/KONZEPT\]{1,2}/);
+  if (m) {
+    try { const p = JSON.parse(m[1].trim()); if (p && p.thema) return p; } catch(e) {}
+  }
+  // Fallback: find the outermost { ... } block that contains "thema" and "konzept_text"
+  const firstBrace = text.indexOf('{');
+  const lastBrace = text.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace > firstBrace) {
+    try {
+      const p = JSON.parse(text.substring(firstBrace, lastBrace + 1));
+      if (p && p.thema && p.konzept_text) return p;
+    } catch(e) {}
+  }
+  return null;
 }
 
 function iwFinalize(konzept, rawReply) {
@@ -6844,24 +6865,46 @@ function applyIdeenKonzept() {
     if (p2 && !p2.value.trim()) p2.value = k.konzept_text;
   }
 
+  // Auto-detect language from concept text
+  if (!document.getElementById('p1_sprache').value) {
+    const allText = [k.thema, k.emotion, k.tonalitaet, k.zielgruppe, k.stil, k.konzept_text].join(' ').toLowerCase();
+    if (/italian|italiano/.test(allText) && /deutsch|german/.test(allText)) {
+      document.getElementById('p1_sprache').value = 'Deutsch+Italiano';
+    } else if (/\bitaliano\b|\bitalien/.test(allText)) {
+      document.getElementById('p1_sprache').value = 'Italiano';
+    }
+  }
+
   autoSave();
   updateNavLocks();
-  showToast('✅ Grundgerüst übernommen! Klicke jetzt auf "Weiter: Lyrics schreiben →"', 'success');
-
-  // Highlight and scroll to the next-step button
-  setTimeout(() => {
-    const nextBtn = document.querySelector('#phase1 .btn-phase-next');
-    if (nextBtn) {
-      nextBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      nextBtn.classList.add('btn-phase-next--highlight');
-      setTimeout(() => nextBtn.classList.remove('btn-phase-next--highlight'), 3000);
-    }
-  }, 400);
 }
 
 function applyAndProceed() {
   applyIdeenKonzept();
-  setTimeout(() => switchPhase(2), 600);
+
+  // Scroll to the Eingaben card so user can see filled fields and pick language
+  setTimeout(() => {
+    const eingaben = document.querySelector('#phase1 .card:has(#p1_thema)') ||
+                     document.getElementById('p1_thema')?.closest('.card');
+    if (eingaben) eingaben.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // If Sprache is still empty, highlight it with a pulsing border
+    const sprache = document.getElementById('p1_sprache');
+    if (sprache && !sprache.value) {
+      sprache.classList.add('field-needs-attention');
+      showToast('✅ Konzept übernommen! Wähle noch die Sprache — dann kannst du zu Lyrics weiter.', 'success');
+      setTimeout(() => sprache.classList.remove('field-needs-attention'), 4000);
+    } else {
+      showToast('✅ Alles ausgefüllt! Klicke "Weiter: Lyrics schreiben →"', 'success');
+      // Highlight the next-step button
+      const nextBtn = document.querySelector('#phase1 .btn-phase-next');
+      if (nextBtn) {
+        nextBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        nextBtn.classList.add('btn-phase-next--highlight');
+        setTimeout(() => nextBtn.classList.remove('btn-phase-next--highlight'), 3000);
+      }
+    }
+  }, 400);
 }
 
 function resetIdeenWorkshop() {
