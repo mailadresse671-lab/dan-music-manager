@@ -6222,13 +6222,34 @@ function closeApiModal() {
   document.getElementById('apiModal').classList.add('hidden');
 }
 
-function saveApiKey() {
+async function saveApiKey() {
   const key = document.getElementById('apiKeyInput').value.trim();
+  const saveBtn = document.querySelector('#apiModal .btn-primary');
   if (!key) { showToast('Bitte API Key eingeben!', 'error'); return; }
   if (!key.startsWith('gsk_')) {
     showToast('API Key Format ungültig (sollte mit gsk_ beginnen)', 'error');
     return;
   }
+
+  // Key live testen bevor er gespeichert wird
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Teste Key...'; }
+  try {
+    const testRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: 'hi' }], max_tokens: 1 })
+    });
+    if (!testRes.ok) {
+      const err = await testRes.json().catch(() => ({}));
+      showToast('❌ Key ungültig: ' + (err.error?.message || 'Bitte neuen Key erstellen auf console.groq.com'), 'error');
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Speichern'; }
+      return;
+    }
+  } catch(e) {
+    showToast('⚠️ Verbindung fehlgeschlagen – Key trotzdem gespeichert', 'info');
+  }
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Speichern'; }
+
   // Save selected model
   const selectedModel = document.querySelector('input[name="groqModel"]:checked')?.value || 'llama-3.3-70b-versatile';
   localStorage.setItem('studio_groq_model', selectedModel);
@@ -6236,10 +6257,10 @@ function saveApiKey() {
   sessionStorage.setItem('studio_api_key', key);
   if (persist) {
     localStorage.setItem('studio_api_key', key);
-    showToast('API Key dauerhaft gespeichert!', 'success');
+    showToast('✅ API Key gültig & dauerhaft gespeichert!', 'success');
   } else {
     localStorage.removeItem('studio_api_key');
-    showToast('API Key gespeichert (nur diese Session)!', 'success');
+    showToast('✅ API Key gültig & gespeichert (nur diese Session)!', 'success');
   }
   updateApiStatus();
   closeApiModal();
