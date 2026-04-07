@@ -243,7 +243,7 @@
   input[type="text"], input[type="number"], textarea, select {
     width: 100%; padding: 10px 14px;
     background: var(--card2); border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text); font-size: 14px;
+    border-radius: 8px; color: var(--text); font-size: 16px; /* 16px verhindert iOS-Zoom */
     outline: none; transition: border-color 0.2s;
     font-family: inherit; resize: vertical;
   }
@@ -442,24 +442,116 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: #2e2e4e; }
-  /* RESPONSIVE */
+  /* =====================
+     RESPONSIVE – TABLET
+     ===================== */
   @media (max-width: 768px) {
     .sidebar { width: 220px; }
     .main-content { padding: 16px; }
     .form-row { grid-template-columns: 1fr; }
     .topbar-title { font-size: 15px; }
+    .team-grid { grid-template-columns: repeat(3, 1fr); }
+    .modal { padding: 22px; }
   }
+
+  /* =====================
+     RESPONSIVE – MOBILE
+     ===================== */
   @media (max-width: 600px) {
+    /* Sidebar als Slide-in */
     .sidebar { position: fixed; left: -260px; top: 60px; bottom: 0; z-index: 200; transition: left 0.3s; width: 260px; }
     .sidebar.open { left: 0; }
     .main-content { padding: 12px; }
-    .topbar { padding: 0 12px; }
-    /* Hide non-essential topbar items on mobile */
+    .topbar { padding: 0 10px; gap: 6px; }
     .topbar-meta-hide { display: none !important; }
     .topbar-brand { display: none !important; }
-    .topbar-title { font-size: 14px; }
-    /* Show only key action buttons, hide secondary ones */
+    .topbar-title { font-size: 13px; }
     .btn-mobile-hide { display: none !important; }
+    /* Phasen */
+    .phase-header { margin-bottom: 14px; gap: 10px; }
+    .phase-title { font-size: 17px; }
+    .phase-subtitle { font-size: 11px; }
+    .phase-icon { width: 34px; height: 34px; font-size: 15px; }
+    /* Cards */
+    .card { padding: 13px; margin-bottom: 12px; }
+    .card-title { font-size: 13px; margin-bottom: 10px; }
+    .result-box, .card { overflow-wrap: break-word; word-break: break-word; }
+    /* Buttons */
+    .btn-full-mobile { width: 100%; }
+    .btn-ai, .btn-primary, .btn-secondary { font-size: 12px; padding: 8px 14px; }
+    /* Grids */
+    .checklist-grid { grid-template-columns: 1fr !important; }
+    .sp-grid { grid-template-columns: 1fr 1fr !important; }
+    .ov-grid { grid-template-columns: 1fr !important; }
+    .bs-controls { flex-direction: column; }
+    .team-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    /* Modal */
+    .modal { padding: 18px; border-radius: 12px; }
+    .modal-title { font-size: 15px; }
+    /* Label Welcome */
+    .label-welcome { padding: 16px; }
+    .label-welcome h2 { font-size: 15px; letter-spacing: 1px; }
+    .label-welcome p { font-size: 12px; }
+    /* Team cards */
+    .team-card { padding: 11px 13px; gap: 10px; }
+    .team-avatar { width: 36px; height: 36px; font-size: 20px; }
+    .team-name { font-size: 12px; }
+    .team-intro-text { font-size: 12px; }
+    /* Chat */
+    .chat-send-btn { padding: 0 12px; font-size: 13px; }
+    .chat-message { max-width: 90%; }
+    /* Form labels */
+    label { min-width: auto !important; }
+    /* Song format toggle */
+    .song-format-toggle { flex-direction: column; }
+    .bez-modul-sides { grid-template-columns: 1fr; }
+    /* Bio */
+    .bio-edit-grid { grid-template-columns: 1fr; }
+    /* Station header */
+    .station-header { gap: 10px; margin: 16px 0 8px; }
+  }
+
+  /* =====================
+     RESPONSIVE – KLEIN
+     ===================== */
+  @media (max-width: 480px) {
+    .main-content { padding: 10px; }
+    .card { padding: 11px; }
+    .team-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .team-member-tile { padding: 8px 10px; gap: 7px; }
+    .team-member-tile .tile-emoji { font-size: 15px; }
+    .team-member-tile .tile-name { font-size: 10px; }
+    .team-member-tile .tile-role { font-size: 8px; }
+    .modal { padding: 14px; }
+    .modal-input { font-size: 14px; } /* verhindert iOS zoom */
+    .topbar { padding: 0 8px; }
+    .topbar-logo { width: 28px; height: 28px; font-size: 11px; }
+    .topbar-title { font-size: 12px; }
+    .label-welcome h2 { font-size: 13px; }
+    .label-welcome button { font-size: 12px; padding: 9px 18px; }
+    .phase-title { font-size: 16px; }
+    .team-card { padding: 10px; }
+    .team-avatar { width: 32px; height: 32px; font-size: 18px; }
+    .sp-grid { grid-template-columns: 1fr 1fr !important; }
+    .form-row { gap: 8px; }
+  }
+
+  /* =====================
+     RESPONSIVE – SEHR KLEIN (iPhone SE etc.)
+     ===================== */
+  @media (max-width: 375px) {
+    .main-content { padding: 8px; }
+    .card { padding: 10px; margin-bottom: 10px; }
+    .topbar { padding: 0 6px; }
+    .topbar-title { display: none; }
+    .modal { padding: 12px; max-width: 95vw; }
+    .team-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
+    .team-member-tile { padding: 7px 8px; gap: 6px; }
+    .phase-title { font-size: 15px; }
+    .card-title { font-size: 12px; }
+    .btn-ai, .btn-primary { font-size: 12px; padding: 8px 12px; }
+    .label-welcome { padding: 12px; }
+    .label-welcome h2 { font-size: 12px; }
   }
   /* Sidebar backdrop for mobile */
   .sidebar-backdrop {
