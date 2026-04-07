@@ -820,6 +820,156 @@
   .mgr-send:hover { opacity:0.85; }
   .mgr-send:disabled { opacity:0.5; cursor:not-allowed; }
 
+  /* ===== IDEEN-WERKSTATT ===== */
+  .iw-card {
+    background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(59,130,246,0.05));
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .iw-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 18px;
+    background: rgba(124,58,237,0.1);
+    border-bottom: 1px solid rgba(124,58,237,0.2);
+  }
+  .iw-header-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .iw-header-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .iw-header-sub { font-size: 11px; color: var(--purple-light); margin-top: 1px; }
+  .iw-header-badge {
+    margin-left: auto; font-size: 10px; padding: 3px 10px;
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3);
+    color: var(--purple-light); border-radius: 20px; white-space: nowrap;
+  }
+  /* idle view */
+  .iw-view-idle { padding: 20px 18px; }
+  .iw-idle-intro {
+    font-size: 13px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.65;
+  }
+  .iw-idle-intro strong { color: var(--text); }
+  .iw-idea-input {
+    width: 100%; padding: 12px 14px; background: var(--card2);
+    border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-size: 14px; outline: none; resize: none;
+    font-family: inherit; line-height: 1.6; min-height: 90px;
+    transition: border-color 0.2s;
+  }
+  .iw-idea-input:focus { border-color: var(--purple); }
+  .iw-idle-row {
+    display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap;
+  }
+  .iw-start-btn {
+    padding: 10px 22px; background: linear-gradient(135deg, var(--purple), var(--blue));
+    border: none; border-radius: 8px; color: white; font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: opacity 0.2s; font-family: inherit;
+  }
+  .iw-start-btn:hover { opacity: 0.88; }
+  .iw-start-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .iw-idle-hint { font-size: 11px; color: var(--text-muted); }
+  /* chat view */
+  .iw-view-chat { display: flex; flex-direction: column; }
+  .iw-chat-msgs {
+    min-height: 120px; max-height: 340px; overflow-y: auto;
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .iw-msg {
+    max-width: 88%; padding: 11px 14px; border-radius: 12px;
+    font-size: 13px; line-height: 1.65; white-space: pre-wrap;
+  }
+  .iw-msg.ai {
+    background: var(--card2); border: 1px solid rgba(124,58,237,0.2);
+    align-self: flex-start; color: var(--text);
+    border-radius: 4px 12px 12px 12px;
+  }
+  .iw-msg.user {
+    background: rgba(124,58,237,0.18); border: 1px solid rgba(124,58,237,0.3);
+    align-self: flex-end; color: var(--text);
+    border-radius: 12px 4px 12px 12px;
+  }
+  .iw-msg-time { font-size: 10px; color: var(--text-muted); margin-top: 5px; }
+  .iw-progress-bar {
+    height: 3px; background: rgba(124,58,237,0.15);
+    margin: 0 16px 0; border-radius: 2px; overflow: hidden;
+  }
+  .iw-progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--purple), var(--blue));
+    border-radius: 2px; transition: width 0.5s ease;
+  }
+  .iw-progress-label {
+    font-size: 10px; color: var(--text-muted);
+    padding: 4px 16px 8px; display: flex; justify-content: space-between;
+  }
+  .iw-input-area {
+    display: flex; gap: 8px; padding: 10px 14px;
+    border-top: 1px solid rgba(124,58,237,0.15);
+  }
+  .iw-textarea {
+    flex: 1; padding: 9px 12px; background: var(--card2);
+    border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-size: 13px; outline: none; resize: none;
+    font-family: inherit; min-height: 42px; max-height: 110px;
+  }
+  .iw-textarea:focus { border-color: var(--purple); }
+  .iw-send-btn {
+    padding: 0 16px; height: 42px;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    border: none; border-radius: 8px; color: white; font-size: 16px;
+    cursor: pointer; transition: opacity 0.2s; flex-shrink: 0; font-family: inherit;
+  }
+  .iw-send-btn:hover { opacity: 0.85; }
+  .iw-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  /* done view */
+  .iw-view-done { padding: 18px; }
+  .iw-done-title {
+    font-size: 14px; font-weight: 700; color: var(--success);
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  }
+  .iw-konzept-box {
+    background: var(--card2); border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 14px;
+    font-size: 13px; line-height: 1.7; color: var(--text);
+  }
+  .iw-konzept-field { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .iw-konzept-label {
+    font-size: 11px; font-weight: 600; color: var(--purple-light);
+    text-transform: uppercase; letter-spacing: 0.5px; min-width: 90px; flex-shrink: 0; padding-top: 1px;
+  }
+  .iw-konzept-value { font-size: 13px; color: var(--text); flex: 1; }
+  .iw-konzept-text-block {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--text-muted); line-height: 1.7;
+    font-style: italic;
+  }
+  .iw-done-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .iw-apply-btn {
+    padding: 10px 22px; background: linear-gradient(135deg, var(--success), #059669);
+    border: none; border-radius: 8px; color: white; font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: opacity 0.2s; font-family: inherit;
+  }
+  .iw-apply-btn:hover { opacity: 0.88; }
+  .iw-reset-btn {
+    padding: 10px 16px; background: transparent;
+    border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text-muted); font-size: 12px;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+  }
+  .iw-reset-btn:hover { border-color: var(--text-muted); color: var(--text); }
+  /* reset link in chat */
+  .iw-reset-link {
+    font-size: 11px; color: var(--text-muted); background: none;
+    border: none; cursor: pointer; text-decoration: underline; font-family: inherit;
+    padding: 0; margin-left: auto;
+  }
+  .iw-reset-link:hover { color: var(--text); }
+
   /* ===== MATERIALS ===== */
   .materials-bar {
     display:flex; align-items:center; justify-content:space-between;
@@ -2951,6 +3101,72 @@
         <div>
           <div class="phase-title">Konzept</div>
           <div class="phase-subtitle">Entwickle deine Song-Idee mit KI-Unterstützung</div>
+        </div>
+      </div>
+
+      <!-- IDEEN-WERKSTATT -->
+      <div class="iw-card" id="ideenWerkstattCard">
+        <div class="iw-header">
+          <div class="iw-header-icon">🎯</div>
+          <div>
+            <div class="iw-header-title">Ideen-Werkstatt</div>
+            <div class="iw-header-sub">KI-Interview · Wir entwickeln deine Idee gemeinsam</div>
+          </div>
+          <div class="iw-header-badge" id="iwBadge">Schritt 1/5</div>
+        </div>
+
+        <!-- VIEW: IDLE (Startseite) -->
+        <div class="iw-view-idle" id="iwViewIdle">
+          <p class="iw-idle-intro">
+            <strong>Sag mir deine Idee</strong> — egal wie roh oder unfertig sie ist.<br>
+            Ich stelle dir dann gezielte Fragen, damit wir gemeinsam das <strong>Grundgerüst deines Songs</strong> aufbauen.
+          </p>
+          <textarea
+            class="iw-idea-input"
+            id="iwIdeaInput"
+            placeholder="z.B. &quot;Ich will einen Song über meine Mama schreiben&quot;, &quot;Ein Track über Aufstieg aus dem Nichts&quot;, &quot;Irgendwas Melancholisches über eine verlorene Liebe&quot;..."
+            onkeydown="handleIwIdeaKey(event)"
+          ></textarea>
+          <div class="iw-idle-row">
+            <button class="iw-start-btn" id="iwStartBtn" onclick="startIdeenWorkshop()">
+              ✨ Idee einreichen &amp; loslegen
+            </button>
+            <span class="iw-idle-hint">↵ Enter oder Klick</span>
+          </div>
+        </div>
+
+        <!-- VIEW: CHAT (Q&A Gespräch) -->
+        <div class="iw-view-chat" id="iwViewChat" style="display:none;">
+          <div class="iw-chat-msgs" id="iwChatMsgs"></div>
+          <div class="iw-progress-bar">
+            <div class="iw-progress-fill" id="iwProgressFill" style="width:20%"></div>
+          </div>
+          <div class="iw-progress-label">
+            <span id="iwProgressText">Frage 1 von 5</span>
+            <button class="iw-reset-link" onclick="resetIdeenWorkshop()">Neu starten</button>
+          </div>
+          <div class="iw-input-area">
+            <textarea
+              class="iw-textarea"
+              id="iwAnswerInput"
+              rows="2"
+              placeholder="Deine Antwort..."
+              onkeydown="handleIwKey(event)"
+            ></textarea>
+            <button class="iw-send-btn" id="iwSendBtn" onclick="sendIdeenAntwort()">→</button>
+          </div>
+        </div>
+
+        <!-- VIEW: DONE (Grundgerüst fertig) -->
+        <div class="iw-view-done" id="iwViewDone" style="display:none;">
+          <div class="iw-done-title">✅ Grundgerüst fertig!</div>
+          <div class="iw-konzept-box" id="iwKonzeptBox">
+            <!-- wird per JS befüllt -->
+          </div>
+          <div class="iw-done-row">
+            <button class="iw-apply-btn" onclick="applyIdeenKonzept()">📋 Ins Formular übernehmen</button>
+            <button class="iw-reset-btn" onclick="resetIdeenWorkshop()">↺ Neu starten</button>
+          </div>
         </div>
       </div>
 
@@ -5666,6 +5882,290 @@ function getSongFormatContext() {
   return ctx;
 }
 
+// =============================
+// IDEEN-WERKSTATT
+// =============================
+const IW_SYSTEM_PROMPT = `Du bist ein kreativer Musik-Coach und A&R. Deine Aufgabe: stelle dem Künstler EINE gezielte Frage nach der anderen, um seine rohe Idee in ein konkretes Song-Grundgerüst zu verwandeln.
+
+Regeln:
+- IMMER nur EINE Frage pro Antwort – niemals mehrere auf einmal
+- Kurz, direkt, auf Deutsch – max 2-3 Sätze
+- Baue auf der vorherigen Antwort auf
+- Decke nacheinander ab: 1) emotionaler Kern / wichtigster Moment, 2) Perspektive oder Situation, 3) Ton der Texte (aggressiv, verletzlich, nachdenklich, feiern...), 4) Zielgruppe / wer soll das fühlen, 5) eine besondere Stärke oder Bild-Idee
+
+Nach GENAU 5 Fragen (du hast dann genug Infos) sagst du: "Perfekt – ich hab jetzt ein klares Bild!" und gibst sofort danach, ohne weiteren Text, das Konzept in diesem exakten Format aus:
+
+[[KONZEPT]]
+{"thema":"...","emotion":"...","tonalitaet":"...","zielgruppe":"...","stil":"...","konzept_text":"3-4 Sätze die das komplette Konzept beschreiben"}
+[[/KONZEPT]]`;
+
+let iwHistory = [];
+let iwQuestionCount = 0;
+let iwParsedKonzept = null;
+
+function handleIwIdeaKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); startIdeenWorkshop(); }
+}
+
+function handleIwKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendIdeenAntwort(); }
+}
+
+function iwShowView(view) {
+  document.getElementById('iwViewIdle').style.display = view === 'idle' ? '' : 'none';
+  document.getElementById('iwViewChat').style.display = view === 'chat' ? '' : 'none';
+  document.getElementById('iwViewDone').style.display = view === 'done' ? '' : 'none';
+}
+
+function iwUpdateProgress(q) {
+  const pct = Math.min(100, q * 20);
+  const fill = document.getElementById('iwProgressFill');
+  const text = document.getElementById('iwProgressText');
+  const badge = document.getElementById('iwBadge');
+  if (fill) fill.style.width = pct + '%';
+  if (text) text.textContent = q < 5 ? `Frage ${q} von 5` : 'Fast fertig…';
+  if (badge) badge.textContent = q < 5 ? `Schritt ${q+1}/5` : 'Schritt 5/5';
+}
+
+function iwAppendMsg(role, text, tempId) {
+  const box = document.getElementById('iwChatMsgs');
+  if (!box) return;
+  const div = document.createElement('div');
+  div.className = 'iw-msg ' + (role === 'user' ? 'user' : 'ai');
+  if (tempId) div.id = tempId;
+  const t = new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = `<div>${text === '⏳ …' ? text : escHtml(text).replace(/\n/g,'<br>')}</div><div class="iw-msg-time">${t}</div>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function startIdeenWorkshop() {
+  const input = document.getElementById('iwIdeaInput');
+  const idea = input ? input.value.trim() : '';
+  if (!idea) { showToast('Bitte erst deine Idee eingeben!', 'error'); return; }
+
+  const btn = document.getElementById('iwStartBtn');
+  if (btn) btn.disabled = true;
+
+  // Switch to chat view
+  iwHistory = [];
+  iwQuestionCount = 0;
+  iwParsedKonzept = null;
+  document.getElementById('iwChatMsgs').innerHTML = '';
+  iwShowView('chat');
+  iwUpdateProgress(0);
+
+  // Show user's idea as first message
+  iwAppendMsg('user', idea);
+  iwHistory.push({ role: 'user', content: idea });
+
+  // Get first question from AI
+  const thinkId = 'iw_think_' + Date.now();
+  iwAppendMsg('ai', '⏳ …', thinkId);
+  document.getElementById('iwSendBtn').disabled = true;
+
+  try {
+    const reply = await callClaudeChat(
+      [{ role: 'user', content: idea }],
+      IW_SYSTEM_PROMPT
+    );
+    const thinkEl = document.getElementById(thinkId);
+    if (thinkEl) thinkEl.remove();
+
+    const konzept = iwExtractKonzept(reply);
+    if (konzept) {
+      iwFinalize(konzept, reply);
+    } else {
+      iwQuestionCount++;
+      iwUpdateProgress(iwQuestionCount);
+      iwHistory.push({ role: 'assistant', content: reply });
+      iwAppendMsg('ai', reply);
+      iwSaveState();
+    }
+  } catch(err) {
+    const thinkEl = document.getElementById(thinkId);
+    if (thinkEl) thinkEl.remove();
+    iwAppendMsg('ai', 'Fehler: ' + err.message);
+  } finally {
+    const sendBtn = document.getElementById('iwSendBtn');
+    if (sendBtn) sendBtn.disabled = false;
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function sendIdeenAntwort() {
+  const input = document.getElementById('iwAnswerInput');
+  const sendBtn = document.getElementById('iwSendBtn');
+  const ans = input ? input.value.trim() : '';
+  if (!ans) return;
+  if (input) input.value = '';
+
+  iwAppendMsg('user', ans);
+  iwHistory.push({ role: 'user', content: ans });
+  iwSaveState();
+
+  if (sendBtn) sendBtn.disabled = true;
+  const thinkId = 'iw_think_' + Date.now();
+  iwAppendMsg('ai', '⏳ …', thinkId);
+
+  try {
+    const msgs = iwHistory.map(h => ({ role: h.role, content: h.content }));
+    const reply = await callClaudeChat(msgs, IW_SYSTEM_PROMPT);
+    const thinkEl = document.getElementById(thinkId);
+    if (thinkEl) thinkEl.remove();
+
+    const konzept = iwExtractKonzept(reply);
+    if (konzept) {
+      iwHistory.push({ role: 'assistant', content: reply });
+      iwFinalize(konzept, reply);
+    } else {
+      iwQuestionCount++;
+      iwUpdateProgress(iwQuestionCount);
+      iwHistory.push({ role: 'assistant', content: reply });
+      iwAppendMsg('ai', reply);
+      iwSaveState();
+    }
+  } catch(err) {
+    const thinkEl = document.getElementById(thinkId);
+    if (thinkEl) thinkEl.remove();
+    iwAppendMsg('ai', 'Fehler: ' + err.message);
+  } finally {
+    if (sendBtn) sendBtn.disabled = false;
+  }
+}
+
+function iwExtractKonzept(text) {
+  const m = text.match(/\[\[KONZEPT\]\]([\s\S]*?)\[\[\/KONZEPT\]\]/);
+  if (!m) return null;
+  try { return JSON.parse(m[1].trim()); } catch(e) { return null; }
+}
+
+function iwFinalize(konzept, rawReply) {
+  iwParsedKonzept = konzept;
+
+  // Show last AI message without the [[KONZEPT]]...[[/KONZEPT]] block
+  const cleanReply = rawReply.replace(/\[\[KONZEPT\]\][\s\S]*?\[\[\/KONZEPT\]\]/, '').trim();
+  if (cleanReply) iwAppendMsg('ai', cleanReply);
+
+  // Build done view
+  const box = document.getElementById('iwKonzeptBox');
+  if (box) {
+    const fields = [
+      ['Thema', konzept.thema],
+      ['Emotion', konzept.emotion],
+      ['Tonalität', konzept.tonalitaet],
+      ['Zielgruppe', konzept.zielgruppe],
+      ['Stil', konzept.stil],
+    ].filter(([,v]) => v);
+    box.innerHTML = fields.map(([l,v]) =>
+      `<div class="iw-konzept-field"><span class="iw-konzept-label">${l}</span><span class="iw-konzept-value">${escHtml(v)}</span></div>`
+    ).join('') + (konzept.konzept_text ? `<div class="iw-konzept-text-block">${escHtml(konzept.konzept_text)}</div>` : '');
+  }
+
+  // Update badge
+  const badge = document.getElementById('iwBadge');
+  if (badge) { badge.textContent = '✅ Fertig'; badge.style.background = 'rgba(16,185,129,0.15)'; badge.style.borderColor = 'rgba(16,185,129,0.3)'; badge.style.color = 'var(--success)'; }
+
+  // Switch view after a small delay so the last message is visible
+  setTimeout(() => iwShowView('done'), 800);
+  iwSaveState();
+}
+
+function applyIdeenKonzept() {
+  if (!iwParsedKonzept) return;
+  const k = iwParsedKonzept;
+
+  if (k.thema) { const el = document.getElementById('p1_thema'); if (el) el.value = k.thema; }
+
+  // For select-with-add fields: inject as custom option if not already there
+  function injectSelect(id, val) {
+    if (!val) return;
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    let found = false;
+    for (const opt of sel.options) { if (opt.value === val) { found = true; break; } }
+    if (!found) { const o = new Option(val, val); sel.appendChild(o); }
+    sel.value = val;
+  }
+
+  injectSelect('p1_emotion', k.emotion);
+  injectSelect('p1_tonalitaet', k.tonalitaet);
+  injectSelect('p1_zielgruppe', k.zielgruppe);
+  injectSelect('p1_stil', k.stil);
+
+  // Fill p2_konzept with the concept text
+  if (k.konzept_text) {
+    const p2 = document.getElementById('p2_konzept');
+    if (p2 && !p2.value.trim()) p2.value = k.konzept_text;
+  }
+
+  autoSave();
+  updateNavLocks();
+  showToast('✅ Grundgerüst übernommen!', 'success');
+}
+
+function resetIdeenWorkshop() {
+  iwHistory = [];
+  iwQuestionCount = 0;
+  iwParsedKonzept = null;
+
+  const ideaInput = document.getElementById('iwIdeaInput');
+  if (ideaInput) ideaInput.value = '';
+  const chatMsgs = document.getElementById('iwChatMsgs');
+  if (chatMsgs) chatMsgs.innerHTML = '';
+  const badge = document.getElementById('iwBadge');
+  if (badge) { badge.textContent = 'Schritt 1/5'; badge.style.background = ''; badge.style.borderColor = ''; badge.style.color = ''; }
+  iwUpdateProgress(0);
+  iwShowView('idle');
+  iwSaveState();
+}
+
+function iwSaveState() {
+  if (!currentSongId || !songs[currentSongId]) return;
+  songs[currentSongId].iw_history = iwHistory;
+  songs[currentSongId].iw_q_count = iwQuestionCount;
+  songs[currentSongId].iw_konzept = iwParsedKonzept;
+  saveToStorage();
+}
+
+function iwLoadState(song) {
+  iwHistory = song.iw_history || [];
+  iwQuestionCount = song.iw_q_count || 0;
+  iwParsedKonzept = song.iw_konzept || null;
+
+  // Reset badge
+  const badge = document.getElementById('iwBadge');
+  if (badge) { badge.textContent = 'Schritt 1/5'; badge.style.background = ''; badge.style.borderColor = ''; badge.style.color = ''; }
+
+  if (iwParsedKonzept) {
+    // Restore done state
+    const box = document.getElementById('iwKonzeptBox');
+    if (box) {
+      const k = iwParsedKonzept;
+      const fields = [
+        ['Thema', k.thema], ['Emotion', k.emotion], ['Tonalität', k.tonalitaet],
+        ['Zielgruppe', k.zielgruppe], ['Stil', k.stil],
+      ].filter(([,v]) => v);
+      box.innerHTML = fields.map(([l,v]) =>
+        `<div class="iw-konzept-field"><span class="iw-konzept-label">${l}</span><span class="iw-konzept-value">${escHtml(v)}</span></div>`
+      ).join('') + (k.konzept_text ? `<div class="iw-konzept-text-block">${escHtml(k.konzept_text)}</div>` : '');
+    }
+    if (badge) { badge.textContent = '✅ Fertig'; badge.style.background = 'rgba(16,185,129,0.15)'; badge.style.borderColor = 'rgba(16,185,129,0.3)'; badge.style.color = 'var(--success)'; }
+    iwShowView('done');
+  } else if (iwHistory.length > 0) {
+    // Restore chat state
+    const chatMsgs = document.getElementById('iwChatMsgs');
+    if (chatMsgs) {
+      chatMsgs.innerHTML = '';
+      iwHistory.forEach(h => iwAppendMsg(h.role === 'user' ? 'user' : 'ai', h.content));
+    }
+    iwUpdateProgress(iwQuestionCount);
+    iwShowView('chat');
+  } else {
+    iwShowView('idle');
+  }
+}
+
 // Phase 1
 async function generatePhase1() {
   const thema = document.getElementById('p1_thema').value.trim();
@@ -6752,6 +7252,9 @@ function switchPhase(num) {
 function loadSongData(id) {
   const s = songs[id];
   if (!s) return;
+
+  // Ideen-Werkstatt
+  iwLoadState(s);
 
   // Phase 1 – custom selects
   setVal('p1_thema', s.p1_thema);
