@@ -1205,6 +1205,30 @@
     font-size: 13px; color: var(--text-muted); line-height: 1.7;
     font-style: italic;
   }
+  .iw-next-step-box {
+    background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 12px;
+  }
+  .iw-next-step-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--success); margin-bottom: 8px;
+  }
+  .iw-next-step-btn {
+    width: 100%; padding: 12px 20px;
+    background: linear-gradient(135deg, var(--success), #059669);
+    border: none; border-radius: 8px; color: white; font-size: 14px;
+    font-weight: 700; cursor: pointer; transition: opacity 0.2s; font-family: inherit;
+    letter-spacing: 0.2px;
+  }
+  .iw-next-step-btn:hover { opacity: 0.88; }
+  .btn-phase-next--highlight {
+    animation: phaseNextPulse 0.6s ease 0s 4 alternate;
+    box-shadow: 0 0 0 4px rgba(124,58,237,0.4) !important;
+  }
+  @keyframes phaseNextPulse {
+    from { box-shadow: 0 0 0 2px rgba(124,58,237,0.3); }
+    to   { box-shadow: 0 0 0 8px rgba(124,58,237,0.0); }
+  }
   .iw-done-row { display: flex; gap: 10px; flex-wrap: wrap; }
   .iw-apply-btn {
     padding: 10px 22px; background: linear-gradient(135deg, var(--success), #059669);
@@ -3667,8 +3691,12 @@
           <div class="iw-konzept-box" id="iwKonzeptBox">
             <!-- wird per JS befüllt -->
           </div>
+          <div class="iw-next-step-box">
+            <div class="iw-next-step-label">👇 Nächster Schritt:</div>
+            <button class="iw-next-step-btn" onclick="applyAndProceed()">✅ Konzept übernehmen &amp; weiter zu Lyrics →</button>
+          </div>
           <div class="iw-done-row">
-            <button class="iw-apply-btn" onclick="applyIdeenKonzept()">📋 Ins Formular übernehmen</button>
+            <button class="iw-apply-btn" onclick="applyIdeenKonzept()">📋 Nur ins Formular übernehmen</button>
             <button class="iw-reset-btn" onclick="resetIdeenWorkshop()">↺ Neu starten</button>
           </div>
         </div>
@@ -6818,7 +6846,22 @@ function applyIdeenKonzept() {
 
   autoSave();
   updateNavLocks();
-  showToast('✅ Grundgerüst übernommen!', 'success');
+  showToast('✅ Grundgerüst übernommen! Klicke jetzt auf "Weiter: Lyrics schreiben →"', 'success');
+
+  // Highlight and scroll to the next-step button
+  setTimeout(() => {
+    const nextBtn = document.querySelector('#phase1 .btn-phase-next');
+    if (nextBtn) {
+      nextBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      nextBtn.classList.add('btn-phase-next--highlight');
+      setTimeout(() => nextBtn.classList.remove('btn-phase-next--highlight'), 3000);
+    }
+  }, 400);
+}
+
+function applyAndProceed() {
+  applyIdeenKonzept();
+  setTimeout(() => switchPhase(2), 600);
 }
 
 function resetIdeenWorkshop() {
