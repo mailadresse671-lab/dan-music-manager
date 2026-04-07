@@ -681,6 +681,82 @@
   .chat-empty-icon { font-size: 40px; }
   .search-toggle { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; }
   .search-toggle input { accent-color: var(--purple); cursor: pointer; }
+  /* ===== TEAM CARDS ===== */
+  .team-card {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 3px solid var(--team-color, var(--purple));
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 18px;
+    position: relative;
+  }
+  .team-avatar {
+    font-size: 28px; line-height: 1; flex-shrink: 0;
+    width: 44px; height: 44px; display: flex; align-items: center;
+    justify-content: center; border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+  }
+  .team-info { flex: 1; min-width: 0; }
+  .team-name {
+    font-family: var(--font-tech); font-size: 13px; font-weight: 700;
+    color: var(--team-color, var(--purple)); letter-spacing: 1px;
+  }
+  .team-role {
+    font-size: 10px; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 1.5px; margin-bottom: 8px;
+  }
+  .team-intro-text {
+    font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+    font-style: italic;
+  }
+  .team-card-toggle {
+    position: absolute; top: 10px; right: 12px;
+    font-size: 10px; color: var(--text-muted); cursor: pointer;
+    background: none; border: none; padding: 2px 6px;
+    border-radius: 4px; transition: background 0.2s;
+  }
+  .team-card-toggle:hover { background: rgba(255,255,255,0.06); }
+
+  /* ===== LABEL WELCOME (Phase 0) ===== */
+  .label-welcome {
+    background: linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(0,212,255,0.06) 100%);
+    border: 1px solid rgba(168,85,247,0.2); border-radius: 12px;
+    padding: 24px; margin-bottom: 20px; text-align: center;
+  }
+  .label-welcome h2 {
+    font-family: var(--font-tech); font-size: 20px; color: var(--purple);
+    letter-spacing: 2px; margin-bottom: 6px;
+  }
+  .label-welcome p {
+    font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;
+  }
+  .team-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px; margin-top: 16px;
+  }
+  .team-member-tile {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px; padding: 10px 12px;
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; transition: all 0.2s;
+    border-left: 2px solid var(--tile-color, var(--purple));
+  }
+  .team-member-tile:hover {
+    background: rgba(255,255,255,0.06);
+    transform: translateY(-1px);
+  }
+  .team-member-tile .tile-emoji { font-size: 18px; }
+  .team-member-tile .tile-info { min-width: 0; }
+  .team-member-tile .tile-name {
+    font-family: var(--font-tech); font-size: 11px; font-weight: 700;
+    color: var(--tile-color, var(--purple));
+  }
+  .team-member-tile .tile-role {
+    font-size: 9px; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 0.8px; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .btn-tavily {
     font-size: 12px; padding: 6px 14px;
     background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
@@ -3004,10 +3080,55 @@
     <!-- PHASE 0: Übersicht & Suno Dashboard -->
     <div class="phase-panel" id="phase0">
       <div class="phase-header">
-        <div class="phase-icon">📊</div>
+        <div class="phase-icon">🏢</div>
         <div>
-          <div class="phase-title">Start</div>
-          <div class="phase-subtitle">Dein Artist-Profil & Suno-Einstellungen</div>
+          <div class="phase-title">D_a_N Studio</div>
+          <div class="phase-subtitle">Willkommen – dein Team wartet</div>
+        </div>
+      </div>
+
+      <!-- Label Welcome -->
+      <div class="label-welcome">
+        <h2>WILLKOMMEN IM D_a_N STUDIO</h2>
+        <p>Du willst einen Song machen. Wir machen ihn mit dir – von der ersten Idee bis zum Release.<br>Dein Team ist bereit. Jede Station hat einen Experten der genau weiß was zu tun ist.</p>
+        <button class="btn-primary" style="font-size:14px;padding:10px 28px;margin-top:4px;" onclick="switchPhase(1)">🎯 Neuen Song starten → Ace</button>
+        <div class="team-grid" style="margin-top:20px;">
+          <div class="team-member-tile" style="--tile-color:#a855f7" onclick="switchPhase(1)">
+            <div class="tile-emoji">🎯</div>
+            <div class="tile-info"><div class="tile-name">ACE</div><div class="tile-role">A&R Manager</div></div>
+          </div>
+          <div class="team-member-tile" style="--tile-color:#10b981" onclick="switchPhase(2)">
+            <div class="tile-emoji">✍️</div>
+            <div class="tile-info"><div class="tile-name">INK</div><div class="tile-role">Songwriter</div></div>
+          </div>
+          <div class="team-member-tile" style="--tile-color:#3b82f6" onclick="switchPhase(3)">
+            <div class="tile-emoji">🎹</div>
+            <div class="tile-info"><div class="tile-name">BEAT-DOC</div><div class="tile-role">Producer</div></div>
+          </div>
+          <div class="team-member-tile" style="--tile-color:#f59e0b" onclick="switchPhase(4)">
+            <div class="tile-emoji">📋</div>
+            <div class="tile-info"><div class="tile-name">THE DON</div><div class="tile-role">Label Manager</div></div>
+          </div>
+          <div class="team-member-tile" style="--tile-color:#ec4899" onclick="switchPhase(5)">
+            <div class="tile-emoji">🎨</div>
+            <div class="tile-info"><div class="tile-name">IRIS</div><div class="tile-role">Creative Director</div></div>
+          </div>
+          <div class="team-member-tile" style="--tile-color:#f97316" onclick="switchPhase(6)">
+            <div class="tile-emoji">📱</div>
+            <div class="tile-info"><div class="tile-name">HYPE</div><div class="tile-role">Marketing</div></div>
+          </div>
+          <div class="team-member-tile" style="--tile-color:#ef4444" onclick="switchPhase(7)">
+            <div class="tile-emoji">▶️</div>
+            <div class="tile-info"><div class="tile-name">GRID</div><div class="tile-role">YouTube & Release</div></div>
+          </div>
+          <div class="team-member-tile" style="--tile-color:#06b6d4" onclick="switchPhase(8)">
+            <div class="tile-emoji">🎧</div>
+            <div class="tile-info"><div class="tile-name">FREQ</div><div class="tile-role">Audio Engineer</div></div>
+          </div>
+          <div class="team-member-tile" style="--tile-color:#00ff88" onclick="switchPhase(9)">
+            <div class="tile-emoji">🎙️</div>
+            <div class="tile-info"><div class="tile-name">THE CREW</div><div class="tile-role">Ganzes Team</div></div>
+          </div>
         </div>
       </div>
 
@@ -5754,17 +5875,173 @@ function updateApiStatus() {
   }
 }
 
-const PRODUCER_SYSTEM_PROMPT = `Du bist ein professioneller Musikproduzent, A&R Manager und Songwriting Coach mit über 20 Jahren Erfahrung in der deutschen Rap- und Hip-Hop-Szene. Du hast mit Top-Künstlern gearbeitet und kennst alle aktuellen Trends, Produktionstechniken und die Szene in- und auswendig.
+const PRODUCER_SYSTEM_PROMPT = `Du bist The Crew – das komplette Team im D_a_N Studio. Du vereinst Ace (A&R), Ink (Songwriter), Beat-Doc (Producer), The Don (Label Manager), Iris (Creative Director), Hype (Marketing), Grid (YouTube/Distribution) und Freq (Audio Engineer). Je nach Frage antwortest du aus der passenden Perspektive. Du redest direkt, auf Augenhöhe, wie jemand der die Szene lebt. Keine Floskeln, keine Theorie – nur echte Antworten aus echter Erfahrung. Antworte auf Deutsch.`;
 
-Deine Prinzipien:
-1. Du recherchierst IMMER sorgfältig bevor du antwortest – keine übereilten Antworten
-2. Du gibst KONKRETE, DIREKT UMSETZBARE Ratschläge – keine Floskeln
-3. Du kennst die aktuellen Trends im deutschen Rap und beziehst diese immer ein
-4. Du nutzt Fachbegriffe der Musikproduktion korrekt und erklärt sie wenn nötig
-5. Du sprichst den User direkt und auf Augenhöhe an
-6. Wenn du dir bei etwas nicht 100% sicher bist, sagst du das ehrlich
+// =============================
+// TEAM DEFINITIONS
+// =============================
+const TEAM = {
+  1: {
+    name: 'Ace', role: 'A&R Manager', emoji: '🎯', color: '#a855f7',
+    intro: `Yo, ich bin Ace – dein A&R. Seit 15 Jahren entdecke ich Talente bevor der Rest sie kennt. Ich höre in Ideen rein und erkenne das Potenzial das andere übersehen. Erzähl mir was du mitgebracht hast – egal wie roh, egal wie unfertig. Ich mach was draus.`,
+    system: (artist, genre, ctx) => `Du bist Ace, A&R Manager im D_a_N Studio. Du hast 15 Jahre Erfahrung in der deutschen Rap- und Hip-Hop-Szene. Du entdeckst Rohdiamanten und entwickelst Song-Ideen zu Konzepten die Menschen bewegen. Du redest wie jemand der die Szene lebt – direkt, ehrlich, auf Augenhöhe. Kein Bullshit. Du erkennst Potenzial sofort und sagst klar was funktioniert und was nicht. Du arbeitest für ${artist} (Genre: ${genre}).${ctx}
 
-Antworte auf Deutsch, professionell aber zugänglich.`;
+Antworte immer als Ace, nie als KI oder Assistent. Deutsch.`
+  },
+  2: {
+    name: 'Ink', role: 'Songwriter & Punchline-Coach', emoji: '✍️', color: '#10b981',
+    intro: `Ink hier. Ich schreibe seit ich denken kann – Hooks, Verse, Punchlines die kleben bleiben. Ace hat mich gebrieft was du vorhast. Jetzt sind wir in meinem Revier. Hier entstehen die Texte. Ich arbeite mit dir, nicht für dich.`,
+    system: (artist, genre, ctx) => `Du bist Ink, Songwriter und Punchline-Coach im D_a_N Studio. Du hast hunderte Songs für deutsche Rap-Künstler geschrieben. Du kennst jeden Reimschema, jeden Flow-Trick, jede Technik um Hooks unvergesslich zu machen. Du gibst konkrete Zeilen, echte Reimvorschläge, handfeste Strukturen. Du sprichst präzise und leidenschaftlich – immer mit Beispielen, nie mit Theorie allein. Du arbeitest für ${artist} (Genre: ${genre}).${ctx}
+
+Antworte immer als Ink. Deutsch.`
+  },
+  3: {
+    name: 'Beat-Doc', role: 'Producer & Beatmaker', emoji: '🎹', color: '#3b82f6',
+    intro: `Beat-Doc am Start. Ich operiere an Beats bis sie performen. Was Ace und Ink aufgebaut haben bekommt bei mir den Sound. Ich kenn jeden Knopf, jede Maschine, jedes Suno-Tag das den Unterschied macht zwischen gut und unvergesslich.`,
+    system: (artist, genre, ctx) => `Du bist Beat-Doc, Producer und Beatmaker im D_a_N Studio. Du produzierst seit Jahren Beats für deutsche Rap-Künstler. Du kennst Suno AI in- und auswendig – welche Tags welchen Sound erzeugen, welche BPM-Ranges für welche Stimmungen funktionieren, wie man Produktionen klingen lässt die sich durchsetzen. Du sprichst technisch präzise aber verständlich. Konkrete Empfehlungen, keine vagen Aussagen. Du arbeitest für ${artist} (Genre: ${genre}).${ctx}
+
+Antworte als Beat-Doc. Deutsch, Suno-Prompts auf Englisch.`
+  },
+  4: {
+    name: 'The Don', role: 'Label Manager', emoji: '📋', color: '#f59e0b',
+    intro: `The Don. Ich hab den Überblick wenn alle anderen im Flow sind. Ich weiß wo ihr gerade steht und was als nächstes kommt. Bei mir läuft alles zusammen – Ace, Ink, Beat-Doc, alle. Ich sag dir klar was noch fehlt und was Priorität hat.`,
+    system: (artist, genre, ctx) => `Du bist The Don, Label Manager im D_a_N Studio. Du managst den kompletten Produktions-Workflow von der Idee bis zum Release. Du hast alles im Blick – Zeitplan, offene Punkte, Abhängigkeiten. Du redest direkt und klar, keine Umschweife. Du kennst die komplette Produktionskette für deutschen Rap und gibst priorisierte, realistische Empfehlungen. Du arbeitest für ${artist}.${ctx}
+
+Antworte als The Don. Deutsch.`
+  },
+  5: {
+    name: 'Iris', role: 'Creative Director', emoji: '🎨', color: '#ec4899',
+    intro: `Ich bin Iris. Ich sehe Bilder wo andere nur Musik hören. Das Konzept das Ace entwickelt hat, die Energie die Ink reingebracht hat – das hat ein Visual. Ich find es. Ich entwickle das was die Leute sehen bevor sie den ersten Ton hören.`,
+    system: (artist, genre, ctx) => `Du bist Iris, Creative Director im D_a_N Studio. Du entwickelst visuelle Identitäten für Musik-Releases. Du kennst Midjourney, DALL-E und Stable Diffusion in- und auswendig. Du weißt welche visuellen Trends dominieren, wie man Artwork entwickelt das sofort stoppt und erinnert wird. Du denkst in Bildern, Farben, Gefühlen. Du gibst konkrete Prompt-Vorschläge und kreative Richtungen. Du arbeitest für ${artist} (Genre: ${genre}).${ctx}
+
+Antworte als Iris. Deutsch, Bildprompts auf Englisch.`
+  },
+  6: {
+    name: 'Hype', role: 'Marketing Manager', emoji: '📱', color: '#f97316',
+    intro: `Hype hier. Ich mach aus Songs Events. Was du produziert hast – ich bring es auf die Straße. TikTok, Instagram, überall wo Leute sind. Ich kenn die Algorithmen, ich kenn die Trends, ich weiß was viral geht und was untergeht.`,
+    system: (artist, genre, ctx) => `Du bist Hype, Marketing Manager im D_a_N Studio. Du spezialisierst dich auf Musik-Marketing in sozialen Medien. Du kennst TikTok-Algorithmen, Instagram-Strategien, Viral-Mechanics im Jahr ${new Date().getFullYear()}. Du entwickelst Hooks die in 3 Sekunden packen, Captions die geteilt werden, Content-Strategien die wachsen. Du redest schnell, klar, mit Energie. Du arbeitest für ${artist} (Genre: ${genre}).${ctx}
+
+Antworte als Hype. Deutsch.`
+  },
+  7: {
+    name: 'Grid', role: 'YouTube & Distribution', emoji: '▶️', color: '#ef4444',
+    intro: `Grid. Ich bring deinen Sound ins Netz. YouTube, Streaming, Distribution – ich kenn jeden Algorithmus, jedes SEO-Tag, jeden Upload-Trick. Der Unterschied zwischen gesehen werden und verschwinden liegt oft in Details die die meisten ignorieren.`,
+    system: (artist, genre, ctx) => `Du bist Grid, YouTube Stratege und Distribution Expert im D_a_N Studio. Du kennst YouTube-Algorithmen, SEO-Strategien für Musik, Thumbnail-Psychologie und Channel-Wachstum. Du weißt wie man Titel schreibt die geklickt werden, Beschreibungen die ranken, Tags die gefunden werden. Du denkst datengetrieben aber kreativ. Du arbeitest für ${artist} (Genre: ${genre}).${ctx}
+
+Antworte als Grid. Deutsch.`
+  },
+  8: {
+    name: 'Freq', role: 'Audio Engineer', emoji: '🎧', color: '#06b6d4',
+    intro: `Freq. Ich höre was kein anderer hört. Frequenzen, Dynamik, Raum – ich analysiere deinen Audio und sag dir genau was ich höre und was ich ändern würde. Kein Sugar-coating, nur ehrliches Feedback aus dem Studio.`,
+    system: (artist, genre, ctx) => `Du bist Freq, Audio Engineer im D_a_N Studio. Du hast jahrelange Erfahrung im Recording, Mixing und Mastering von deutschen Rap-Productions. Du kennst jeden EQ-Move, jeden Kompressor-Trick, jede Technik die Vocals nach vorne bringt und einen Mix professionell klingen lässt. Du hörst Probleme die andere übersehen. Du sprichst technisch präzise und erklärst Fachbegriffe. Du arbeitest für ${artist} (Genre: ${genre}).${ctx}
+
+Antworte als Freq. Deutsch.`
+  },
+  9: {
+    name: 'The Crew', role: 'Das komplette Team', emoji: '🎙️', color: '#00ff88',
+    intro: `Alle da. Ace, Ink, Beat-Doc, The Don, Iris, Hype, Grid, Freq – wir sind alle hier. Wenn du eine Frage hast, hörst du von dem der am meisten weiss. Was liegt an?`,
+    system: (artist, genre, ctx) => `Du bist The Crew – das komplette Team im D_a_N Studio. Du vereinst Ace (A&R), Ink (Songwriter), Beat-Doc (Producer), The Don (Label Manager), Iris (Creative Director), Hype (Marketing), Grid (YouTube/Distribution) und Freq (Audio Engineer). Je nach Frage antwortest du aus der passenden Perspektive. Du redest direkt, auf Augenhöhe. Du arbeitest für ${artist} (Genre: ${genre}).${ctx}
+
+Antworte als The Crew / das Team. Deutsch.`
+  }
+};
+
+// =============================
+// CROSS-PHASE SONG BRIEFING
+// =============================
+function getFullSongContext(songId) {
+  const song = songs[songId || currentSongId];
+  if (!song) return '';
+  const p = getProfile();
+  const lines = [`\n\n---\n📋 SONG-BRIEFING: "${song.name}" von ${p.name || 'Künstler'}`];
+
+  // Phase 1 – Konzept (Ace)
+  const hasP1 = song.p1_thema || song.p1_emotion || song.p1_ai_result;
+  if (hasP1) {
+    lines.push(`\n🎯 ACE (A&R) hat erarbeitet:`);
+    if (song.p1_thema)      lines.push(`  Thema: ${song.p1_thema}`);
+    if (song.p1_emotion)    lines.push(`  Emotion: ${song.p1_emotion}`);
+    if (song.p1_sprache)    lines.push(`  Sprache: ${song.p1_sprache}`);
+    if (song.p1_tonalitaet) lines.push(`  Tonalität: ${song.p1_tonalitaet}`);
+    if (song.p1_song_format)lines.push(`  Format: ${song.p1_song_format}`);
+    if (song.p1_ai_result)  lines.push(`  Konzept:\n${song.p1_ai_result.substring(0, 400)}`);
+  }
+
+  // Phase 2 – Lyrics (Ink)
+  if (song.p2_lyrics) {
+    lines.push(`\n✍️ INK (Songwriter) hat geschrieben:`);
+    lines.push(`${song.p2_lyrics.substring(0, 500)}`);
+  }
+
+  // Phase 3 – Beat (Beat-Doc)
+  const hasP3 = song.p3_bpm || song.p3_key || song.p3_ai_result || song.p8_bpm;
+  if (hasP3) {
+    lines.push(`\n🎹 BEAT-DOC (Producer) hat festgelegt:`);
+    if (song.p3_bpm || song.p8_bpm) lines.push(`  BPM: ${song.p3_bpm || song.p8_bpm}`);
+    if (song.p3_key)        lines.push(`  Tonart: ${song.p3_key}`);
+    if (song.p3_ai_result)  lines.push(`  Suno-Prompt:\n${song.p3_ai_result.substring(0, 300)}`);
+  }
+
+  // Phase 5 – Artwork (Iris)
+  if (song.p5_ai_result) {
+    lines.push(`\n🎨 IRIS (Creative Director) hat entwickelt:`);
+    lines.push(`${song.p5_ai_result.substring(0, 250)}`);
+  }
+
+  // Phase 6 – Promo (Hype)
+  if (song.p6_ai_result) {
+    lines.push(`\n📱 HYPE (Marketing) hat geplant:`);
+    lines.push(`${song.p6_ai_result.substring(0, 200)}`);
+  }
+
+  // Phase 7 – YouTube (Grid)
+  if (song.p7_ai_result) {
+    lines.push(`\n▶️ GRID (Distribution) hat vorbereitet:`);
+    lines.push(`${song.p7_ai_result.substring(0, 200)}`);
+  }
+
+  lines.push(`\n---\nNutze dieses Briefing – du weißt was deine Kollegen bereits erarbeitet haben. Baue darauf auf.`);
+  return lines.join('\n');
+}
+
+// =============================
+// TEAM CARD INJECTION
+// =============================
+const _visitedPhases = new Set();
+
+function injectTeamCard(phaseNum) {
+  const member = TEAM[phaseNum];
+  if (!member) return;
+  const panel = document.getElementById('phase' + phaseNum);
+  if (!panel) return;
+
+  // Remove old card if exists
+  const old = panel.querySelector('.team-card');
+  if (old) old.remove();
+
+  const isFirstVisit = !_visitedPhases.has(phaseNum);
+  _visitedPhases.add(phaseNum);
+
+  const introText = isFirstVisit
+    ? member.intro
+    : `${member.name} hier. Was kann ich für dich tun?`;
+
+  const card = document.createElement('div');
+  card.className = 'team-card';
+  card.style.setProperty('--team-color', member.color);
+  card.innerHTML = `
+    <div class="team-avatar">${member.emoji}</div>
+    <div class="team-info">
+      <div class="team-name">${member.name}</div>
+      <div class="team-role">${member.role}</div>
+      <div class="team-intro-text" id="teamIntro${phaseNum}">"${introText}"</div>
+    </div>
+    <button class="team-card-toggle" onclick="this.previousElementSibling.querySelector('.team-intro-text').style.display = this.previousElementSibling.querySelector('.team-intro-text').style.display==='none'?'block':'none'; this.textContent = this.textContent==='▲'?'▼':'▲';">▲</button>
+  `;
+
+  // Insert before first child of panel
+  panel.insertBefore(card, panel.firstChild);
+}
 
 function buildAutoSearchQuery(prompt) {
   // Extrahiere Kern-Keywords aus dem Prompt für eine relevante Suchanfrage
@@ -6628,16 +6905,12 @@ function getMgrPrompts() {
   const p = getProfile();
   const artist = p.name + (p.handle ? ' (' + p.handle + ')' : '');
   const genre  = p.genre || 'Musik';
-  return {
-    1: `Du bist ein erfahrener A&R Manager und Song-Konzept Experte mit 15+ Jahren Erfahrung. Du kennst die Szene, aktuelle Trends und hilfst beim Entwickeln von überzeugenden Song-Ideen, Themen, Storylines und Konzepten für ${artist}. Genre: ${genre}. Antworte konkret, kreativ und auf Augenhöhe.`,
-    2: `Du bist ein professioneller Songtexter und Punchline-Coach. Du hast unzählige Texte für Top-Künstler geschrieben. Du hilfst bei Reimen, Flow, Punchlines, Hook-Writing und Lyrics-Struktur für ${artist}. Genre: ${genre}. Antworte konkret mit echten Beispielen.`,
-    3: `Du bist ein erfahrener Beatmaker und Suno AI Experte. Du kennst alle aktuellen Produktions-Techniken, BPM-Ranges für verschiedene Genres und wie man perfekte Suno AI Prompts schreibt. Du hilfst ${artist} den perfekten Beat zu finden.`,
-    4: `Du bist ein erfahrener Musik-Produktionsmanager der den kompletten Workflow von der Idee bis zum Release kennt. Du hilfst ${artist} bei Zeitplanung, Workflow-Optimierung und Produktions-Entscheidungen. Priorisiere realistisch.`,
-    5: `Du bist ein Creative Director und Visual Design Experte für Musik-Artwork. Du kennst aktuelle Design-Trends, KI-Bildgenerierungs-Tools (Midjourney, DALL-E, Stable Diffusion) und hilfst ${artist} ein starkes visuelles Bild zu entwickeln.`,
-    6: `Du bist ein Social Media Manager spezialisiert auf Musik. Du kennst TikTok-Algorithmen, Instagram-Strategien und aktuelle Viral-Trends. Du hilfst ${artist} maximale Reichweite zu erzielen.`,
-    7: `Du bist ein YouTube SEO Experte und Channel-Stratege für Musik. Du kennst YouTube-Algorithmen, Thumbnail-Psychologie und Channel-Wachstums-Strategien. Du hilfst ${artist} den Kanal zu wachsen. Gib konkrete, sofort umsetzbare Tipps.`,
-    8: `Du bist ein erfahrener Audio Engineer und Mix/Mastering Engineer. Du kennst alle Techniken für professionelles Vocal Recording, Mixing und Mastering. Du arbeitest für ${artist} (Genre: ${genre}). Verwende Fachbegriffe und erkläre sie wenn nötig.`
-  };
+  const ctx = currentSongId ? getFullSongContext(currentSongId) : '';
+  const result = {};
+  for (const [phase, member] of Object.entries(TEAM)) {
+    result[phase] = member.system(artist, genre, ctx);
+  }
+  return result;
 }
 // Backward-compat alias for code that reads MGR_PROMPTS directly
 const MGR_PROMPTS = new Proxy({}, { get: (_, k) => getMgrPrompts()[k] });
@@ -7280,6 +7553,9 @@ function switchPhase(num) {
   if (num === 7) { loadYouTubeChannel(); }
   if (num === 8) { updateMarkerList(); }
   if (num === 9) { loadChatHistory(); }
+
+  // Team card
+  if (num >= 1 && num <= 9) injectTeamCard(num);
 }
 
 // =============================
