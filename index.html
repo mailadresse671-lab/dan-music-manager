@@ -3577,28 +3577,24 @@
         </div>
       </div>
 
-      <!-- Suno Style Prompt (for Stile field) -->
+      <!-- Suno Cockpit (eingeklappt) -->
       <div class="card" style="margin-top:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <div class="card-title" style="margin-bottom:0;">🎨 Suno → Stile-Feld</div>
-          <button class="btn-copy" onclick="copyOvField('ov_style_prompt')">📋 Kopieren</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'; this.querySelector('.suno-toggle').textContent=this.nextElementSibling.style.display==='none'?'▼ zeigen':'▲ verbergen'">
+          <div class="card-title" style="margin-bottom:0;">🎵 Suno Cockpit – Kopierfelder</div>
+          <span class="suno-toggle" style="font-size:11px;color:var(--text-muted);font-family:var(--font-tech);">▼ zeigen</span>
         </div>
-        <div class="ov-copy-box" id="ov_style_prompt">–</div>
-      </div>
-
-      <!-- Suno Lyrics -->
-      <div class="card" style="margin-top:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <div class="card-title" style="margin-bottom:0;">📝 Suno → Text-Feld (Lyrics)</div>
-          <button class="btn-copy" onclick="copyOvField('ov_lyrics_prompt')">📋 Kopieren</button>
+        <div style="display:none;margin-top:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">🎨 Stile-Feld</span>
+            <button class="btn-copy" onclick="copyOvField('ov_style_prompt')">📋 Kopieren</button>
+          </div>
+          <div class="ov-copy-box" id="ov_style_prompt" style="margin-bottom:14px;">–</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">📝 Text-Feld (Lyrics)</span>
+            <button class="btn-copy" onclick="copyOvField('ov_lyrics_prompt')">📋 Kopieren</button>
+          </div>
+          <div class="ov-copy-box" id="ov_lyrics_prompt" style="max-height:200px;overflow-y:auto;white-space:pre-wrap;font-family:monospace;font-size:12px;">–</div>
         </div>
-        <div class="ov-copy-box" id="ov_lyrics_prompt" style="max-height:200px;overflow-y:auto;white-space:pre-wrap;font-family:monospace;font-size:12px;">–</div>
-      </div>
-
-      <!-- Materials -->
-      <div class="card" style="margin-top:12px;">
-        <div class="card-title">📁 Materialien</div>
-        <div id="ov_materials" class="ov-list"></div>
       </div>
     </div>
 
