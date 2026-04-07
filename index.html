@@ -819,9 +819,91 @@
     font-family: var(--font-tech); font-size: 20px; color: var(--purple);
     letter-spacing: 2px; margin-bottom: 6px;
   }
-  .label-welcome p {
-    font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;
+  .label-welcome p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+
+  /* ===== PHASE ROADMAP ===== */
+  .roadmap-section { margin-bottom: 20px; }
+  .roadmap-title {
+    font-family: var(--font-tech); font-size: 11px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
   }
+  .roadmap-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+  .roadmap-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+  }
+  .roadmap-card {
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px; padding: 14px 16px; cursor: pointer;
+    transition: all 0.2s; position: relative; overflow: hidden;
+    border-left: 3px solid var(--rc-color, var(--purple));
+  }
+  .roadmap-card:hover {
+    background: rgba(255,255,255,0.05); transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .roadmap-card-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .roadmap-num {
+    font-family: var(--font-tech); font-size: 10px; font-weight: 700;
+    color: var(--rc-color, var(--purple)); opacity: 0.6; min-width: 18px;
+  }
+  .roadmap-emoji { font-size: 20px; }
+  .roadmap-person {
+    flex: 1;
+  }
+  .roadmap-person-name {
+    font-family: var(--font-tech); font-size: 12px; font-weight: 700;
+    color: var(--rc-color, var(--purple));
+  }
+  .roadmap-person-role {
+    font-size: 9px; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .roadmap-phase-name {
+    font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px;
+  }
+  .roadmap-rows { display: flex; flex-direction: column; gap: 5px; }
+  .roadmap-row {
+    display: flex; gap: 8px; align-items: flex-start; font-size: 11px;
+  }
+  .roadmap-row-label {
+    color: var(--text-muted); white-space: nowrap; min-width: 70px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    padding-top: 1px;
+  }
+  .roadmap-row-val { color: var(--text-secondary); line-height: 1.4; }
+  .roadmap-go-btn {
+    margin-top: 12px; width: 100%; padding: 6px; border-radius: 6px;
+    border: 1px solid var(--rc-color, var(--purple));
+    background: transparent; color: var(--rc-color, var(--purple));
+    font-size: 11px; font-family: var(--font-tech); cursor: pointer;
+    transition: all 0.2s; letter-spacing: 0.5px;
+  }
+  .roadmap-go-btn:hover { background: rgba(255,255,255,0.06); }
+
+  /* ===== APP INFO SECTION ===== */
+  .info-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    margin-bottom: 20px;
+  }
+  .info-tile {
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .info-tile-icon { font-size: 22px; margin-bottom: 8px; }
+  .info-tile-title {
+    font-family: var(--font-tech); font-size: 11px; color: var(--text);
+    font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px;
+  }
+  .info-tile-text { font-size: 11px; color: var(--text-muted); line-height: 1.6; }
+
+  /* ===== TEAM GRID ===== */
   .team-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 10px; margin-top: 16px;
@@ -834,8 +916,7 @@
     border-left: 2px solid var(--tile-color, var(--purple));
   }
   .team-member-tile:hover {
-    background: rgba(255,255,255,0.06);
-    transform: translateY(-1px);
+    background: rgba(255,255,255,0.06); transform: translateY(-1px);
   }
   .team-member-tile .tile-emoji { font-size: 18px; }
   .team-member-tile .tile-info { min-width: 0; }
@@ -845,8 +926,16 @@
   }
   .team-member-tile .tile-role {
     font-size: 9px; color: var(--text-muted); text-transform: uppercase;
-    letter-spacing: 0.8px; white-space: nowrap; overflow: hidden;
-    text-overflow: ellipsis;
+    letter-spacing: 0.8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  @media (max-width: 768px) {
+    .roadmap-grid { grid-template-columns: 1fr 1fr; }
+    .info-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .roadmap-grid { grid-template-columns: 1fr; }
+    .info-grid { grid-template-columns: 1fr; }
   }
 
   .btn-tavily {
@@ -3179,12 +3268,218 @@
         </div>
       </div>
 
-      <!-- Label Welcome -->
+      <!-- WILLKOMMEN BANNER -->
       <div class="label-welcome">
         <h2>WILLKOMMEN IM D_a_N STUDIO</h2>
-        <p>Du willst einen Song machen. Wir machen ihn mit dir – von der ersten Idee bis zum Release.<br>Dein Team ist bereit. Jede Station hat einen Experten der genau weiß was zu tun ist.</p>
-        <button class="btn-primary" style="font-size:14px;padding:10px 28px;margin-top:4px;" onclick="switchPhase(1)">🎯 Neuen Song starten → Ace</button>
-        <div class="team-grid" style="margin-top:20px;">
+        <p>Von der ersten Idee bis zum Release – dein komplettes Label-Team in einer App.<br>Jede Station hat einen Experten. Jeder weiß was die anderen gemacht haben.</p>
+        <button class="btn-primary" style="font-size:14px;padding:10px 28px;" onclick="switchPhase(1)">🎯 Jetzt mit Ace starten</button>
+      </div>
+
+      <!-- WIE ES FUNKTIONIERT -->
+      <div class="roadmap-section">
+        <div class="roadmap-title">So funktioniert das Studio</div>
+        <div class="info-grid">
+          <div class="info-tile">
+            <div class="info-tile-icon">🎯</div>
+            <div class="info-tile-title">Ein Song – ein Weg</div>
+            <div class="info-tile-text">Erstelle einen neuen Track und geh ihn Schritt für Schritt durch – von der Idee bis zum Upload. Jede Phase baut auf der vorherigen auf.</div>
+          </div>
+          <div class="info-tile">
+            <div class="info-tile-icon">🤝</div>
+            <div class="info-tile-title">Dein Team kennt alles</div>
+            <div class="info-tile-text">Jeder im Team bekommt ein vollständiges Briefing. Was Ace entwickelt hat, weiß Ink. Was Beat-Doc festgelegt hat, nutzt The Don. Alles bleibt verbunden.</div>
+          </div>
+          <div class="info-tile">
+            <div class="info-tile-icon">🌐</div>
+            <div class="info-tile-title">Immer aktuell</div>
+            <div class="info-tile-text">Mit Tavily Web-Key durchsucht das Team das aktuelle Internet für jeden Schritt – aktuelle Trends, neue Infos, keine veralteten Antworten.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DER WEG ZUM SONG – Roadmap -->
+      <div class="roadmap-section">
+        <div class="roadmap-title">Der Weg zum Song – alle Stationen</div>
+        <div class="roadmap-grid">
+
+          <!-- Phase 1 – Ace -->
+          <div class="roadmap-card" style="--rc-color:#a855f7" onclick="switchPhase(1)">
+            <div class="roadmap-card-header">
+              <span class="roadmap-num">01</span>
+              <span class="roadmap-emoji">🎯</span>
+              <div class="roadmap-person">
+                <div class="roadmap-person-name">ACE</div>
+                <div class="roadmap-person-role">A&R Manager</div>
+              </div>
+            </div>
+            <div class="roadmap-phase-name">Konzept</div>
+            <div class="roadmap-rows">
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bringst</span><span class="roadmap-row-val">Eine rohe Idee – egal wie unfertig</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bekommst</span><span class="roadmap-row-val">Titel, Storyline, Emotion, Stil – das komplette Konzept</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">KI macht</span><span class="roadmap-row-val">Ideen-Interview, Konzept-Entwicklung, Titelvorschläge</span></div>
+            </div>
+            <button class="roadmap-go-btn">→ ZU ACE</button>
+          </div>
+
+          <!-- Phase 2 – Ink -->
+          <div class="roadmap-card" style="--rc-color:#10b981" onclick="switchPhase(2)">
+            <div class="roadmap-card-header">
+              <span class="roadmap-num">02</span>
+              <span class="roadmap-emoji">✍️</span>
+              <div class="roadmap-person">
+                <div class="roadmap-person-name">INK</div>
+                <div class="roadmap-person-role">Songwriter & Punchline-Coach</div>
+              </div>
+            </div>
+            <div class="roadmap-phase-name">Lyrics</div>
+            <div class="roadmap-rows">
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bringst</span><span class="roadmap-row-val">Das Konzept von Ace + deine Wünsche</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bekommst</span><span class="roadmap-row-val">Vollständige Lyrics: Intro, Verse, Hook, Bridge, Outro</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">KI macht</span><span class="roadmap-row-val">Text generieren, Verse hinzufügen, Punchlines verfeinern</span></div>
+            </div>
+            <button class="roadmap-go-btn">→ ZU INK</button>
+          </div>
+
+          <!-- Phase 3 – Beat-Doc -->
+          <div class="roadmap-card" style="--rc-color:#3b82f6" onclick="switchPhase(3)">
+            <div class="roadmap-card-header">
+              <span class="roadmap-num">03</span>
+              <span class="roadmap-emoji">🎹</span>
+              <div class="roadmap-person">
+                <div class="roadmap-person-name">BEAT-DOC</div>
+                <div class="roadmap-person-role">Producer & Beatmaker</div>
+              </div>
+            </div>
+            <div class="roadmap-phase-name">Beat & Sound</div>
+            <div class="roadmap-rows">
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bringst</span><span class="roadmap-row-val">BPM, Stil, Instrumente, Stimmung</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bekommst</span><span class="roadmap-row-val">Fertiger Suno AI Prompt + Beat-Studio Konfiguration</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">KI macht</span><span class="roadmap-row-val">Suno-Prompt generieren, Prompt verbessern, Persona wählen</span></div>
+            </div>
+            <button class="roadmap-go-btn">→ ZU BEAT-DOC</button>
+          </div>
+
+          <!-- Phase 4 – The Don -->
+          <div class="roadmap-card" style="--rc-color:#f59e0b" onclick="switchPhase(4)">
+            <div class="roadmap-card-header">
+              <span class="roadmap-num">04</span>
+              <span class="roadmap-emoji">📋</span>
+              <div class="roadmap-person">
+                <div class="roadmap-person-name">THE DON</div>
+                <div class="roadmap-person-role">Label Manager</div>
+              </div>
+            </div>
+            <div class="roadmap-phase-name">Produktions-Check</div>
+            <div class="roadmap-rows">
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bringst</span><span class="roadmap-row-val">Den aktuellen Produktionsstand</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-val">Fortschritts-Checkliste, offene Punkte, nächste Schritte</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">KI macht</span><span class="roadmap-row-val">Prioritäten setzen, Empfehlungen für nächste Schritte</span></div>
+            </div>
+            <button class="roadmap-go-btn">→ ZU THE DON</button>
+          </div>
+
+          <!-- Phase 5 – Iris -->
+          <div class="roadmap-card" style="--rc-color:#ec4899" onclick="switchPhase(5)">
+            <div class="roadmap-card-header">
+              <span class="roadmap-num">05</span>
+              <span class="roadmap-emoji">🎨</span>
+              <div class="roadmap-person">
+                <div class="roadmap-person-name">IRIS</div>
+                <div class="roadmap-person-role">Creative Director</div>
+              </div>
+            </div>
+            <div class="roadmap-phase-name">Artwork</div>
+            <div class="roadmap-rows">
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bringst</span><span class="roadmap-row-val">Mood, Stil, Farbpalette, Motiv-Ideen</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bekommst</span><span class="roadmap-row-val">Midjourney-Prompt + DALL-E Prompt auf Englisch</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">KI macht</span><span class="roadmap-row-val">Bild-Prompts für KI-Bildgeneratoren erstellen</span></div>
+            </div>
+            <button class="roadmap-go-btn">→ ZU IRIS</button>
+          </div>
+
+          <!-- Phase 6 – Hype -->
+          <div class="roadmap-card" style="--rc-color:#f97316" onclick="switchPhase(6)">
+            <div class="roadmap-card-header">
+              <span class="roadmap-num">06</span>
+              <span class="roadmap-emoji">📱</span>
+              <div class="roadmap-person">
+                <div class="roadmap-person-name">HYPE</div>
+                <div class="roadmap-person-role">Marketing Manager</div>
+              </div>
+            </div>
+            <div class="roadmap-phase-name">Promo</div>
+            <div class="roadmap-rows">
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bringst</span><span class="roadmap-row-val">Song-Name + Konzept</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bekommst</span><span class="roadmap-row-val">TikTok-Hooks, Instagram-Caption, Reels-Ideen, X/Twitter-Post</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">KI macht</span><span class="roadmap-row-val">Komplettes Social Media Paket für alle Plattformen</span></div>
+            </div>
+            <button class="roadmap-go-btn">→ ZU HYPE</button>
+          </div>
+
+          <!-- Phase 7 – Grid -->
+          <div class="roadmap-card" style="--rc-color:#ef4444" onclick="switchPhase(7)">
+            <div class="roadmap-card-header">
+              <span class="roadmap-num">07</span>
+              <span class="roadmap-emoji">▶️</span>
+              <div class="roadmap-person">
+                <div class="roadmap-person-name">GRID</div>
+                <div class="roadmap-person-role">YouTube & Distribution</div>
+              </div>
+            </div>
+            <div class="roadmap-phase-name">YouTube Upload</div>
+            <div class="roadmap-rows">
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bringst</span><span class="roadmap-row-val">Song-Name, Lyrics-Ausschnitt, Video-Material</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bekommst</span><span class="roadmap-row-val">SEO-Titel, Beschreibung, 30 Tags, Thumbnail-Texte</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">KI macht</span><span class="roadmap-row-val">YouTube-optimierten Upload-Content komplett generieren</span></div>
+            </div>
+            <button class="roadmap-go-btn">→ ZU GRID</button>
+          </div>
+
+          <!-- Phase 8 – Freq -->
+          <div class="roadmap-card" style="--rc-color:#06b6d4" onclick="switchPhase(8)">
+            <div class="roadmap-card-header">
+              <span class="roadmap-num">08</span>
+              <span class="roadmap-emoji">🎧</span>
+              <div class="roadmap-person">
+                <div class="roadmap-person-name">FREQ</div>
+                <div class="roadmap-person-role">Audio Engineer</div>
+              </div>
+            </div>
+            <div class="roadmap-phase-name">Audio Studio</div>
+            <div class="roadmap-rows">
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bringst</span><span class="roadmap-row-val">Audio-Datei (MP3, WAV, etc.)</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bekommst</span><span class="roadmap-row-val">Transkription, Analyse, Marker-Kommentare, Mix-Feedback</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">KI macht</span><span class="roadmap-row-val">Audio analysieren, Sprache transkribieren, Feedback geben</span></div>
+            </div>
+            <button class="roadmap-go-btn">→ ZU FREQ</button>
+          </div>
+
+          <!-- Phase 9 – The Crew -->
+          <div class="roadmap-card" style="--rc-color:#00ff88" onclick="switchPhase(9)">
+            <div class="roadmap-card-header">
+              <span class="roadmap-num">💬</span>
+              <span class="roadmap-emoji">🎙️</span>
+              <div class="roadmap-person">
+                <div class="roadmap-person-name">THE CREW</div>
+                <div class="roadmap-person-role">Ganzes Team</div>
+              </div>
+            </div>
+            <div class="roadmap-phase-name">Producer Chat</div>
+            <div class="roadmap-rows">
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bringst</span><span class="roadmap-row-val">Jede Frage rund um Musik, Production, Release</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">Du bekommst</span><span class="roadmap-row-val">Direkte Antworten vom kompletten Team mit Song-Kontext</span></div>
+              <div class="roadmap-row"><span class="roadmap-row-label">Extra</span><span class="roadmap-row-val">Mit Tavily-Key: live Web-Recherche für aktuelle Infos</span></div>
+            </div>
+            <button class="roadmap-go-btn">→ ZUM TEAM</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- DEIN TEAM -->
+      <div class="roadmap-section">
+        <div class="roadmap-title">Dein Team – direkt anklicken</div>
+        <div class="team-grid">
           <div class="team-member-tile" style="--tile-color:#a855f7" onclick="switchPhase(1)">
             <div class="tile-emoji">🎯</div>
             <div class="tile-info"><div class="tile-name">ACE</div><div class="tile-role">A&R Manager</div></div>
