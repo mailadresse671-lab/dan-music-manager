@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="90" fill="#0a0a0f"/>
+  <rect width="512" height="512" rx="90" fill="url(#g)"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <!-- Music note -->
+  <path d="M210 150 L210 310 Q210 345 175 345 Q140 345 140 310 Q140 275 175 275 L175 220 L340 195 L340 305 Q340 340 305 340 Q270 340 270 305 Q270 270 305 270 L305 175 Z"
+        fill="white" opacity="0.95"/>
+</svg>
