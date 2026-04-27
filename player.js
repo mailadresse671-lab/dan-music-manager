@@ -40,7 +40,122 @@ function rpRenameTrack(pi,event){
   }
 }
 
-// ── File loading ───────────────────────────────────────────
+// ── IndexedDB (Ordner-Handle speichern) ────────────────────
+function openDB(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open('rp-db',1);
+    r.onupgradeneeded=e=>e.target.result.createObjectStore('data');
+    r.onsuccess=e=>res(e.target.result);
+    r.onerror=rej;
+  });
+}
+async function dbSet(key,val){
+  const db=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction('data','readwrite');
+    tx.objectStore('data').put(val,key);
+    tx.oncomplete=res;tx.onerror=rej;
+  });
+}
+async function dbGet(key){
+  const db=await openDB();
+  return new Promise(res=>{
+    const tx=db.transaction('data','readonly');
+    const r=tx.objectStore('data').get(key);
+    r.onsuccess=e=>res(e.target.result||null);
+    r.onerror=()=>res(null);
+  });
+}
+
+// ── Rekursiver Ordner-Scan ─────────────────────────────────
+async function scanDir(dirHandle,arr){
+  for await(const[,handle] of dirHandle){
+    if(handle.kind==='file'){
+      try{
+        const f=await handle.getFile();
+        const x=ext(f.name);
+        if(AUDIO_EXT.includes(x)||VIDEO_EXT.includes(x)){
+          arr.push(f);
+          $('rpScanCount').textContent=arr.length+' Dateien gefunden';
+        }
+      }catch(e){}
+    }else if(handle.kind==='directory'){
+      try{await scanDir(handle,arr)}catch(e){}
+    }
+  }
+}
+
+// ── Haupt-Ordner auswählen ─────────────────────────────────
+async function rpPickRootFolder(){
+  if(!window.showDirectoryPicker){
+    // Fallback: alter Input
+    $('rpFolderIn').click();return;
+  }
+  try{
+    const handle=await window.showDirectoryPicker({mode:'read',startIn:'music'});
+    await dbSet('rootDir',handle);
+    await rpScanHandle(handle);
+  }catch(e){
+    if(e.name!=='AbortError')rpToast('Fehler beim Ordner laden');
+  }
+}
+
+async function rpScanHandle(handle){
+  // Scan-UI zeigen
+  $('rpSetupBox').style.display='none';
+  $('rpReloadBox').style.display='none';
+  $('rpScanBox').style.display='flex';
+  $('rpScanCount').textContent='0 Dateien gefunden';
+
+  const arr=[];
+  try{
+    await scanDir(handle,arr);
+  }catch(e){}
+
+  $('rpScanBox').style.display='none';
+
+  if(!arr.length){
+    $('rpSetupBox').style.display='';
+    rpToast('Keine Musikdateien gefunden');
+    return;
+  }
+  files=arr;
+  buildPlaylist(false);
+  rpToast('✓ '+files.length+' Tracks geladen');
+}
+
+// ── Letzten Ordner neu laden ───────────────────────────────
+async function rpReloadLast(){
+  const handle=await dbGet('rootDir');
+  if(!handle){$('rpReloadBox').style.display='none';$('rpSetupBox').style.display='';return}
+  try{
+    const perm=await handle.requestPermission({mode:'read'});
+    if(perm==='granted'){await rpScanHandle(handle);return}
+  }catch(e){}
+  rpToast('Zugriff verweigert – bitte Ordner neu auswählen');
+  $('rpReloadBox').style.display='none';
+  $('rpSetupBox').style.display='';
+}
+
+// ── Beim App-Start: Handle prüfen ──────────────────────────
+async function rpCheckSavedDir(){
+  try{
+    const handle=await dbGet('rootDir');
+    if(!handle)return;
+    const perm=await handle.queryPermission({mode:'read'});
+    if(perm==='granted'){
+      // Still granted – direkt laden
+      await rpScanHandle(handle);
+    }else{
+      // Braucht erneute Erlaubnis (Nutzergeste nötig)
+      $('rpSetupBox').style.display='none';
+      $('rpReloadBox').style.display='flex';
+    }
+  }catch(e){}
+}
+
+// ── File loading (Fallback: Input) ─────────────────────────
+function rpOpenFilePicker(){$('rpFilesIn').click()}
 function rpOpenPicker(t){$(t==='folder'?'rpFolderIn':'rpFilesIn').click()}
 
 function rpLoad(e){
@@ -58,6 +173,20 @@ function buildPlaylist(autoplay){
   playlist=idx;cur=files.length?0:-1;
   renderUI();
   if(autoplay&&files.length)playTrack(0);
+}
+
+// ── Einfacher Toast ────────────────────────────────────────
+function rpToast(msg){
+  let t=$('rpToast');
+  if(!t){t=document.createElement('div');t.id='rpToast';
+    Object.assign(t.style,{position:'fixed',bottom:'80px',left:'50%',transform:'translateX(-50%)',
+      background:'rgba(212,160,23,0.95)',color:'#0d0b08',padding:'8px 18px',borderRadius:'20px',
+      fontFamily:"'Bebas Neue',sans-serif",fontSize:'14px',letterSpacing:'1px',
+      zIndex:'200',pointerEvents:'none',transition:'opacity 0.4s'});
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._to);t._to=setTimeout(()=>t.style.opacity='0',2500);
 }
 
 // ── Playback ───────────────────────────────────────────────
@@ -297,4 +426,6 @@ function updateMediaSession(f){
 // ── Service Worker ─────────────────────────────────────────
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
+// ── Start ──────────────────────────────────────────────────
 updateUI();
+rpCheckSavedDir();
