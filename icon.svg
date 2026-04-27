@@ -1,13 +1,93 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="90" fill="#0a0a0f"/>
-  <rect width="512" height="512" rx="90" fill="url(#g)"/>
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#7c3aed"/>
-      <stop offset="100%" stop-color="#3b82f6"/>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e1810"/>
+      <stop offset="100%" stop-color="#0d0b08"/>
     </linearGradient>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f5cc50"/>
+      <stop offset="50%" stop-color="#d4a017"/>
+      <stop offset="100%" stop-color="#8a6010"/>
+    </linearGradient>
+    <linearGradient id="goldGrad2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f0c040"/>
+      <stop offset="100%" stop-color="#9a7012"/>
+    </linearGradient>
+    <radialGradient id="vinylGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#2a2520"/>
+      <stop offset="18%" stop-color="#111"/>
+      <stop offset="19%" stop-color="#1c1c1c"/>
+      <stop offset="32%" stop-color="#0d0d0d"/>
+      <stop offset="33%" stop-color="#1c1c1c"/>
+      <stop offset="46%" stop-color="#0d0d0d"/>
+      <stop offset="47%" stop-color="#1c1c1c"/>
+      <stop offset="60%" stop-color="#0d0d0d"/>
+      <stop offset="61%" stop-color="#1c1c1c"/>
+      <stop offset="74%" stop-color="#111"/>
+      <stop offset="100%" stop-color="#1a1a1a"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.7"/>
+    </filter>
   </defs>
-  <!-- Music note -->
-  <path d="M210 150 L210 310 Q210 345 175 345 Q140 345 140 310 Q140 275 175 275 L175 220 L340 195 L340 305 Q340 340 305 340 Q270 340 270 305 Q270 270 305 270 L305 175 Z"
-        fill="white" opacity="0.95"/>
+
+  <!-- Background rounded square -->
+  <rect width="512" height="512" rx="100" fill="url(#bgGrad)"/>
+
+  <!-- Gold border glow -->
+  <rect width="512" height="512" rx="100" fill="none"
+        stroke="url(#goldGrad2)" stroke-width="6" opacity="0.35"/>
+
+  <!-- Vinyl disc shadow -->
+  <circle cx="256" cy="248" r="178" fill="#000" opacity="0.5" filter="url(#shadow)"/>
+
+  <!-- Vinyl disc -->
+  <circle cx="256" cy="244" r="174" fill="url(#vinylGrad)"/>
+
+  <!-- Groove rings -->
+  <circle cx="256" cy="244" r="160" fill="none" stroke="rgba(255,255,255,0.035)" stroke-width="1.5"/>
+  <circle cx="256" cy="244" r="140" fill="none" stroke="rgba(255,255,255,0.035)" stroke-width="1.5"/>
+  <circle cx="256" cy="244" r="120" fill="none" stroke="rgba(255,255,255,0.035)" stroke-width="1.5"/>
+  <circle cx="256" cy="244" r="100" fill="none" stroke="rgba(255,255,255,0.035)" stroke-width="1.5"/>
+  <circle cx="256" cy="244" r="80"  fill="none" stroke="rgba(255,255,255,0.04)"  stroke-width="1"/>
+
+  <!-- Center label -->
+  <circle cx="256" cy="244" r="60" fill="url(#goldGrad)" filter="url(#glow)"/>
+
+  <!-- Label shine -->
+  <ellipse cx="244" cy="228" rx="30" ry="16" fill="rgba(255,255,255,0.12)" transform="rotate(-20,244,228)"/>
+
+  <!-- Center hole -->
+  <circle cx="256" cy="244" r="7" fill="#0d0b08"/>
+
+  <!-- DaN text on label -->
+  <text x="256" y="238"
+        text-anchor="middle"
+        font-family="Impact, 'Arial Narrow', Arial, sans-serif"
+        font-size="26" font-weight="900"
+        fill="#0d0b08"
+        letter-spacing="3">DaN</text>
+
+  <!-- VIBE text on label -->
+  <text x="256" y="258"
+        text-anchor="middle"
+        font-family="'Arial Narrow', Arial, sans-serif"
+        font-size="11" font-weight="700"
+        fill="#3a2a08"
+        letter-spacing="5">VIBE</text>
+
+  <!-- Bottom gold bar -->
+  <rect x="80" y="448" width="352" height="3" rx="2" fill="url(#goldGrad2)" opacity="0.6"/>
+
+  <!-- Bottom text -->
+  <text x="256" y="492"
+        text-anchor="middle"
+        font-family="Impact, 'Arial Narrow', Arial, sans-serif"
+        font-size="28" font-weight="900"
+        fill="url(#goldGrad2)"
+        letter-spacing="6">DaN Vibe</text>
 </svg>
