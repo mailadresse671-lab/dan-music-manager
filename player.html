@@ -19,18 +19,40 @@
   <div class="header" id="rpHeader">
     <div class="header-logo">D_a_N</div>
     <div class="header-title">MIXTAPE PLAYER</div>
-    <button class="header-load-btn" onclick="rpOpenPicker('folder')">📂</button>
+    <button class="header-load-btn" onclick="rpPickRootFolder()">📂</button>
   </div>
 
   <!-- EMPTY STATE -->
   <div class="empty-state" id="rpEmpty">
-    <div class="drop-zone" id="rpDrop" onclick="rpOpenPicker('folder')">
-      <div class="drop-vinyl">◉</div>
-      <div class="drop-title">TRACKS LADEN</div>
-      <div class="drop-sub">Ordner oder Dateien auswählen</div>
+
+    <!-- Scan-Fortschritt -->
+    <div class="scan-box" id="rpScanBox" style="display:none">
+      <div class="scan-spinner">◉</div>
+      <div class="scan-label">Durchsuche Ordner...</div>
+      <div class="scan-count" id="rpScanCount">0 Dateien gefunden</div>
     </div>
-    <button class="btn-load-files" onclick="rpOpenPicker('files')">🎵 EINZELNE DATEIEN</button>
-    <div class="drop-formats">MP3 · WAV · FLAC · AAC · OGG · MP4 · MKV u.v.m.</div>
+
+    <!-- Neu-Laden Prompt (nach erstem Setup) -->
+    <div class="reload-box" id="rpReloadBox" style="display:none">
+      <div style="font-size:44px;margin-bottom:12px;">🎵</div>
+      <div class="reload-title">Musik neu laden?</div>
+      <div class="reload-sub">Letzten Ordner wieder einlesen</div>
+      <button class="btn-reload" onclick="rpReloadLast()">▶ MUSIK LADEN</button>
+      <button class="btn-change-folder" onclick="rpPickRootFolder()">📂 Anderen Ordner wählen</button>
+    </div>
+
+    <!-- Ersteinrichtung -->
+    <div id="rpSetupBox">
+      <div class="drop-zone" id="rpDrop" onclick="rpPickRootFolder()">
+        <div class="drop-vinyl">◉</div>
+        <div class="drop-title">ALLE SONGS LADEN</div>
+        <div class="drop-sub">Wähle deinen Haupt-Ordner –<br>alle Unterordner werden automatisch durchsucht</div>
+      </div>
+      <div class="setup-note">📁 Einmalige Einrichtung · App merkt sich deinen Ordner</div>
+      <button class="btn-load-files" onclick="rpOpenFilePicker()">🎵 Einzelne Dateien auswählen</button>
+      <div class="drop-formats">MP3 · WAV · FLAC · AAC · OGG · MP4 · MKV u.v.m.</div>
+    </div>
+
   </div>
 
   <!-- PLAYER -->
