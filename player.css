@@ -25,6 +25,12 @@ html,body{height:100%;background:var(--bg);color:var(--cream);font-family:'Oswal
   background:none;border:1px solid var(--border);color:var(--gold);
   font-size:20px;width:38px;height:38px;border-radius:8px;cursor:pointer;
 }
+.header-rescan-btn{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  font-size:18px;width:38px;height:38px;border-radius:8px;cursor:pointer;
+  transition:color 0.2s;
+}
+.header-rescan-btn:active{color:var(--gold)}
 
 /* ── EMPTY STATE ───────────────────────────────────────── */
 .empty-state{
