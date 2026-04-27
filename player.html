@@ -33,12 +33,12 @@
       <div class="scan-label">Durchsuche Ordner...</div>
       <div class="scan-count" id="rpScanCount">0 Dateien gefunden</div>
     </div>
-    <div class="reload-box" id="rpReloadBox" style="display:none">
-      <div style="font-size:44px;margin-bottom:12px;">🎵</div>
-      <div class="reload-title">Musik neu laden?</div>
-      <div class="reload-sub">Letzten Ordner wieder einlesen</div>
-      <button class="btn-reload" onclick="rpReloadLast()">▶ MUSIK LADEN</button>
-      <button class="btn-change-folder" onclick="rpPickRootFolder()">📂 Anderen Ordner wählen</button>
+    <div class="reload-box" id="rpReloadBox" style="display:none" onclick="rpReloadLast()">
+      <div class="reload-vinyl-icon">◉</div>
+      <div class="reload-title">DaN VIBE</div>
+      <div class="reload-sub">Tippe irgendwo um deine Musik zu laden</div>
+      <div class="reload-tap-hint">▶ MUSIK LADEN</div>
+      <button class="btn-change-folder" onclick="rpPickRootFolder();event.stopPropagation()">📂 Anderen Ordner wählen</button>
     </div>
     <div id="rpSetupBox">
       <div class="drop-zone" id="rpDrop" onclick="rpPickRootFolder()">

@@ -77,15 +77,29 @@ html,body{height:100%;background:var(--bg);color:var(--cream);font-family:'Oswal
 .scan-spinner{font-size:60px;color:var(--gold);animation:spin 1.5s linear infinite;display:inline-block}
 .scan-label{font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;font-size:18px;letter-spacing:2px;color:var(--cream)}
 .scan-count{font-size:13px;color:var(--gold);letter-spacing:1px}
-.reload-box{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center;width:100%;max-width:360px}
-.reload-title{font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;font-size:22px;color:var(--gold);letter-spacing:3px}
-.reload-sub{font-size:13px;color:var(--muted);margin-bottom:6px}
-.btn-reload{
-  width:100%;padding:16px;
+.reload-box{
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  padding:40px 24px;text-align:center;width:100%;cursor:pointer;
+}
+.reload-vinyl-icon{
+  font-size:90px;color:var(--gold);
+  animation:spin 3s linear infinite;display:inline-block;
+  filter:drop-shadow(0 0 20px rgba(212,160,23,0.5));
+}
+.reload-title{
+  font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;font-size:38px;
+  letter-spacing:5px;
+  background:linear-gradient(135deg,#fff5c0,var(--gold-light),var(--gold),var(--gold-dark));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.reload-sub{font-size:14px;color:var(--muted);letter-spacing:1px}
+.reload-tap-hint{
+  margin-top:8px;padding:14px 40px;
   background:linear-gradient(135deg,var(--gold),var(--gold-dark));
-  border:none;border-radius:10px;
-  font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;font-size:18px;letter-spacing:2px;
-  color:#0d0b08;cursor:pointer;
+  border-radius:30px;
+  font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;font-size:18px;letter-spacing:3px;
+  color:#0d0b08;
+  box-shadow:0 0 30px rgba(212,160,23,0.3);
 }
 .btn-change-folder{
   width:100%;padding:10px;background:none;border:1px solid var(--border);border-radius:8px;
@@ -133,8 +147,10 @@ video{width:100%;max-height:40vh;display:block;object-fit:contain}
 }
 .vinyl-label-name{
   font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;
-  font-size:clamp(8px,2.2vw,11px);color:#0d0b08;letter-spacing:0.5px;
-  max-width:80%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;
+  font-size:clamp(6px,1.8vw,9px);color:#0d0b08;letter-spacing:0.3px;
+  max-width:86%;text-align:center;line-height:1.25;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+  overflow:hidden;word-break:break-all;
 }
 .vinyl-label-dot{font-size:6px;color:#0d0b08;margin-top:2px}
 

@@ -1,4 +1,4 @@
-const CACHE = 'danvibe-v3';
+const CACHE = 'danvibe-v5';
 
 // Alle App-Dateien die offline verfügbar sein müssen
 const ASSETS = [

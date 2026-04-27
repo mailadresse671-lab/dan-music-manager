@@ -341,9 +341,8 @@ function playTrack(pi){
   $('rpCur').textContent='0:00';$('rpTot').textContent='0:00';
   $('rpTrackName').classList.toggle('scrolling',clean.length>22);
 
-  // Vinyl label: Song-Name (rotiert mit)
-  const labelText=clean.length>9?clean.slice(0,8)+'…':clean;
-  $('rpVinylLabelName').textContent=labelText;
+  // Vinyl label: Song-Name (rotiert mit, CSS übernimmt Umbruch/Clamp)
+  $('rpVinylLabelName').textContent=clean;
   $('rpVinyl').classList.toggle('playing',!isVid(f.name));
 
   startEq();highlightItem(pi);updateMediaSession(f);
