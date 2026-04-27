@@ -101,16 +101,13 @@ async function rpPickRootFolder(){
 }
 
 async function rpScanHandle(handle){
-  // Scan-UI zeigen
   $('rpSetupBox').style.display='none';
   $('rpReloadBox').style.display='none';
   $('rpScanBox').style.display='flex';
   $('rpScanCount').textContent='0 Dateien gefunden';
 
   const arr=[];
-  try{
-    await scanDir(handle,arr);
-  }catch(e){}
+  try{ await scanDir(handle,arr); }catch(e){}
 
   $('rpScanBox').style.display='none';
 
@@ -122,6 +119,44 @@ async function rpScanHandle(handle){
   files=arr;
   buildPlaylist(false);
   rpToast('✓ '+files.length+' Tracks geladen');
+  // Rescan-Button im Header anzeigen
+  $('rpRescanBtn').style.display='flex';
+}
+
+// ── Rescan: Ordner neu einlesen ────────────────────────────
+async function rpRescan(){
+  const handle=await dbGet('rootDir');
+  if(!handle){rpToast('Kein Ordner gespeichert');return}
+  try{
+    const perm=await handle.requestPermission({mode:'read'});
+    if(perm!=='granted'){rpToast('Zugriff verweigert');return}
+  }catch(e){rpToast('Fehler beim Zugriff');return}
+
+  // Aktuellen Track merken
+  const curName=cur>=0?files[playlist[cur]]?.name:null;
+
+  $('rpScanBox').style.display='flex';
+  $('rpScanCount').textContent='0 Dateien gefunden';
+  const arr=[];
+  try{ await scanDir(handle,arr); }catch(e){}
+  $('rpScanBox').style.display='none';
+
+  if(!arr.length){rpToast('Keine Dateien gefunden');return}
+  files=arr;
+
+  // Versuche aktuellen Track wiederzufinden
+  const wasPlaying=playing;
+  buildPlaylist(false);
+
+  if(curName){
+    const idx=files.findIndex(f=>f.name===curName);
+    if(idx>=0){
+      const pi=playlist.indexOf(idx);
+      if(pi>=0)cur=pi;
+    }
+  }
+  renderUI();
+  rpToast('✓ '+files.length+' Tracks · Neu eingelesen');
 }
 
 // ── Letzten Ordner neu laden ───────────────────────────────
