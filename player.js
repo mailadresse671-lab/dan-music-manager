@@ -11,206 +11,275 @@ const ext=n=>(n.split('.').pop()||'').toLowerCase();
 const isVid=n=>VIDEO_EXT.includes(ext(n));
 const fmt=s=>!isFinite(s)||isNaN(s)?'0:00':Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmtSize=b=>b>1048576?(b/1048576).toFixed(1)+' MB':(b/1024).toFixed(0)+' KB';
 
-// ── Custom names (localStorage) ────────────────────────────
+// ── Custom names ───────────────────────────────────────────
 const NAMES_KEY='rp_names';
 let customNames={};
 try{customNames=JSON.parse(localStorage.getItem(NAMES_KEY)||'{}')}catch(e){}
-
 function fileKey(f){return f.name+'|'+f.size}
 function getDisplayName(f){return customNames[fileKey(f)]||f.name.replace(/\.[^.]+$/,'')}
-function saveCustomName(f,name){
-  customNames[fileKey(f)]=name;
-  try{localStorage.setItem(NAMES_KEY,JSON.stringify(customNames))}catch(e){}
-}
+function saveCustomName(f,name){customNames[fileKey(f)]=name;try{localStorage.setItem(NAMES_KEY,JSON.stringify(customNames))}catch(e){}}
 
 function rpRenameTrack(pi,event){
   event.stopPropagation();
   const f=files[playlist[pi]];
-  const current=getDisplayName(f);
-  const newName=prompt('Neuer Name:',current);
-  if(newName===null)return;
-  const trimmed=newName.trim();
-  if(!trimmed)return;
-  saveCustomName(f,trimmed);
+  const newName=prompt('Neuer Name:',getDisplayName(f));
+  if(newName===null||!newName.trim())return;
+  saveCustomName(f,newName.trim());
   renderList();
-  if(pi===cur){
-    $('rpTrackName').textContent=trimmed;
-    $('rpTrackName').classList.toggle('scrolling',trimmed.length>22);
-  }
+  if(pi===cur){const n=newName.trim();$('rpTrackName').textContent=n;$('rpTrackName').classList.toggle('scrolling',n.length>22)}
 }
 
-// ── IndexedDB (Ordner-Handle speichern) ────────────────────
+// ── Favorites ──────────────────────────────────────────────
+const FAVS_KEY='rp_favs';
+let favorites=new Set();
+try{favorites=new Set(JSON.parse(localStorage.getItem(FAVS_KEY)||'[]'))}catch(e){}
+let favFilterOn=false;
+function saveFavs(){try{localStorage.setItem(FAVS_KEY,JSON.stringify([...favorites]))}catch(e){}}
+function rpToggleFav(pi,event){
+  event.stopPropagation();
+  const k=fileKey(files[playlist[pi]]);
+  if(favorites.has(k))favorites.delete(k);else favorites.add(k);
+  saveFavs();renderList();
+}
+function rpToggleFavFilter(){
+  favFilterOn=!favFilterOn;
+  $('rpFavFilterBtn').classList.toggle('on',favFilterOn);
+  renderList();
+}
+
+// ── Search ─────────────────────────────────────────────────
+let searchTerm='';
+function rpFilterList(){
+  searchTerm=$('rpSearch').value.toLowerCase().trim();
+  renderList();
+}
+
+// ── Sleep Timer ────────────────────────────────────────────
+const SLEEP_STEPS=[0,15,30,60];
+let sleepIdx=0,sleepTimeout=null,sleepInterval=null,sleepEnd=0;
+function rpCycleSleep(){
+  sleepIdx=(sleepIdx+1)%SLEEP_STEPS.length;
+  clearTimeout(sleepTimeout);clearInterval(sleepInterval);
+  $('rpSleepToast').style.display='none';
+  if(sleepIdx===0){$('rpSleepBtn').classList.remove('on');return}
+  const mins=SLEEP_STEPS[sleepIdx];
+  $('rpSleepBtn').classList.add('on');
+  $('rpSleepBtn').title='Sleep: '+mins+' min';
+  sleepEnd=Date.now()+mins*60000;
+  const update=()=>{
+    const left=Math.max(0,sleepEnd-Date.now());
+    const m=Math.floor(left/60000),s=Math.floor((left%60000)/1000);
+    const t=$('rpSleepToast');
+    t.style.display='block';
+    t.textContent='🌙 '+m+':'+String(s).padStart(2,'0');
+    if(left===0){t.style.display='none';clearInterval(sleepInterval)}
+  };
+  update();
+  sleepInterval=setInterval(update,1000);
+  sleepTimeout=setTimeout(()=>{
+    if(media){media.pause();playing=false;$('rpVinyl').classList.remove('playing');stopEq();updateUI()}
+    sleepIdx=0;$('rpSleepBtn').classList.remove('on');
+    $('rpSleepToast').style.display='none';
+    clearInterval(sleepInterval);
+    rpToast('🌙 Sleep-Timer abgelaufen');
+  },mins*60000);
+}
+
+// ── Color Themes ───────────────────────────────────────────
+const THEME_KEY='rp_theme';
+let currentTheme=localStorage.getItem(THEME_KEY)||'gold';
+function applyTheme(t){
+  document.body.className=t==='gold'?'':'theme-'+t;
+  currentTheme=t;
+  try{localStorage.setItem(THEME_KEY,t)}catch(e){}
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===t));
+}
+function rpSetTheme(t){applyTheme(t);rpCloseThemePicker()}
+function rpOpenThemePicker(){
+  $('rpThemeOverlay').classList.add('open');$('rpThemePanel').classList.add('open');
+}
+function rpCloseThemePicker(){
+  $('rpThemeOverlay').classList.remove('open');$('rpThemePanel').classList.remove('open');
+}
+
+// ── Track Info Modal ───────────────────────────────────────
+function rpShowTrackInfo(){
+  if(cur<0||!files.length)return;
+  const f=files[playlist[cur]];
+  $('rpInfoTitle').textContent=getDisplayName(f);
+  const rows=[
+    ['Datei',f.name],
+    ['Format',ext(f.name).toUpperCase()],
+    ['Größe',fmtSize(f.size)],
+    ['Dauer',fmt(media?.duration||0)],
+    ['Track','#'+(cur+1)+' von '+playlist.length],
+  ];
+  $('rpInfoGrid').innerHTML=rows.map(([k,v])=>`<span class="info-key">${k}</span><span class="info-val">${esc(String(v))}</span>`).join('');
+  $('rpInfoOverlay').classList.add('open');$('rpInfoPanel').classList.add('open');
+}
+function rpCloseTrackInfo(){
+  $('rpInfoOverlay').classList.remove('open');$('rpInfoPanel').classList.remove('open');
+}
+
+// ── Web Audio (Bass Boost) ─────────────────────────────────
+let audioCtx=null,bassFilter=null,bassGain=null,audioSrcNode=null;
+function initWebAudio(){
+  if(audioCtx||!audioEl)return;
+  try{
+    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    audioSrcNode=audioCtx.createMediaElementSource(audioEl);
+    bassFilter=audioCtx.createBiquadFilter();
+    bassFilter.type='lowshelf';
+    bassFilter.frequency.value=250;
+    bassFilter.gain.value=0;
+    audioSrcNode.connect(bassFilter);
+    bassFilter.connect(audioCtx.destination);
+  }catch(e){audioCtx=null}
+}
+function rpSetBass(val){
+  const v=parseFloat(val);
+  $('rpBassVal').textContent=(v>=0?'+':'')+v+' dB';
+  const pct=((v-(-10))/(20-(-10)))*100;
+  $('rpBass').style.setProperty('--v',pct+'%');
+  if(bassFilter)bassFilter.gain.value=v;
+}
+
+// ── Crossfade ──────────────────────────────────────────────
+const CROSSFADE_SEC=3;
+let cfActive=false,cfEl=null,cfUrl=null,cfFadeTimer=null;
+function initCrossfadeEl(){
+  if(cfEl)return;
+  cfEl=new Audio();
+}
+function startCrossfade(){
+  if(!cfEl||cur<0||!media||isVid(files[playlist[cur]].name))return;
+  const nextPi=repeat==='one'?cur:(cur+1<playlist.length?cur+1:repeat==='all'?0:-1);
+  if(nextPi<0||nextPi===cur)return;
+  const nf=files[playlist[nextPi]];
+  if(isVid(nf.name))return;
+  if(cfUrl)URL.revokeObjectURL(cfUrl);
+  cfUrl=URL.createObjectURL(nf);
+  cfEl.src=cfUrl;cfEl.volume=0;
+  cfEl.play().catch(()=>{cfActive=false});
+  const volAtStart=parseFloat($('rpVol').value);
+  const steps=CROSSFADE_SEC*10;
+  let step=0;
+  clearInterval(cfFadeTimer);
+  cfFadeTimer=setInterval(()=>{
+    step++;
+    const t=step/steps;
+    if(media)media.volume=Math.max(0,volAtStart*(1-t));
+    cfEl.volume=Math.min(volAtStart,volAtStart*t);
+    if(step>=steps)clearInterval(cfFadeTimer);
+  },100);
+}
+
+// ── IndexedDB ──────────────────────────────────────────────
 function openDB(){
-  return new Promise((res,rej)=>{
-    const r=indexedDB.open('rp-db',1);
-    r.onupgradeneeded=e=>e.target.result.createObjectStore('data');
-    r.onsuccess=e=>res(e.target.result);
-    r.onerror=rej;
-  });
+  return new Promise((res,rej)=>{const r=indexedDB.open('rp-db',1);r.onupgradeneeded=e=>e.target.result.createObjectStore('data');r.onsuccess=e=>res(e.target.result);r.onerror=rej});
 }
-async function dbSet(key,val){
-  const db=await openDB();
-  return new Promise((res,rej)=>{
-    const tx=db.transaction('data','readwrite');
-    tx.objectStore('data').put(val,key);
-    tx.oncomplete=res;tx.onerror=rej;
-  });
-}
-async function dbGet(key){
-  const db=await openDB();
-  return new Promise(res=>{
-    const tx=db.transaction('data','readonly');
-    const r=tx.objectStore('data').get(key);
-    r.onsuccess=e=>res(e.target.result||null);
-    r.onerror=()=>res(null);
-  });
-}
+async function dbSet(key,val){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction('data','readwrite');tx.objectStore('data').put(val,key);tx.oncomplete=res;tx.onerror=rej})}
+async function dbGet(key){const db=await openDB();return new Promise(res=>{const tx=db.transaction('data','readonly');const r=tx.objectStore('data').get(key);r.onsuccess=e=>res(e.target.result||null);r.onerror=()=>res(null)})}
 
 // ── Rekursiver Ordner-Scan ─────────────────────────────────
 async function scanDir(dirHandle,arr){
   for await(const[,handle] of dirHandle){
     if(handle.kind==='file'){
-      try{
-        const f=await handle.getFile();
-        const x=ext(f.name);
-        if(AUDIO_EXT.includes(x)||VIDEO_EXT.includes(x)){
-          arr.push(f);
-          $('rpScanCount').textContent=arr.length+' Dateien gefunden';
-        }
-      }catch(e){}
-    }else if(handle.kind==='directory'){
-      try{await scanDir(handle,arr)}catch(e){}
-    }
+      try{const f=await handle.getFile();const x=ext(f.name);if(AUDIO_EXT.includes(x)||VIDEO_EXT.includes(x)){arr.push(f);$('rpScanCount').textContent=arr.length+' Dateien gefunden'}}catch(e){}
+    }else if(handle.kind==='directory'){try{await scanDir(handle,arr)}catch(e){}}
   }
 }
 
 // ── Haupt-Ordner auswählen ─────────────────────────────────
 async function rpPickRootFolder(){
-  if(!window.showDirectoryPicker){
-    // Fallback: alter Input
-    $('rpFolderIn').click();return;
-  }
+  if(!window.showDirectoryPicker){$('rpFolderIn').click();return}
   try{
     const handle=await window.showDirectoryPicker({mode:'read',startIn:'music'});
-    await dbSet('rootDir',handle);
-    await rpScanHandle(handle);
-  }catch(e){
-    if(e.name!=='AbortError')rpToast('Fehler beim Ordner laden');
-  }
+    await dbSet('rootDir',handle);await rpScanHandle(handle);
+  }catch(e){if(e.name!=='AbortError')rpToast('Fehler beim Ordner laden')}
 }
-
 async function rpScanHandle(handle){
-  $('rpSetupBox').style.display='none';
-  $('rpReloadBox').style.display='none';
-  $('rpScanBox').style.display='flex';
-  $('rpScanCount').textContent='0 Dateien gefunden';
-
-  const arr=[];
-  try{ await scanDir(handle,arr); }catch(e){}
-
+  $('rpSetupBox').style.display='none';$('rpReloadBox').style.display='none';
+  $('rpScanBox').style.display='flex';$('rpScanCount').textContent='0 Dateien gefunden';
+  const arr=[];try{await scanDir(handle,arr)}catch(e){}
   $('rpScanBox').style.display='none';
-
-  if(!arr.length){
-    $('rpSetupBox').style.display='';
-    rpToast('Keine Musikdateien gefunden');
-    return;
-  }
-  files=arr;
-  buildPlaylist(false);
-  rpToast('✓ '+files.length+' Tracks geladen');
-  // Rescan-Button im Header anzeigen
+  if(!arr.length){$('rpSetupBox').style.display='';rpToast('Keine Musikdateien gefunden');return}
+  files=arr;buildPlaylist(false);rpToast('✓ '+files.length+' Tracks geladen');
   $('rpRescanBtn').style.display='flex';
 }
 
-// ── Rescan: Ordner neu einlesen ────────────────────────────
+// ── Rescan ─────────────────────────────────────────────────
 async function rpRescan(){
   const handle=await dbGet('rootDir');
   if(!handle){rpToast('Kein Ordner gespeichert');return}
-  try{
-    const perm=await handle.requestPermission({mode:'read'});
-    if(perm!=='granted'){rpToast('Zugriff verweigert');return}
-  }catch(e){rpToast('Fehler beim Zugriff');return}
-
-  // Aktuellen Track merken
+  try{const perm=await handle.requestPermission({mode:'read'});if(perm!=='granted'){rpToast('Zugriff verweigert');return}}catch(e){rpToast('Fehler');return}
   const curName=cur>=0?files[playlist[cur]]?.name:null;
-
-  $('rpScanBox').style.display='flex';
-  $('rpScanCount').textContent='0 Dateien gefunden';
-  const arr=[];
-  try{ await scanDir(handle,arr); }catch(e){}
+  $('rpScanBox').style.display='flex';$('rpScanCount').textContent='0 Dateien gefunden';
+  const arr=[];try{await scanDir(handle,arr)}catch(e){}
   $('rpScanBox').style.display='none';
-
   if(!arr.length){rpToast('Keine Dateien gefunden');return}
-  files=arr;
-
-  // Versuche aktuellen Track wiederzufinden
-  const wasPlaying=playing;
-  buildPlaylist(false);
-
-  if(curName){
-    const idx=files.findIndex(f=>f.name===curName);
-    if(idx>=0){
-      const pi=playlist.indexOf(idx);
-      if(pi>=0)cur=pi;
-    }
-  }
-  renderUI();
-  rpToast('✓ '+files.length+' Tracks · Neu eingelesen');
+  files=arr;buildPlaylist(false);
+  if(curName){const idx=files.findIndex(f=>f.name===curName);if(idx>=0){const pi=playlist.indexOf(idx);if(pi>=0)cur=pi}}
+  renderUI();rpToast('✓ '+files.length+' Tracks · Neu eingelesen');
 }
 
 // ── Letzten Ordner neu laden ───────────────────────────────
 async function rpReloadLast(){
   const handle=await dbGet('rootDir');
   if(!handle){$('rpReloadBox').style.display='none';$('rpSetupBox').style.display='';return}
-  try{
-    const perm=await handle.requestPermission({mode:'read'});
-    if(perm==='granted'){await rpScanHandle(handle);return}
-  }catch(e){}
-  rpToast('Zugriff verweigert – bitte Ordner neu auswählen');
-  $('rpReloadBox').style.display='none';
-  $('rpSetupBox').style.display='';
+  try{const perm=await handle.requestPermission({mode:'read'});if(perm==='granted'){await rpScanHandle(handle);return}}catch(e){}
+  rpToast('Zugriff verweigert');$('rpReloadBox').style.display='none';$('rpSetupBox').style.display='';
 }
 
-// ── Beim App-Start: Handle prüfen ──────────────────────────
+// ── App-Start ──────────────────────────────────────────────
 async function rpCheckSavedDir(){
   try{
-    const handle=await dbGet('rootDir');
-    if(!handle)return;
+    const handle=await dbGet('rootDir');if(!handle)return;
     const perm=await handle.queryPermission({mode:'read'});
-    if(perm==='granted'){
-      // Still granted – direkt laden
-      await rpScanHandle(handle);
-    }else{
-      // Braucht erneute Erlaubnis (Nutzergeste nötig)
-      $('rpSetupBox').style.display='none';
-      $('rpReloadBox').style.display='flex';
-    }
+    if(perm==='granted'){await rpScanHandle(handle)}else{$('rpSetupBox').style.display='none';$('rpReloadBox').style.display='flex'}
   }catch(e){}
 }
 
-// ── File loading (Fallback: Input) ─────────────────────────
+// ── Ordner hinzufügen (ohne zu ersetzen) ──────────────────
+async function rpAddFolder(){
+  if(!window.showDirectoryPicker){$('rpFolderIn').click();return}
+  try{
+    const handle=await window.showDirectoryPicker({mode:'read',startIn:'music'});
+    rpToast('Scanne Ordner…');
+    const arr=[];try{await scanDir(handle,arr)}catch(e){}
+    if(!arr.length){rpToast('Keine Musikdateien gefunden');return}
+    const seen=new Set(files.map(f=>f.name+f.size));
+    let added=0;arr.forEach(f=>{if(!seen.has(f.name+f.size)){files.push(f);added++}});
+    if(!added){rpToast('Alle Dateien bereits in der Liste');return}
+    const wasCur=cur>=0?playlist[cur]:-1;
+    const idx=files.map((_,i)=>i);
+    if(shuffle){for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}}
+    playlist=idx;cur=wasCur>=0?playlist.indexOf(wasCur):0;if(cur<0)cur=0;
+    renderUI();renderList();rpToast('✓ '+added+' Tracks hinzugefügt');
+  }catch(e){if(e.name!=='AbortError')rpToast('Fehler beim Ordner laden')}
+}
+
+// ── File loading ───────────────────────────────────────────
 function rpOpenFilePicker(){$('rpFilesIn').click()}
 function rpOpenPicker(t){$(t==='folder'?'rpFolderIn':'rpFilesIn').click()}
-
 function rpLoad(e){
   const valid=Array.from(e.target.files).filter(f=>{const x=ext(f.name);return AUDIO_EXT.includes(x)||VIDEO_EXT.includes(x)});
   if(!valid.length){alert('Keine Musik- oder Videodateien gefunden.');return}
   const seen=new Set(files.map(f=>f.name+f.size));
   valid.forEach(f=>{if(!seen.has(f.name+f.size))files.push(f)});
-  buildPlaylist(true);
-  e.target.value='';
+  buildPlaylist(true);e.target.value='';
 }
 
 function buildPlaylist(autoplay){
   const idx=files.map((_,i)=>i);
   if(shuffle){for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}}
   playlist=idx;cur=files.length?0:-1;
-  renderUI();
-  if(autoplay&&files.length)playTrack(0);
+  renderUI();if(autoplay&&files.length)playTrack(0);
 }
 
-// ── Einfacher Toast ────────────────────────────────────────
+// ── Toast ──────────────────────────────────────────────────
 function rpToast(msg){
   let t=$('rpToast');
   if(!t){t=document.createElement('div');t.id='rpToast';
@@ -231,10 +300,16 @@ function ensureAudio(){
   audioEl.addEventListener('timeupdate',onTime);
   audioEl.addEventListener('ended',onEnded);
   audioEl.addEventListener('loadedmetadata',onMeta);
+  initCrossfadeEl();
 }
 
 function playTrack(pi){
   if(pi<0||pi>=playlist.length)return;
+  cfActive=false;clearInterval(cfFadeTimer);
+  // Reset crossfade element volume
+  if(cfEl){cfEl.pause();cfEl.src='';cfEl.volume=0}
+  if(cfUrl){URL.revokeObjectURL(cfUrl);cfUrl=null}
+
   cur=pi;
   const f=files[playlist[pi]];
   if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}
@@ -244,25 +319,16 @@ function playTrack(pi){
   const vid=$('rpVideo'),va=$('rpVideoArea'),viny=$('rpVinylArea');
 
   if(isVid(f.name)){
-    // Video mode
     audioEl.pause();audioEl.src='';
-    vid.removeEventListener('timeupdate',onTime);
-    vid.removeEventListener('ended',onEnded);
-    vid.removeEventListener('loadedmetadata',onMeta);
-    vid.addEventListener('timeupdate',onTime);
-    vid.addEventListener('ended',onEnded);
-    vid.addEventListener('loadedmetadata',onMeta);
-    vid.src=objUrl;
-    va.className='video-area visible';
-    viny.style.display='none';
-    media=vid;
+    vid.removeEventListener('timeupdate',onTime);vid.removeEventListener('ended',onEnded);vid.removeEventListener('loadedmetadata',onMeta);
+    vid.addEventListener('timeupdate',onTime);vid.addEventListener('ended',onEnded);vid.addEventListener('loadedmetadata',onMeta);
+    vid.src=objUrl;va.className='video-area visible';viny.style.display='none';media=vid;
   }else{
-    // Audio mode – Vinyl anzeigen
-    vid.pause();vid.src='';
-    va.className='video-area';
-    viny.style.display='';
-    audioEl.src=objUrl;
-    media=audioEl;
+    vid.pause();vid.src='';va.className='video-area';viny.style.display='';
+    audioEl.src=objUrl;media=audioEl;
+    // Init Web Audio on first audio play (needs user gesture)
+    if(!audioCtx)initWebAudio();
+    if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();
   }
 
   media.volume=parseFloat($('rpVol').value);
@@ -273,17 +339,13 @@ function playTrack(pi){
   $('rpTrackSub').textContent='TRACK '+(pi+1)+' / '+playlist.length+'  ·  '+ext(f.name).toUpperCase();
   $('rpBar').value=0;$('rpBar').style.setProperty('--v','0%');
   $('rpCur').textContent='0:00';$('rpTot').textContent='0:00';
+  $('rpTrackName').classList.toggle('scrolling',clean.length>22);
 
-  // Marquee bei langen Namen
-  const el=$('rpTrackName');
-  el.classList.toggle('scrolling',clean.length>22);
-
-  // Vinyl
+  // Vinyl label: Song-Name (rotiert mit, CSS übernimmt Umbruch/Clamp)
+  $('rpVinylLabelName').textContent=clean;
   $('rpVinyl').classList.toggle('playing',!isVid(f.name));
 
-  startEq();
-  highlightItem(pi);
-  updateMediaSession(f);
+  startEq();highlightItem(pi);updateMediaSession(f);
 }
 
 function onTime(){
@@ -291,9 +353,20 @@ function onTime(){
   const p=media.duration?(media.currentTime/media.duration)*100:0;
   $('rpBar').value=p;$('rpBar').style.setProperty('--v',p+'%');
   $('rpCur').textContent=fmt(media.currentTime);
+
+  // Crossfade: start when CROSSFADE_SEC seconds remain
+  if(media.duration&&!cfActive&&playing&&!isVid(files[playlist[cur]]?.name||'')){
+    const left=media.duration-media.currentTime;
+    if(left>0&&left<=CROSSFADE_SEC){
+      cfActive=true;startCrossfade();
+    }
+  }
 }
 function onMeta(){if(media)$('rpTot').textContent=fmt(media.duration)}
 function onEnded(){
+  cfActive=false;clearInterval(cfFadeTimer);
+  // Restore user volume
+  if(media)media.volume=parseFloat($('rpVol').value);
   if(repeat==='one'){media.currentTime=0;media.play();return}
   if(cur+1<playlist.length)playTrack(cur+1);
   else if(repeat==='all'){if(shuffle)buildPlaylist(true);else playTrack(0)}
@@ -302,13 +375,10 @@ function onEnded(){
 
 function rpTogglePlay(){
   if(!media)return;
-  if(playing){
-    media.pause();playing=false;
-    $('rpVinyl').classList.remove('playing');stopEq();
-  }else{
-    media.play();playing=true;
-    if(media===audioEl)$('rpVinyl').classList.add('playing');
-    startEq();
+  if(playing){media.pause();playing=false;$('rpVinyl').classList.remove('playing');stopEq()}
+  else{
+    if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();
+    media.play();playing=true;if(media===audioEl)$('rpVinyl').classList.add('playing');startEq();
   }
   updateUI();
 }
@@ -321,23 +391,38 @@ function rpPrev(){
 function rpSeek(v){if(media&&media.duration)media.currentTime=(v/100)*media.duration}
 function rpSetVol(v){const n=parseFloat(v);if(audioEl)audioEl.volume=n;$('rpVideo').volume=n}
 
+// ── Vinyl Touch Gestures ───────────────────────────────────
+(function(){
+  let tx=0,ty=0,tt=0;
+  const v=$('rpVinyl');
+  v.addEventListener('touchstart',e=>{
+    const t=e.touches[0];tx=t.clientX;ty=t.clientY;tt=Date.now();
+  },{passive:true});
+  v.addEventListener('touchend',e=>{
+    const t=e.changedTouches[0];
+    const dx=t.clientX-tx,dy=t.clientY-ty,dt=Date.now()-tt;
+    if(Math.abs(dx)<20&&Math.abs(dy)<20&&dt<300){
+      // Tap → play/pause
+      rpTogglePlay();
+    }else if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){
+      // Swipe → skip
+      if(dx<0)rpNext();else rpPrev();
+    }
+  },{passive:true});
+})();
+
 // ── Video Fullscreen ───────────────────────────────────────
 function rpVideoFullscreen(){
   const vid=$('rpVideo');
   const req=vid.requestFullscreen||vid.webkitRequestFullscreen||vid.mozRequestFullScreen||vid.msRequestFullscreen;
-  if(req) req.call(vid);
+  if(req)req.call(vid);
 }
-
-// Landscape-Rotation beim Vollbild
 document.addEventListener('fullscreenchange',handleFsChange);
 document.addEventListener('webkitfullscreenchange',handleFsChange);
 function handleFsChange(){
   const inFs=!!(document.fullscreenElement||document.webkitFullscreenElement);
-  if(inFs&&screen.orientation&&screen.orientation.lock){
-    screen.orientation.lock('landscape').catch(()=>{});
-  }else if(!inFs&&screen.orientation&&screen.orientation.unlock){
-    screen.orientation.unlock();
-  }
+  if(inFs&&screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{});
+  else if(!inFs&&screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();
 }
 
 // ── Shuffle / Repeat ───────────────────────────────────────
@@ -351,32 +436,20 @@ function rpToggleShuffle(){
   }
   updateUI();
 }
-function rpToggleRepeat(){
-  const m=['off','all','one'];
-  repeat=m[(m.indexOf(repeat)+1)%3];
-  updateUI();
-}
+function rpToggleRepeat(){const m=['off','all','one'];repeat=m[(m.indexOf(repeat)+1)%3];updateUI()}
 
 // ── Playlist overlay ───────────────────────────────────────
 function rpToggleList(){
   listOpen=!listOpen;
   $('rpPlOverlay').classList.toggle('open',listOpen);
   $('rpPlPanel').classList.toggle('open',listOpen);
-  if(listOpen)renderList();
+  if(listOpen){$('rpSearch').value='';searchTerm='';renderList()}
 }
 
 // ── EQ ────────────────────────────────────────────────────
 const EQ_N=12;
-function startEq(){
-  stopEq();
-  eqInterval=setInterval(()=>{
-    for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height=(12+Math.random()*78)+'%'}
-  },130);
-}
-function stopEq(){
-  clearInterval(eqInterval);
-  for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height='10%'}
-}
+function startEq(){stopEq();eqInterval=setInterval(()=>{for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height=(12+Math.random()*78)+'%'}},130)}
+function stopEq(){clearInterval(eqInterval);for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height='10%'}}
 
 // ── UI update ──────────────────────────────────────────────
 function updateUI(){
@@ -397,16 +470,23 @@ function renderUI(){
 }
 
 function renderList(){
-  $('rpList').innerHTML=playlist.map((fi,pi)=>{
+  let items=playlist.map((fi,pi)=>({fi,pi}));
+  // Favorites filter
+  if(favFilterOn)items=items.filter(({fi})=>favorites.has(fileKey(files[fi])));
+  // Search filter
+  if(searchTerm)items=items.filter(({fi})=>getDisplayName(files[fi]).toLowerCase().includes(searchTerm));
+  $('rpList').innerHTML=items.map(({fi,pi})=>{
     const f=files[fi];
     const icon=isVid(f.name)?'🎬':'🎵';
     const x=ext(f.name).toUpperCase();
     const name=esc(getDisplayName(f));
+    const isFav=favorites.has(fileKey(f));
     return`<div class="pl-item${pi===cur?' active':''}" id="pi${pi}" onclick="playTrack(${pi});rpToggleList()">
       <span class="pl-num">${pi+1}</span>
       <span class="pl-icon">${icon}</span>
       <span class="pl-name">${name}</span>
       <span class="pl-ext">${x}</span>
+      <button class="pl-fav-btn${isFav?' active':''}" onclick="rpToggleFav(${pi},event)" title="Favorit">❤️</button>
       <button class="pl-rename-btn" onclick="rpRenameTrack(${pi},event)" title="Umbenennen">✏️</button>
     </div>`;
   }).join('');
@@ -414,8 +494,7 @@ function renderList(){
 
 function highlightItem(pi){
   document.querySelectorAll('.pl-item').forEach((el,i)=>el.classList.toggle('active',i===pi));
-  const el=$('pi'+pi);
-  if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  const el=$('pi'+pi);if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 function rpClear(){
@@ -423,15 +502,12 @@ function rpClear(){
   if(media){media.pause();media.src=''}
   if(audioEl)audioEl.src='';
   const v=$('rpVideo');v.pause();v.src='';
-  $('rpVideoArea').className='video-area';
-  $('rpVinylArea').style.display='';
-  $('rpVinyl').classList.remove('playing');
-  stopEq();
+  $('rpVideoArea').className='video-area';$('rpVinylArea').style.display='';
+  $('rpVinyl').classList.remove('playing');stopEq();
   if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}
   files=[];playlist=[];cur=-1;playing=false;media=null;
-  listOpen=false;
-  $('rpPlOverlay').classList.remove('open');
-  $('rpPlPanel').classList.remove('open');
+  listOpen=false;$('rpPlOverlay').classList.remove('open');$('rpPlPanel').classList.remove('open');
+  $('rpVinylLabelName').textContent='DaN';
   renderUI();
 }
 
@@ -451,7 +527,7 @@ drop.addEventListener('drop',e=>{
 // ── Media Session ──────────────────────────────────────────
 function updateMediaSession(f){
   if(!('mediaSession' in navigator))return;
-  navigator.mediaSession.metadata=new MediaMetadata({title:f.name.replace(/\.[^.]+$/,''),artist:'D_a_N Player'});
+  navigator.mediaSession.metadata=new MediaMetadata({title:f.name.replace(/\.[^.]+$/,''),artist:'DaN Vibe'});
   navigator.mediaSession.setActionHandler('play',rpTogglePlay);
   navigator.mediaSession.setActionHandler('pause',rpTogglePlay);
   navigator.mediaSession.setActionHandler('nexttrack',rpNext);
@@ -462,5 +538,8 @@ function updateMediaSession(f){
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
 // ── Start ──────────────────────────────────────────────────
+applyTheme(currentTheme);
+// Init bass slider visual
+rpSetBass(0);
 updateUI();
 rpCheckSavedDir();
