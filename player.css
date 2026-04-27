@@ -15,12 +15,15 @@ html,body{height:100%;background:var(--bg);color:var(--cream);font-family:'Oswal
   background:linear-gradient(180deg,#1a1410,#0d0b08);
   border-bottom:2px solid var(--gold-dark);flex-shrink:0;z-index:10;
 }
+.header-brand{display:flex;align-items:baseline;gap:6px;flex:1}
 .header-logo{
-  font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;font-size:22px;letter-spacing:2px;
-  background:linear-gradient(135deg,var(--gold-light),var(--gold-dark));
+  font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;font-size:34px;letter-spacing:3px;
+  background:linear-gradient(135deg,#fff5c0,var(--gold-light),var(--gold),var(--gold-dark));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 8px rgba(212,160,23,0.6));
+  line-height:1;
 }
-.header-title{flex:1;font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;font-size:14px;color:var(--muted);letter-spacing:3px}
+.header-title{font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;font-size:17px;color:var(--gold-dark);letter-spacing:4px;padding-bottom:2px}
 .header-load-btn{
   background:none;border:1px solid var(--border);color:var(--gold);
   font-size:20px;width:38px;height:38px;border-radius:8px;cursor:pointer;
