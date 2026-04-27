@@ -1,4 +1,4 @@
-const CACHE = 'danvibe-v3';
+const CACHE = 'danvibe-v4';
 
 // Alle App-Dateien die offline verfügbar sein müssen
 const ASSETS = [
@@ -7,7 +7,11 @@ const ASSETS = [
   './player.js',
   './manifest.json',
   './icon.svg',
-  './icon-maskable.svg'
+  './icon-maskable.svg',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-192.png',
+  './icon-maskable-512.png'
 ];
 
 // Beim Installieren: alle App-Dateien sofort cachen

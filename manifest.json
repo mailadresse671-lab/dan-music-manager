@@ -3,23 +3,43 @@
   "short_name": "DaN Vibe",
   "description": "DaN Vibe – Dein persönlicher Musik & Video Player",
   "start_url": "./player.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0d0b08",
   "theme_color": "#d4a017",
   "orientation": "any",
   "lang": "de",
+  "categories": ["music", "entertainment"],
   "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
-    },
-    {
-      "src": "icon-maskable.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
     }
   ]
 }
