@@ -149,7 +149,7 @@ video{width:100%;max-height:40vh;display:block;object-fit:contain}
   position:relative;z-index:2;
   box-shadow:0 0 16px rgba(212,160,23,0.5);
 }
-.vinyl-label-name{font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;font-size:clamp(9px,2.5vw,13px);color:#0d0b08;letter-spacing:1px}
+.vinyl-label-name{font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;font-size:clamp(8px,2.2vw,11px);color:#0d0b08;letter-spacing:0.5px;max-width:80%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
 .vinyl-label-dot{font-size:6px;color:#0d0b08;margin-top:2px}
 
 /* ── TRACK INFO ────────────────────────────────────────── */

@@ -189,6 +189,32 @@ async function rpCheckSavedDir(){
   }catch(e){}
 }
 
+// ── Ordner hinzufügen (ohne zu ersetzen) ──────────────────
+async function rpAddFolder(){
+  if(!window.showDirectoryPicker){$('rpFolderIn').click();return}
+  try{
+    const handle=await window.showDirectoryPicker({mode:'read',startIn:'music'});
+    rpToast('Scanne Ordner…');
+    const arr=[];
+    try{await scanDir(handle,arr)}catch(e){}
+    if(!arr.length){rpToast('Keine Musikdateien gefunden');return}
+    const seen=new Set(files.map(f=>f.name+f.size));
+    let added=0;
+    arr.forEach(f=>{if(!seen.has(f.name+f.size)){files.push(f);added++}});
+    if(!added){rpToast('Alle Dateien bereits in der Liste');return}
+    const wasCur=cur>=0?playlist[cur]:-1;
+    const idx=files.map((_,i)=>i);
+    if(shuffle){for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}}
+    playlist=idx;
+    cur=wasCur>=0?playlist.indexOf(wasCur):0;
+    if(cur<0)cur=0;
+    renderUI();renderList();
+    rpToast('✓ '+added+' Tracks hinzugefügt');
+  }catch(e){
+    if(e.name!=='AbortError')rpToast('Fehler beim Ordner laden');
+  }
+}
+
 // ── File loading (Fallback: Input) ─────────────────────────
 function rpOpenFilePicker(){$('rpFilesIn').click()}
 function rpOpenPicker(t){$(t==='folder'?'rpFolderIn':'rpFilesIn').click()}
@@ -277,6 +303,10 @@ function playTrack(pi){
   // Marquee bei langen Namen
   const el=$('rpTrackName');
   el.classList.toggle('scrolling',clean.length>22);
+
+  // Vinyl Label: Song-Name (gekürzt, dreht sich mit)
+  const labelText=clean.length>9?clean.slice(0,8)+'…':clean;
+  $('rpVinylLabelName').textContent=labelText;
 
   // Vinyl
   $('rpVinyl').classList.toggle('playing',!isVid(f.name));
@@ -432,6 +462,7 @@ function rpClear(){
   listOpen=false;
   $('rpPlOverlay').classList.remove('open');
   $('rpPlPanel').classList.remove('open');
+  $('rpVinylLabelName').textContent='DaN';
   renderUI();
 }
 

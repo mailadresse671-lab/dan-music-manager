@@ -72,7 +72,7 @@
         <div class="vinyl-groove g2"></div>
         <div class="vinyl-groove g3"></div>
         <div class="vinyl-label">
-          <div class="vinyl-label-name">D_a_N</div>
+          <div class="vinyl-label-name" id="rpVinylLabelName">DaN</div>
           <div class="vinyl-label-dot">●</div>
         </div>
       </div>
@@ -135,6 +135,7 @@
       <span class="pl-panel-title">TRACKLIST</span>
       <span class="pl-count" id="rpCount">0 TRACKS</span>
       <div style="display:flex;gap:6px;margin-left:auto">
+        <button class="pl-btn" onclick="rpAddFolder();event.stopPropagation()">+ ORDNER</button>
         <button class="pl-btn" onclick="rpOpenPicker('files');event.stopPropagation()">+ ADD</button>
         <button class="pl-btn danger" onclick="rpClear();event.stopPropagation()">✕</button>
         <button class="pl-btn" onclick="rpToggleList()">✕ CLOSE</button>
