@@ -247,6 +247,12 @@ video{width:100%;max-height:40vh;display:block;object-fit:contain}
 .pl-name{font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:0.5px}
 .pl-item.active .pl-name{color:var(--gold)}
 .pl-ext{font-size:10px;padding:2px 6px;border-radius:3px;background:rgba(212,160,23,0.1);color:var(--gold-dark);letter-spacing:1px;flex-shrink:0}
+.pl-rename-btn{
+  background:none;border:none;font-size:14px;cursor:pointer;
+  opacity:0.35;padding:2px 4px;flex-shrink:0;transition:opacity 0.15s;
+}
+.pl-item:hover .pl-rename-btn,.pl-item.active .pl-rename-btn{opacity:0.7}
+.pl-rename-btn:active{opacity:1}
 
 /* ── VIDEO FULLSCREEN STYLES ───────────────────────────── */
 video:fullscreen,video:-webkit-full-screen{
