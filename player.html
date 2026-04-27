@@ -13,10 +13,10 @@
 </head>
 <body>
 
-<div class="app">
+<div class="app" id="rpApp">
 
   <!-- HEADER -->
-  <div class="header">
+  <div class="header" id="rpHeader">
     <div class="header-logo">D_a_N</div>
     <div class="header-title">MIXTAPE PLAYER</div>
     <button class="header-load-btn" onclick="rpOpenPicker('folder')">📂</button>
@@ -36,36 +36,35 @@
   <!-- PLAYER -->
   <div class="player-wrap" id="rpPlayer" style="display:none">
 
-    <!-- VIDEO -->
-    <div class="video-wrap" id="rpVideoWrap">
+    <!-- VIDEO AREA -->
+    <div class="video-area" id="rpVideoArea">
       <video id="rpVideo" playsinline></video>
+      <button class="video-fs-btn" onclick="rpVideoFullscreen()" title="Vollbild">⛶</button>
     </div>
 
-    <!-- VINYL -->
-    <div class="vinyl-section">
-      <div class="vinyl-outer">
-        <div class="vinyl-disc" id="rpVinyl">
-          <div class="vinyl-groove g1"></div>
-          <div class="vinyl-groove g2"></div>
-          <div class="vinyl-groove g3"></div>
-          <div class="vinyl-label">
-            <div class="vinyl-label-name">D_a_N</div>
-            <div class="vinyl-label-dot">●</div>
-          </div>
+    <!-- NOW PLAYING: Vinyl (audio mode) -->
+    <div class="vinyl-area" id="rpVinylArea">
+      <div class="vinyl-disc" id="rpVinyl">
+        <div class="vinyl-groove g1"></div>
+        <div class="vinyl-groove g2"></div>
+        <div class="vinyl-groove g3"></div>
+        <div class="vinyl-label">
+          <div class="vinyl-label-name">D_a_N</div>
+          <div class="vinyl-label-dot">●</div>
         </div>
       </div>
     </div>
 
     <!-- TRACK INFO -->
-    <div class="track-info-section">
+    <div class="track-info-bar">
       <div class="track-marquee-wrap">
         <div class="track-marquee" id="rpTrackName">– – –</div>
       </div>
       <div class="track-sub" id="rpTrackSub">TRACK 0 / 0</div>
     </div>
 
-    <!-- EQUALIZER VISUALIZER -->
-    <div class="eq-section" id="rpEq">
+    <!-- EQ VISUALIZER -->
+    <div class="eq-row" id="rpEq">
       <div class="eq-bar" id="eq0"></div>
       <div class="eq-bar" id="eq1"></div>
       <div class="eq-bar" id="eq2"></div>
@@ -81,14 +80,14 @@
     </div>
 
     <!-- PROGRESS -->
-    <div class="progress-section">
+    <div class="progress-row">
       <span class="p-time" id="rpCur">0:00</span>
       <input type="range" class="p-bar" id="rpBar" min="0" max="100" value="0" step="0.1" oninput="rpSeek(this.value)">
       <span class="p-time" id="rpTot">0:00</span>
     </div>
 
     <!-- CONTROLS -->
-    <div class="controls">
+    <div class="controls-row">
       <button class="ctrl-btn" id="rpShuffleBtn" onclick="rpToggleShuffle()">🔀</button>
       <button class="ctrl-btn" onclick="rpPrev()">⏮</button>
       <button class="ctrl-btn play-btn" id="rpPlayBtn" onclick="rpTogglePlay()">▶</button>
@@ -96,27 +95,31 @@
       <button class="ctrl-btn" id="rpRepeatBtn" onclick="rpToggleRepeat()">🔁</button>
     </div>
 
-    <!-- VOLUME -->
-    <div class="vol-section">
+    <!-- VOLUME + LIST TOGGLE -->
+    <div class="bottom-bar">
       <span class="vol-icon">🔈</span>
       <input type="range" class="vol-bar" id="rpVol" min="0" max="1" step="0.01" value="1" oninput="rpSetVol(this.value)">
       <span class="vol-icon">🔊</span>
+      <button class="list-toggle-btn" id="rpListToggle" onclick="rpToggleList()">≡ TRACKS</button>
     </div>
-
-    <!-- PLAYLIST HEADER -->
-    <div class="pl-header">
-      <span class="pl-title">TRACKLIST</span>
-      <span class="pl-count" id="rpCount">0 TRACKS</span>
-      <div class="pl-actions">
-        <button class="pl-btn" onclick="rpOpenPicker('files')">+ ADD</button>
-        <button class="pl-btn danger" onclick="rpClear()">✕</button>
-      </div>
-    </div>
-
-    <!-- PLAYLIST -->
-    <div class="playlist" id="rpList"></div>
 
   </div>
+
+  <!-- PLAYLIST OVERLAY -->
+  <div class="pl-overlay" id="rpPlOverlay" onclick="rpToggleList()"></div>
+  <div class="pl-panel" id="rpPlPanel">
+    <div class="pl-panel-header">
+      <span class="pl-panel-title">TRACKLIST</span>
+      <span class="pl-count" id="rpCount">0 TRACKS</span>
+      <div style="display:flex;gap:6px;margin-left:auto">
+        <button class="pl-btn" onclick="rpOpenPicker('files');event.stopPropagation()">+ ADD</button>
+        <button class="pl-btn danger" onclick="rpClear();event.stopPropagation()">✕</button>
+        <button class="pl-btn" onclick="rpToggleList()">✕ CLOSE</button>
+      </div>
+    </div>
+    <div class="pl-list" id="rpList"></div>
+  </div>
+
 </div>
 
 <!-- HIDDEN INPUTS -->

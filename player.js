@@ -4,7 +4,7 @@ const VIDEO_EXT=['mp4','webm','mov','avi','mkv','m4v','wmv','3gp','flv','ogv'];
 let files=[],playlist=[],cur=-1;
 let shuffle=true,repeat='off';
 let playing=false,objUrl=null,audioEl=null,media=null;
-let eqInterval=null;
+let eqInterval=null,listOpen=false;
 
 const $=id=>document.getElementById(id);
 const ext=n=>(n.split('.').pop()||'').toLowerCase();
@@ -26,9 +26,7 @@ function rpLoad(e){
 
 function buildPlaylist(autoplay){
   const idx=files.map((_,i)=>i);
-  if(shuffle){
-    for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}
-  }
+  if(shuffle){for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}}
   playlist=idx;cur=files.length?0:-1;
   renderUI();
   if(autoplay&&files.length)playTrack(0);
@@ -51,8 +49,10 @@ function playTrack(pi){
   objUrl=URL.createObjectURL(f);
   ensureAudio();
 
-  const vid=$('rpVideo'),vw=$('rpVideoWrap');
+  const vid=$('rpVideo'),va=$('rpVideoArea'),viny=$('rpVinylArea');
+
   if(isVid(f.name)){
+    // Video mode
     audioEl.pause();audioEl.src='';
     vid.removeEventListener('timeupdate',onTime);
     vid.removeEventListener('ended',onEnded);
@@ -60,10 +60,17 @@ function playTrack(pi){
     vid.addEventListener('timeupdate',onTime);
     vid.addEventListener('ended',onEnded);
     vid.addEventListener('loadedmetadata',onMeta);
-    vid.src=objUrl;vw.className='video-wrap visible';media=vid;
+    vid.src=objUrl;
+    va.className='video-area visible';
+    viny.style.display='none';
+    media=vid;
   }else{
-    vid.pause();vid.src='';vw.className='video-wrap';
-    audioEl.src=objUrl;media=audioEl;
+    // Audio mode – Vinyl anzeigen
+    vid.pause();vid.src='';
+    va.className='video-area';
+    viny.style.display='';
+    audioEl.src=objUrl;
+    media=audioEl;
   }
 
   media.volume=parseFloat($('rpVol').value);
@@ -75,14 +82,13 @@ function playTrack(pi){
   $('rpBar').value=0;$('rpBar').style.setProperty('--v','0%');
   $('rpCur').textContent='0:00';$('rpTot').textContent='0:00';
 
-  // Marquee nur bei langen Namen
+  // Marquee bei langen Namen
   const el=$('rpTrackName');
-  el.classList.toggle('long',clean.length>20);
+  el.classList.toggle('scrolling',clean.length>22);
 
-  // Vinyl spin
-  $('rpVinyl').classList.add('playing');
+  // Vinyl
+  $('rpVinyl').classList.toggle('playing',!isVid(f.name));
 
-  // EQ
   startEq();
   highlightItem(pi);
   updateMediaSession(f);
@@ -104,8 +110,14 @@ function onEnded(){
 
 function rpTogglePlay(){
   if(!media)return;
-  if(playing){media.pause();playing=false;$('rpVinyl').classList.remove('playing');stopEq()}
-  else{media.play();playing=true;$('rpVinyl').classList.add('playing');startEq()}
+  if(playing){
+    media.pause();playing=false;
+    $('rpVinyl').classList.remove('playing');stopEq();
+  }else{
+    media.play();playing=true;
+    if(media===audioEl)$('rpVinyl').classList.add('playing');
+    startEq();
+  }
   updateUI();
 }
 function rpNext(){if(playlist.length)playTrack(cur+1<playlist.length?cur+1:0)}
@@ -116,6 +128,25 @@ function rpPrev(){
 }
 function rpSeek(v){if(media&&media.duration)media.currentTime=(v/100)*media.duration}
 function rpSetVol(v){const n=parseFloat(v);if(audioEl)audioEl.volume=n;$('rpVideo').volume=n}
+
+// ── Video Fullscreen ───────────────────────────────────────
+function rpVideoFullscreen(){
+  const vid=$('rpVideo');
+  const req=vid.requestFullscreen||vid.webkitRequestFullscreen||vid.mozRequestFullScreen||vid.msRequestFullscreen;
+  if(req) req.call(vid);
+}
+
+// Landscape-Rotation beim Vollbild
+document.addEventListener('fullscreenchange',handleFsChange);
+document.addEventListener('webkitfullscreenchange',handleFsChange);
+function handleFsChange(){
+  const inFs=!!(document.fullscreenElement||document.webkitFullscreenElement);
+  if(inFs&&screen.orientation&&screen.orientation.lock){
+    screen.orientation.lock('landscape').catch(()=>{});
+  }else if(!inFs&&screen.orientation&&screen.orientation.unlock){
+    screen.orientation.unlock();
+  }
+}
 
 // ── Shuffle / Repeat ───────────────────────────────────────
 function rpToggleShuffle(){
@@ -134,23 +165,28 @@ function rpToggleRepeat(){
   updateUI();
 }
 
-// ── Equalizer (animated) ───────────────────────────────────
-const EQ_BARS=12;
+// ── Playlist overlay ───────────────────────────────────────
+function rpToggleList(){
+  listOpen=!listOpen;
+  $('rpPlOverlay').classList.toggle('open',listOpen);
+  $('rpPlPanel').classList.toggle('open',listOpen);
+  if(listOpen)renderList();
+}
+
+// ── EQ ────────────────────────────────────────────────────
+const EQ_N=12;
 function startEq(){
   stopEq();
   eqInterval=setInterval(()=>{
-    for(let i=0;i<EQ_BARS;i++){
-      const b=$('eq'+i);
-      if(b)b.style.height=(15+Math.random()*75)+'%';
-    }
+    for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height=(12+Math.random()*78)+'%'}
   },130);
 }
 function stopEq(){
   clearInterval(eqInterval);
-  for(let i=0;i<EQ_BARS;i++){const b=$('eq'+i);if(b)b.style.height='10%'}
+  for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height='10%'}
 }
 
-// ── UI ─────────────────────────────────────────────────────
+// ── UI update ──────────────────────────────────────────────
 function updateUI(){
   $('rpPlayBtn').textContent=playing?'⏸':'▶';
   $('rpShuffleBtn').classList.toggle('on',shuffle);
@@ -165,7 +201,7 @@ function renderUI(){
   $('rpEmpty').style.display=has?'none':'flex';
   $('rpPlayer').style.display=has?'flex':'none';
   $('rpCount').textContent=files.length+' TRACKS';
-  updateUI();renderList();
+  updateUI();
 }
 
 function renderList(){
@@ -174,7 +210,7 @@ function renderList(){
     const icon=isVid(f.name)?'🎬':'🎵';
     const x=ext(f.name).toUpperCase();
     const name=esc(f.name.replace(/\.[^.]+$/,''));
-    return`<div class="pl-item${pi===cur?' active':''}" id="pi${pi}" onclick="playTrack(${pi})">
+    return`<div class="pl-item${pi===cur?' active':''}" id="pi${pi}" onclick="playTrack(${pi});rpToggleList()">
       <span class="pl-num">${pi+1}</span>
       <span class="pl-icon">${icon}</span>
       <span class="pl-name">${name}</span>
@@ -194,11 +230,15 @@ function rpClear(){
   if(media){media.pause();media.src=''}
   if(audioEl)audioEl.src='';
   const v=$('rpVideo');v.pause();v.src='';
-  $('rpVideoWrap').className='video-wrap';
+  $('rpVideoArea').className='video-area';
+  $('rpVinylArea').style.display='';
   $('rpVinyl').classList.remove('playing');
   stopEq();
   if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}
   files=[];playlist=[];cur=-1;playing=false;media=null;
+  listOpen=false;
+  $('rpPlOverlay').classList.remove('open');
+  $('rpPlPanel').classList.remove('open');
   renderUI();
 }
 
@@ -218,10 +258,7 @@ drop.addEventListener('drop',e=>{
 // ── Media Session ──────────────────────────────────────────
 function updateMediaSession(f){
   if(!('mediaSession' in navigator))return;
-  navigator.mediaSession.metadata=new MediaMetadata({
-    title:f.name.replace(/\.[^.]+$/,''),
-    artist:'D_a_N Player'
-  });
+  navigator.mediaSession.metadata=new MediaMetadata({title:f.name.replace(/\.[^.]+$/,''),artist:'D_a_N Player'});
   navigator.mediaSession.setActionHandler('play',rpTogglePlay);
   navigator.mediaSession.setActionHandler('pause',rpTogglePlay);
   navigator.mediaSession.setActionHandler('nexttrack',rpNext);
@@ -231,5 +268,4 @@ function updateMediaSession(f){
 // ── Service Worker ─────────────────────────────────────────
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-// ── Init ───────────────────────────────────────────────────
 updateUI();

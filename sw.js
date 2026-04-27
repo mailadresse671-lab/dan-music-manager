@@ -1,4 +1,4 @@
-const CACHE = 'dan-player-v2';
+const CACHE = 'dan-player-v3';
 const ASSETS = [
   './player.html',
   './manifest.json',
