@@ -670,6 +670,78 @@
     border-radius: 3px; pointer-events: none; transition: width 0.1s linear;
   }
   .audio-time { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+  /* ===== ZUFALLS-PLAYER ===== */
+  .rp-drop {
+    border: 2px dashed rgba(124,58,237,0.4);
+    border-radius: 14px; padding: 32px 20px;
+    text-align: center; cursor: pointer;
+    transition: all 0.2s; background: rgba(124,58,237,0.04);
+  }
+  .rp-drop:hover, .rp-drop.dragover {
+    border-color: var(--purple); background: rgba(124,58,237,0.1);
+  }
+  .rp-video-wrap { display:none; margin-bottom:16px; border-radius:10px; overflow:hidden; background:#000; }
+  .rp-video-wrap.visible { display:block; }
+  .rp-track-name {
+    font-size:15px; font-weight:700; color:var(--text);
+    text-align:center; margin-bottom:4px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .rp-track-sub { font-size:12px; color:var(--text-muted); text-align:center; margin-bottom:16px; }
+  .rp-progress-wrap { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+  .rp-progress {
+    flex:1; -webkit-appearance:none; appearance:none;
+    height:5px; border-radius:3px;
+    background:linear-gradient(90deg,var(--purple) var(--val,0%),rgba(255,255,255,0.1) var(--val,0%));
+    cursor:pointer; outline:none;
+  }
+  .rp-progress::-webkit-slider-thumb {
+    -webkit-appearance:none; width:14px; height:14px;
+    border-radius:50%; background:var(--purple); cursor:pointer;
+  }
+  .rp-time { font-size:11px; color:var(--text-muted); min-width:36px; white-space:nowrap; }
+  .rp-controls {
+    display:flex; align-items:center; justify-content:center;
+    gap:10px; margin-bottom:16px; flex-wrap:wrap;
+  }
+  .rp-btn {
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);
+    color:var(--text); border-radius:50%; width:42px; height:42px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:16px; transition:all 0.2s; flex-shrink:0;
+  }
+  .rp-btn:hover { background:rgba(255,255,255,0.12); }
+  .rp-btn.large {
+    width:58px; height:58px; font-size:24px;
+    background:var(--purple); border-color:var(--purple);
+  }
+  .rp-btn.large:hover { background:var(--purple-light); }
+  .rp-btn.active { color:var(--purple-light); border-color:var(--purple); background:rgba(124,58,237,0.15); }
+  .rp-vol-wrap { display:flex; align-items:center; gap:8px; margin-bottom:18px; }
+  .rp-vol {
+    flex:1; -webkit-appearance:none; appearance:none;
+    height:3px; border-radius:2px; background:rgba(255,255,255,0.12);
+    cursor:pointer; outline:none;
+  }
+  .rp-vol::-webkit-slider-thumb {
+    -webkit-appearance:none; width:12px; height:12px;
+    border-radius:50%; background:var(--text-muted); cursor:pointer;
+  }
+  .rp-playlist-item {
+    display:flex; align-items:center; gap:10px; padding:8px 10px;
+    border-radius:8px; cursor:pointer; transition:background 0.15s;
+    border-left:3px solid transparent;
+  }
+  .rp-playlist-item:hover { background:rgba(255,255,255,0.04); }
+  .rp-playlist-item.active {
+    background:rgba(124,58,237,0.12); border-left-color:var(--purple);
+  }
+  .rp-playlist-num { font-size:11px; color:var(--text-muted); min-width:22px; text-align:right; }
+  .rp-playlist-icon { font-size:14px; min-width:18px; }
+  .rp-playlist-name { font-size:13px; color:var(--text); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rp-playlist-type { font-size:10px; padding:2px 6px; border-radius:4px; background:rgba(124,58,237,0.12); color:var(--purple-light); flex-shrink:0; }
+
   .bpm-display { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
   .bpm-value {
     font-size: 52px; font-weight: 800; line-height: 1;
@@ -3254,6 +3326,10 @@
         <div class="phase-num" style="font-size:14px;border:none;">💬</div>
         <span>Producer Chat</span>
       </div>
+      <div class="nav-item" data-phase="10" onclick="switchPhase(10)">
+        <div class="phase-num" style="font-size:14px;border:none;">🎲</div>
+        <span>Zufalls-Player</span>
+      </div>
     </div>
 
     <hr class="sidebar-divider">
@@ -5118,6 +5194,81 @@
             <div style="font-size:11px;color:var(--text-muted);">Enter zum Senden · Shift+Enter für neue Zeile</div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- PHASE 10: Zufalls-Player -->
+    <div class="phase-panel" id="phase10">
+      <div class="phase-header">
+        <div class="phase-icon">🎲</div>
+        <div>
+          <div class="phase-title">Zufalls-Player</div>
+          <div class="phase-subtitle">Alle Songs & Videos – zufällig gemischt</div>
+        </div>
+      </div>
+
+      <!-- File loader -->
+      <div class="card" id="rpLoaderCard">
+        <div class="rp-drop" id="rpDrop" onclick="rpOpenPicker('folder')">
+          <div style="font-size:44px;margin-bottom:10px;">📂</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Ordner laden</div>
+          <div style="font-size:13px;color:var(--text-muted);">Alle Songs aus einem Ordner automatisch laden</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:10px;">Tippen zum Auswählen · oder Dateien hierher ziehen</div>
+        </div>
+        <div style="text-align:center;margin:10px 0;font-size:12px;color:var(--text-muted);">— oder —</div>
+        <button class="btn-secondary" style="width:100%;padding:10px;" onclick="rpOpenPicker('files')">
+          🎵 Einzelne Dateien auswählen
+        </button>
+        <input type="file" id="rpFolderInput" webkitdirectory multiple style="display:none" onchange="rpLoadFiles(event)">
+        <input type="file" id="rpFilesInput" multiple accept="audio/*,video/*,.mp3,.wav,.ogg,.flac,.aac,.m4a,.opus,.mp4,.webm,.mov,.mkv,.avi,.m4v,.wma" style="display:none" onchange="rpLoadFiles(event)">
+        <div style="margin-top:14px;padding:10px 12px;background:rgba(0,0,0,0.2);border-radius:8px;font-size:11px;color:var(--text-muted);line-height:1.6;">
+          <strong style="color:var(--text);">Unterstützte Formate:</strong> MP3 · WAV · OGG · FLAC · AAC · M4A · OPUS · MP4 · WebM · MOV · MKV · AVI u.v.m.
+        </div>
+      </div>
+
+      <!-- Player (versteckt bis Dateien geladen) -->
+      <div class="card" id="rpPlayerCard" style="display:none">
+        <!-- Videobereich -->
+        <div class="rp-video-wrap" id="rpVideoWrap">
+          <video id="rpVideo" style="width:100%;max-height:50vh;display:block;background:#000;"></video>
+        </div>
+        <!-- Track-Info -->
+        <div class="rp-track-name" id="rpTrackName">–</div>
+        <div class="rp-track-sub" id="rpTrackSub">Kein Titel geladen</div>
+        <!-- Fortschrittsbalken -->
+        <div class="rp-progress-wrap">
+          <span class="rp-time" id="rpTimeCur">0:00</span>
+          <input type="range" class="rp-progress" id="rpProgress" min="0" max="100" value="0" step="0.1" oninput="rpSeek(this.value)">
+          <span class="rp-time" id="rpTimeTot">0:00</span>
+        </div>
+        <!-- Steuerung -->
+        <div class="rp-controls">
+          <button class="rp-btn" id="rpShuffleBtn" onclick="rpToggleShuffle()" title="Zufällig">🔀</button>
+          <button class="rp-btn" onclick="rpPrev()" title="Zurück">⏮</button>
+          <button class="rp-btn large" id="rpPlayBtn" onclick="rpTogglePlay()" title="Play / Pause">▶</button>
+          <button class="rp-btn" onclick="rpNext()" title="Weiter">⏭</button>
+          <button class="rp-btn" id="rpRepeatBtn" onclick="rpToggleRepeat()" title="Wiederholen">🔁</button>
+        </div>
+        <!-- Lautstärke -->
+        <div class="rp-vol-wrap">
+          <span style="font-size:14px;">🔈</span>
+          <input type="range" class="rp-vol" id="rpVolume" min="0" max="1" step="0.01" value="1" oninput="rpSetVolume(this.value)">
+          <span style="font-size:14px;">🔊</span>
+        </div>
+        <!-- Statusleiste -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border);">
+          <div style="font-size:12px;color:var(--text-muted);" id="rpStats">0 Titel geladen</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-secondary" style="font-size:11px;padding:4px 10px;" onclick="rpAddMore()">+ Mehr laden</button>
+            <button class="btn-secondary" style="font-size:11px;padding:4px 10px;color:var(--danger);border-color:rgba(239,68,68,0.3);" onclick="rpClearAll()">✕ Leeren</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Playlist -->
+      <div class="card" id="rpPlaylistCard" style="display:none">
+        <div style="font-weight:700;font-size:14px;margin-bottom:12px;">Playlist</div>
+        <div id="rpPlaylistItems" style="max-height:420px;overflow-y:auto;"></div>
       </div>
     </div>
 
@@ -8004,6 +8155,18 @@ function applyBezModulPreset(mod) {
 function switchPhase(num) {
   if (num === 0) { updateDashboard(); updateSunoCockpit(); }
   if (num === 3) { setTimeout(() => { initSunoPersonaPicker(); initBeatStudio(); updateBsBpm(); updateSunoLyricsCounter(); updateSunoCockpit(); }, 0); }
+
+  // Zufalls-Player ist unabhängig von einem aktiven Song
+  if (num === 10) {
+    currentPhase = 10;
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', parseInt(el.dataset.phase) === 10));
+    document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('phase10');
+    if (panel) panel.classList.add('active');
+    if (window.innerWidth <= 600) closeSidebar();
+    rpInitDrop();
+    return;
+  }
 
   if (!currentSongId) return;
 
@@ -11263,6 +11426,286 @@ function buildIntroParticles() {
     requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
+}
+
+// =============================
+// ZUFALLS-PLAYER
+// =============================
+const RP_AUDIO_EXT = ['mp3','wav','ogg','flac','aac','m4a','opus','wma','oga','m4b','ape'];
+const RP_VIDEO_EXT = ['mp4','webm','mov','avi','mkv','m4v','wmv','3gp','flv','ogv','ts'];
+
+let rpFiles = [];
+let rpPlaylist = [];
+let rpCurrentIdx = -1;
+let rpShuffle = true;
+let rpRepeat = 'off'; // 'off' | 'all' | 'one'
+let rpIsPlaying = false;
+let rpObjectURL = null;
+let rpAudioEl = null;
+let rpCurrentMedia = null;
+let rpDropInitialized = false;
+
+function rpGetExt(name) { return (name.split('.').pop() || '').toLowerCase(); }
+function rpIsVideo(name) { return RP_VIDEO_EXT.includes(rpGetExt(name)); }
+function rpFmtTime(s) {
+  if (!isFinite(s) || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  return m + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+}
+
+function rpOpenPicker(type) {
+  document.getElementById(type === 'folder' ? 'rpFolderInput' : 'rpFilesInput').click();
+}
+
+function rpLoadFiles(event) {
+  const valid = Array.from(event.target.files).filter(f => {
+    const e = rpGetExt(f.name);
+    return RP_AUDIO_EXT.includes(e) || RP_VIDEO_EXT.includes(e);
+  });
+  if (!valid.length) { showToast('Keine Musik- oder Videodateien gefunden.', 'error'); return; }
+  const seen = new Set(rpFiles.map(f => f.name + f.size));
+  valid.forEach(f => { if (!seen.has(f.name + f.size)) rpFiles.push(f); });
+  rpBuildPlaylist(true);
+  showToast('✓ ' + rpFiles.length + ' Dateien geladen', 'success');
+  event.target.value = '';
+}
+
+function rpBuildPlaylist(autoplay) {
+  const indices = rpFiles.map((_, i) => i);
+  if (rpShuffle) {
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+  }
+  rpPlaylist = indices;
+  rpCurrentIdx = rpFiles.length > 0 ? 0 : -1;
+  rpShowPlayer();
+  rpRenderPlaylist();
+  if (autoplay && rpFiles.length > 0) rpPlayTrack(0);
+}
+
+function rpShowPlayer() {
+  const hasFiles = rpFiles.length > 0;
+  document.getElementById('rpPlayerCard').style.display = hasFiles ? 'block' : 'none';
+  document.getElementById('rpPlaylistCard').style.display = hasFiles ? 'block' : 'none';
+  document.getElementById('rpStats').textContent = rpFiles.length + ' Titel geladen';
+  rpUpdateShuffleBtn();
+  rpUpdateRepeatBtn();
+}
+
+function rpEnsureAudio() {
+  if (!rpAudioEl) {
+    rpAudioEl = new Audio();
+    rpAudioEl.addEventListener('timeupdate', rpOnTimeUpdate);
+    rpAudioEl.addEventListener('ended', rpOnEnded);
+    rpAudioEl.addEventListener('loadedmetadata', rpOnMeta);
+  }
+}
+
+function rpPlayTrack(pi) {
+  if (pi < 0 || pi >= rpPlaylist.length) return;
+  rpCurrentIdx = pi;
+  const file = rpFiles[rpPlaylist[pi]];
+  if (rpObjectURL) { URL.revokeObjectURL(rpObjectURL); rpObjectURL = null; }
+  rpObjectURL = URL.createObjectURL(file);
+
+  const videoEl = document.getElementById('rpVideo');
+  const videoWrap = document.getElementById('rpVideoWrap');
+  rpEnsureAudio();
+
+  if (rpIsVideo(file.name)) {
+    rpAudioEl.pause(); rpAudioEl.src = '';
+    // Remove old listeners to avoid duplicates
+    videoEl.removeEventListener('timeupdate', rpOnTimeUpdate);
+    videoEl.removeEventListener('ended', rpOnEnded);
+    videoEl.removeEventListener('loadedmetadata', rpOnMeta);
+    videoEl.addEventListener('timeupdate', rpOnTimeUpdate);
+    videoEl.addEventListener('ended', rpOnEnded);
+    videoEl.addEventListener('loadedmetadata', rpOnMeta);
+    videoEl.src = rpObjectURL;
+    videoWrap.style.display = 'block';
+    rpCurrentMedia = videoEl;
+  } else {
+    videoEl.pause(); videoEl.src = ''; videoWrap.style.display = 'none';
+    rpAudioEl.src = rpObjectURL;
+    rpCurrentMedia = rpAudioEl;
+  }
+
+  rpCurrentMedia.volume = parseFloat(document.getElementById('rpVolume').value);
+  rpCurrentMedia.play().then(() => { rpIsPlaying = true; rpUpdatePlayBtn(); }).catch(() => {
+    rpIsPlaying = false; rpUpdatePlayBtn();
+  });
+
+  const cleanName = file.name.replace(/\.[^.]+$/, '');
+  document.getElementById('rpTrackName').textContent = cleanName;
+  document.getElementById('rpTrackSub').textContent = (pi + 1) + ' / ' + rpPlaylist.length + '  ·  ' + rpGetExt(file.name).toUpperCase();
+  document.getElementById('rpProgress').value = 0;
+  document.getElementById('rpTimeCur').textContent = '0:00';
+  document.getElementById('rpTimeTot').textContent = '–:––';
+  rpHighlightPlaylistItem(pi);
+}
+
+function rpOnTimeUpdate() {
+  if (!rpCurrentMedia) return;
+  const pct = rpCurrentMedia.duration ? (rpCurrentMedia.currentTime / rpCurrentMedia.duration) * 100 : 0;
+  const el = document.getElementById('rpProgress');
+  if (el) { el.value = pct; el.style.setProperty('--val', pct + '%'); }
+  const cur = document.getElementById('rpTimeCur');
+  if (cur) cur.textContent = rpFmtTime(rpCurrentMedia.currentTime);
+}
+
+function rpOnMeta() {
+  if (!rpCurrentMedia) return;
+  const tot = document.getElementById('rpTimeTot');
+  if (tot) tot.textContent = rpFmtTime(rpCurrentMedia.duration);
+}
+
+function rpOnEnded() {
+  if (rpRepeat === 'one') { rpCurrentMedia.currentTime = 0; rpCurrentMedia.play(); return; }
+  if (rpCurrentIdx + 1 < rpPlaylist.length) {
+    rpPlayTrack(rpCurrentIdx + 1);
+  } else if (rpRepeat === 'all') {
+    if (rpShuffle) rpBuildPlaylist(true);
+    else rpPlayTrack(0);
+  } else {
+    rpIsPlaying = false; rpUpdatePlayBtn();
+  }
+}
+
+function rpTogglePlay() {
+  if (!rpCurrentMedia) return;
+  if (rpIsPlaying) { rpCurrentMedia.pause(); rpIsPlaying = false; }
+  else { rpCurrentMedia.play(); rpIsPlaying = true; }
+  rpUpdatePlayBtn();
+}
+
+function rpNext() {
+  if (!rpPlaylist.length) return;
+  const next = rpCurrentIdx + 1 < rpPlaylist.length ? rpCurrentIdx + 1 : 0;
+  rpPlayTrack(next);
+}
+
+function rpPrev() {
+  if (!rpPlaylist.length) return;
+  if (rpCurrentMedia && rpCurrentMedia.currentTime > 3) { rpCurrentMedia.currentTime = 0; return; }
+  const prev = rpCurrentIdx > 0 ? rpCurrentIdx - 1 : rpPlaylist.length - 1;
+  rpPlayTrack(prev);
+}
+
+function rpSeek(val) {
+  if (!rpCurrentMedia || !rpCurrentMedia.duration) return;
+  rpCurrentMedia.currentTime = (val / 100) * rpCurrentMedia.duration;
+}
+
+function rpSetVolume(val) {
+  const v = parseFloat(val);
+  if (rpAudioEl) rpAudioEl.volume = v;
+  const vid = document.getElementById('rpVideo');
+  if (vid) vid.volume = v;
+}
+
+function rpToggleShuffle() {
+  rpShuffle = !rpShuffle;
+  rpUpdateShuffleBtn();
+  if (!rpFiles.length) return;
+  const curFileIdx = rpPlaylist[rpCurrentIdx];
+  const rest = rpFiles.map((_, i) => i).filter(i => i !== curFileIdx);
+  if (rpShuffle) {
+    for (let i = rest.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [rest[i], rest[j]] = [rest[j], rest[i]];
+    }
+  }
+  rpPlaylist = [curFileIdx, ...rest];
+  rpCurrentIdx = 0;
+  rpRenderPlaylist();
+  rpHighlightPlaylistItem(0);
+}
+
+function rpToggleRepeat() {
+  const modes = ['off', 'all', 'one'];
+  rpRepeat = modes[(modes.indexOf(rpRepeat) + 1) % modes.length];
+  rpUpdateRepeatBtn();
+}
+
+function rpUpdatePlayBtn() {
+  const btn = document.getElementById('rpPlayBtn');
+  if (btn) btn.textContent = rpIsPlaying ? '⏸' : '▶';
+}
+
+function rpUpdateShuffleBtn() {
+  const btn = document.getElementById('rpShuffleBtn');
+  if (btn) btn.classList.toggle('active', rpShuffle);
+}
+
+function rpUpdateRepeatBtn() {
+  const btn = document.getElementById('rpRepeatBtn');
+  if (!btn) return;
+  if (rpRepeat === 'off') { btn.classList.remove('active'); btn.textContent = '🔁'; btn.title = 'Wiederholen (aus)'; }
+  else if (rpRepeat === 'all') { btn.classList.add('active'); btn.textContent = '🔁'; btn.title = 'Alle wiederholen'; }
+  else { btn.classList.add('active'); btn.textContent = '🔂'; btn.title = 'Einen wiederholen'; }
+}
+
+function rpRenderPlaylist() {
+  const container = document.getElementById('rpPlaylistItems');
+  if (!container) return;
+  container.innerHTML = rpPlaylist.map((fileIdx, pi) => {
+    const file = rpFiles[fileIdx];
+    const icon = rpIsVideo(file.name) ? '🎬' : '🎵';
+    const ext = rpGetExt(file.name).toUpperCase();
+    const cleanName = file.name.replace(/\.[^.]+$/, '');
+    return `<div class="rp-playlist-item${pi === rpCurrentIdx ? ' active' : ''}" id="rp-item-${pi}" onclick="rpPlayTrack(${pi})">
+      <span class="rp-playlist-num">${pi + 1}</span>
+      <span class="rp-playlist-icon">${icon}</span>
+      <span class="rp-playlist-name" title="${escHtml(file.name)}">${escHtml(cleanName)}</span>
+      <span class="rp-playlist-type">${ext}</span>
+    </div>`;
+  }).join('');
+}
+
+function rpHighlightPlaylistItem(pi) {
+  document.querySelectorAll('.rp-playlist-item').forEach((el, i) => el.classList.toggle('active', i === pi));
+  const el = document.getElementById('rp-item-' + pi);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function rpAddMore() { document.getElementById('rpFilesInput').click(); }
+
+function rpClearAll() {
+  if (!confirm('Alle Dateien aus dem Player entfernen?')) return;
+  if (rpCurrentMedia) { rpCurrentMedia.pause(); rpCurrentMedia.src = ''; }
+  if (rpAudioEl) rpAudioEl.src = '';
+  const vid = document.getElementById('rpVideo');
+  if (vid) { vid.pause(); vid.src = ''; }
+  document.getElementById('rpVideoWrap').style.display = 'none';
+  if (rpObjectURL) { URL.revokeObjectURL(rpObjectURL); rpObjectURL = null; }
+  rpFiles = []; rpPlaylist = []; rpCurrentIdx = -1;
+  rpIsPlaying = false; rpCurrentMedia = null;
+  rpShowPlayer(); rpRenderPlaylist();
+  document.getElementById('rpTrackName').textContent = '–';
+  document.getElementById('rpTrackSub').textContent = 'Kein Titel geladen';
+}
+
+function rpInitDrop() {
+  if (rpDropInitialized) return;
+  rpDropInitialized = true;
+  const drop = document.getElementById('rpDrop');
+  if (!drop) return;
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('dragover');
+    const items = Array.from(e.dataTransfer.files).filter(f => {
+      const ext = rpGetExt(f.name);
+      return RP_AUDIO_EXT.includes(ext) || RP_VIDEO_EXT.includes(ext);
+    });
+    if (!items.length) { showToast('Keine Musik- oder Videodateien erkannt.', 'error'); return; }
+    const seen = new Set(rpFiles.map(f => f.name + f.size));
+    items.forEach(f => { if (!seen.has(f.name + f.size)) rpFiles.push(f); });
+    rpBuildPlaylist(true);
+    showToast('✓ ' + rpFiles.length + ' Dateien geladen', 'success');
+  });
 }
 
 // =============================
