@@ -28,6 +28,62 @@ body.theme-red{
 }
 html,body{height:100%;background:var(--bg);color:var(--cream);font-family:'Oswald','Arial Narrow',Arial,sans-serif;overflow:hidden}
 
+/* ── INTRO SPLASH ──────────────────────────────────────── */
+.intro-splash{
+  position:fixed;inset:0;z-index:999;
+  background:radial-gradient(ellipse at 50% 60%,#1a1206 0%,#0a0805 60%,#050402 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;
+  transition:opacity 0.7s ease;
+}
+.intro-splash.hiding{opacity:0;pointer-events:none}
+.intro-disc-wrap{
+  opacity:0;
+  animation:introScaleIn 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  animation-delay:0.15s;
+}
+@keyframes introScaleIn{
+  from{transform:scale(0.1);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+.intro-disc{
+  width:min(72vw,280px);height:min(72vw,280px);border-radius:50%;
+  background:radial-gradient(circle,#2a2a2a 0%,#111 18%,#1a1a1a 19%,#0a0a0a 34%,#1a1a1a 35%,#0a0a0a 50%,#1a1a1a 51%,#0a0a0a 66%,#1a1a1a 67%,#111 82%,#222 100%);
+  position:relative;display:flex;align-items:center;justify-content:center;
+  animation:spin 2.5s linear infinite;
+  box-shadow:0 0 80px rgba(212,160,23,0.3),0 0 160px rgba(212,160,23,0.1),0 12px 60px rgba(0,0,0,0.9);
+}
+.intro-groove{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,0.05)}
+.ig1{width:90%;height:90%}
+.ig2{width:74%;height:74%}
+.ig3{width:58%;height:58%}
+.ig4{width:44%;height:44%}
+.intro-label{
+  width:32%;height:32%;border-radius:50%;
+  background:linear-gradient(135deg,#f5e090,#d4a017,#9a7012);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 0 24px rgba(212,160,23,0.7);position:relative;z-index:2;
+}
+.intro-dan{
+  font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;
+  font-size:clamp(18px,6vw,28px);color:#0d0b06;letter-spacing:2px;line-height:1;
+}
+.intro-dot{font-size:5px;color:#2a1e08;margin:1px 0}
+.intro-vibe{
+  font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;
+  font-size:clamp(7px,2vw,10px);color:#2a1e08;letter-spacing:3px;
+}
+.intro-tagline{
+  font-family:'Oswald','Arial Narrow',sans-serif;
+  font-size:12px;color:var(--muted);letter-spacing:5px;text-align:center;
+  opacity:0;
+  animation:introFadeUp 0.6s ease forwards;
+  animation-delay:0.85s;
+}
+@keyframes introFadeUp{
+  from{transform:translateY(12px);opacity:0}
+  to{transform:translateY(0);opacity:0.7}
+}
+
 /* ── APP SHELL ─────────────────────────────────────────── */
 .app{display:flex;flex-direction:column;height:100dvh;height:100vh;position:relative;overflow:hidden}
 

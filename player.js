@@ -537,9 +537,18 @@ function updateMediaSession(f){
 // ── Service Worker ─────────────────────────────────────────
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
+// ── Intro Splash ───────────────────────────────────────────
+(function(){
+  const intro=document.getElementById('rpIntro');
+  if(!intro)return;
+  setTimeout(()=>{
+    intro.classList.add('hiding');
+    setTimeout(()=>{intro.style.display='none'},700);
+  },2300);
+})();
+
 // ── Start ──────────────────────────────────────────────────
 applyTheme(currentTheme);
-// Init bass slider visual
 rpSetBass(0);
 updateUI();
 rpCheckSavedDir();
