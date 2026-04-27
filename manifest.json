@@ -1,0 +1,25 @@
+{
+  "name": "D_a_N Zufalls-Player",
+  "short_name": "D_a_N Player",
+  "description": "Zufalls-Player für alle Musik- und Videodateien vom Handy",
+  "start_url": "./player.html",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#7c3aed",
+  "orientation": "any",
+  "lang": "de",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

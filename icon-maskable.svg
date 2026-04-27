@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Maskable: voller Hintergrund ohne Rundung -->
+  <rect width="512" height="512" fill="url(#gm)"/>
+  <defs>
+    <linearGradient id="gm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <!-- Music note (etwas kleiner für Safe Zone) -->
+  <path d="M220 165 L220 310 Q220 342 188 342 Q156 342 156 310 Q156 278 188 278 L188 228 L340 205 L340 300 Q340 332 308 332 Q276 332 276 300 Q276 268 308 268 L308 185 Z"
+        fill="white" opacity="0.95"/>
+</svg>
