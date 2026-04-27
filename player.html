@@ -22,20 +22,17 @@
       <div class="header-title">VIBE</div>
     </div>
     <button class="header-rescan-btn" id="rpRescanBtn" onclick="rpRescan()" style="display:none" title="Neu einlesen">🔄</button>
+    <button class="header-icon-btn" onclick="rpOpenThemePicker()" title="Farbthema">🎨</button>
     <button class="header-load-btn" onclick="rpPickRootFolder()">📂</button>
   </div>
 
   <!-- EMPTY STATE -->
   <div class="empty-state" id="rpEmpty">
-
-    <!-- Scan-Fortschritt -->
     <div class="scan-box" id="rpScanBox" style="display:none">
       <div class="scan-spinner">◉</div>
       <div class="scan-label">Durchsuche Ordner...</div>
       <div class="scan-count" id="rpScanCount">0 Dateien gefunden</div>
     </div>
-
-    <!-- Neu-Laden Prompt (nach erstem Setup) -->
     <div class="reload-box" id="rpReloadBox" style="display:none">
       <div style="font-size:44px;margin-bottom:12px;">🎵</div>
       <div class="reload-title">Musik neu laden?</div>
@@ -43,8 +40,6 @@
       <button class="btn-reload" onclick="rpReloadLast()">▶ MUSIK LADEN</button>
       <button class="btn-change-folder" onclick="rpPickRootFolder()">📂 Anderen Ordner wählen</button>
     </div>
-
-    <!-- Ersteinrichtung -->
     <div id="rpSetupBox">
       <div class="drop-zone" id="rpDrop" onclick="rpPickRootFolder()">
         <div class="drop-vinyl">◉</div>
@@ -55,7 +50,6 @@
       <button class="btn-load-files" onclick="rpOpenFilePicker()">🎵 Einzelne Dateien auswählen</button>
       <div class="drop-formats">MP3 · WAV · FLAC · AAC · OGG · MP4 · MKV u.v.m.</div>
     </div>
-
   </div>
 
   <!-- PLAYER -->
@@ -80,8 +74,8 @@
       </div>
     </div>
 
-    <!-- TRACK INFO -->
-    <div class="track-info-bar">
+    <!-- TRACK INFO (klickbar für Details) -->
+    <div class="track-info-bar" onclick="rpShowTrackInfo()">
       <div class="track-marquee-wrap">
         <div class="track-marquee" id="rpTrackName">– – –</div>
       </div>
@@ -90,18 +84,12 @@
 
     <!-- EQ VISUALIZER -->
     <div class="eq-row" id="rpEq">
-      <div class="eq-bar" id="eq0"></div>
-      <div class="eq-bar" id="eq1"></div>
-      <div class="eq-bar" id="eq2"></div>
-      <div class="eq-bar" id="eq3"></div>
-      <div class="eq-bar" id="eq4"></div>
-      <div class="eq-bar" id="eq5"></div>
-      <div class="eq-bar" id="eq6"></div>
-      <div class="eq-bar" id="eq7"></div>
-      <div class="eq-bar" id="eq8"></div>
-      <div class="eq-bar" id="eq9"></div>
-      <div class="eq-bar" id="eq10"></div>
-      <div class="eq-bar" id="eq11"></div>
+      <div class="eq-bar" id="eq0"></div><div class="eq-bar" id="eq1"></div>
+      <div class="eq-bar" id="eq2"></div><div class="eq-bar" id="eq3"></div>
+      <div class="eq-bar" id="eq4"></div><div class="eq-bar" id="eq5"></div>
+      <div class="eq-bar" id="eq6"></div><div class="eq-bar" id="eq7"></div>
+      <div class="eq-bar" id="eq8"></div><div class="eq-bar" id="eq9"></div>
+      <div class="eq-bar" id="eq10"></div><div class="eq-bar" id="eq11"></div>
     </div>
 
     <!-- PROGRESS -->
@@ -109,6 +97,13 @@
       <span class="p-time" id="rpCur">0:00</span>
       <input type="range" class="p-bar" id="rpBar" min="0" max="100" value="0" step="0.1" oninput="rpSeek(this.value)">
       <span class="p-time" id="rpTot">0:00</span>
+    </div>
+
+    <!-- BASS BOOST -->
+    <div class="bass-row">
+      <span class="bass-label">🔊 BASS</span>
+      <input type="range" class="bass-bar" id="rpBass" min="-10" max="20" value="0" step="1" oninput="rpSetBass(this.value)">
+      <span class="bass-val" id="rpBassVal">0 dB</span>
     </div>
 
     <!-- CONTROLS -->
@@ -120,11 +115,13 @@
       <button class="ctrl-btn" id="rpRepeatBtn" onclick="rpToggleRepeat()">🔁</button>
     </div>
 
-    <!-- VOLUME + LIST TOGGLE -->
+    <!-- VOLUME + ACTIONS -->
     <div class="bottom-bar">
       <span class="vol-icon">🔈</span>
       <input type="range" class="vol-bar" id="rpVol" min="0" max="1" step="0.01" value="1" oninput="rpSetVol(this.value)">
       <span class="vol-icon">🔊</span>
+      <button class="action-btn" id="rpSleepBtn" onclick="rpCycleSleep()" title="Sleep-Timer">🌙</button>
+      <button class="action-btn" id="rpFavFilterBtn" onclick="rpToggleFavFilter()" title="Nur Favoriten">❤️</button>
       <button class="list-toggle-btn" id="rpListToggle" onclick="rpToggleList()">≡ TRACKS</button>
     </div>
 
@@ -143,8 +140,36 @@
         <button class="pl-btn" onclick="rpToggleList()">✕ CLOSE</button>
       </div>
     </div>
+    <!-- SEARCH -->
+    <div class="pl-search-bar">
+      <input type="text" class="pl-search-input" id="rpSearch" placeholder="🔍  Song suchen..." oninput="rpFilterList()" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
     <div class="pl-list" id="rpList"></div>
   </div>
+
+  <!-- THEME PICKER -->
+  <div class="modal-overlay" id="rpThemeOverlay" onclick="rpCloseThemePicker()"></div>
+  <div class="theme-panel" id="rpThemePanel">
+    <div class="theme-panel-title">FARBTHEMA</div>
+    <div class="theme-grid">
+      <button class="theme-btn" data-theme="gold" onclick="rpSetTheme('gold')"><span class="theme-dot" style="background:#d4a017"></span>Gold</button>
+      <button class="theme-btn" data-theme="blue" onclick="rpSetTheme('blue')"><span class="theme-dot" style="background:#1e90ff"></span>Blau</button>
+      <button class="theme-btn" data-theme="green" onclick="rpSetTheme('green')"><span class="theme-dot" style="background:#2ecc71"></span>Grün</button>
+      <button class="theme-btn" data-theme="purple" onclick="rpSetTheme('purple')"><span class="theme-dot" style="background:#9b59b6"></span>Lila</button>
+      <button class="theme-btn" data-theme="red" onclick="rpSetTheme('red')"><span class="theme-dot" style="background:#e74c3c"></span>Rot</button>
+    </div>
+  </div>
+
+  <!-- TRACK INFO MODAL -->
+  <div class="modal-overlay" id="rpInfoOverlay" onclick="rpCloseTrackInfo()"></div>
+  <div class="info-panel" id="rpInfoPanel">
+    <div class="info-title" id="rpInfoTitle">–</div>
+    <div class="info-grid" id="rpInfoGrid"></div>
+    <button class="info-close-btn" onclick="rpCloseTrackInfo()">SCHLIESSEN</button>
+  </div>
+
+  <!-- SLEEP TIMER DISPLAY -->
+  <div class="sleep-toast" id="rpSleepToast" style="display:none"></div>
 
 </div>
 
