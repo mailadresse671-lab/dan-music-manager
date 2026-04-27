@@ -12,6 +12,34 @@ const isVid=n=>VIDEO_EXT.includes(ext(n));
 const fmt=s=>!isFinite(s)||isNaN(s)?'0:00':Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
+// ── Custom names (localStorage) ────────────────────────────
+const NAMES_KEY='rp_names';
+let customNames={};
+try{customNames=JSON.parse(localStorage.getItem(NAMES_KEY)||'{}')}catch(e){}
+
+function fileKey(f){return f.name+'|'+f.size}
+function getDisplayName(f){return customNames[fileKey(f)]||f.name.replace(/\.[^.]+$/,'')}
+function saveCustomName(f,name){
+  customNames[fileKey(f)]=name;
+  try{localStorage.setItem(NAMES_KEY,JSON.stringify(customNames))}catch(e){}
+}
+
+function rpRenameTrack(pi,event){
+  event.stopPropagation();
+  const f=files[playlist[pi]];
+  const current=getDisplayName(f);
+  const newName=prompt('Neuer Name:',current);
+  if(newName===null)return;
+  const trimmed=newName.trim();
+  if(!trimmed)return;
+  saveCustomName(f,trimmed);
+  renderList();
+  if(pi===cur){
+    $('rpTrackName').textContent=trimmed;
+    $('rpTrackName').classList.toggle('scrolling',trimmed.length>22);
+  }
+}
+
 // ── File loading ───────────────────────────────────────────
 function rpOpenPicker(t){$(t==='folder'?'rpFolderIn':'rpFilesIn').click()}
 
@@ -76,7 +104,7 @@ function playTrack(pi){
   media.volume=parseFloat($('rpVol').value);
   media.play().then(()=>{playing=true;updateUI()}).catch(()=>{playing=false;updateUI()});
 
-  const clean=f.name.replace(/\.[^.]+$/,'');
+  const clean=getDisplayName(f);
   $('rpTrackName').textContent=clean;
   $('rpTrackSub').textContent='TRACK '+(pi+1)+' / '+playlist.length+'  ·  '+ext(f.name).toUpperCase();
   $('rpBar').value=0;$('rpBar').style.setProperty('--v','0%');
@@ -209,12 +237,13 @@ function renderList(){
     const f=files[fi];
     const icon=isVid(f.name)?'🎬':'🎵';
     const x=ext(f.name).toUpperCase();
-    const name=esc(f.name.replace(/\.[^.]+$/,''));
+    const name=esc(getDisplayName(f));
     return`<div class="pl-item${pi===cur?' active':''}" id="pi${pi}" onclick="playTrack(${pi});rpToggleList()">
       <span class="pl-num">${pi+1}</span>
       <span class="pl-icon">${icon}</span>
       <span class="pl-name">${name}</span>
       <span class="pl-ext">${x}</span>
+      <button class="pl-rename-btn" onclick="rpRenameTrack(${pi},event)" title="Umbenennen">✏️</button>
     </div>`;
   }).join('');
 }
