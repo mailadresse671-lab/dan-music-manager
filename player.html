@@ -3,475 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#7c3aed">
+<meta name="theme-color" content="#d4a017">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="D_a_N Player">
-<title>D_a_N Zufalls-Player</title>
+<title>D_a_N Mixtape Player</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon.svg">
-<style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-:root {
-  --bg:#0a0a0f; --card:#12121e; --card2:#1a1a2e;
-  --purple:#7c3aed; --purple-light:#9d5ff3;
-  --text:#e2e8f0; --muted:#94a3b8; --border:#1e1e35;
-  --danger:#ef4444;
-}
-html, body { height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; overflow:hidden; }
-
-/* Layout */
-.app { display:flex; flex-direction:column; height:100dvh; height:100vh; }
-.header {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:12px 16px; background:var(--card); border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.header-title { display:flex; align-items:center; gap:10px; }
-.logo { width:34px; height:34px; background:linear-gradient(135deg,var(--purple),#3b82f6); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; }
-.app-name { font-size:16px; font-weight:700; }
-.app-sub { font-size:11px; color:var(--muted); }
-.header-btns { display:flex; gap:8px; }
-.hbtn {
-  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
-  color:var(--text); border-radius:8px; padding:6px 12px; font-size:12px;
-  cursor:pointer; transition:background 0.2s;
-}
-.hbtn:hover { background:rgba(255,255,255,0.12); }
-
-.body { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-
-/* Empty state */
-.empty-state {
-  flex:1; display:flex; flex-direction:column; align-items:center;
-  justify-content:center; padding:24px; gap:0;
-}
-.drop-zone {
-  width:100%; max-width:480px; border:2px dashed rgba(124,58,237,0.4);
-  border-radius:16px; padding:36px 24px; text-align:center; cursor:pointer;
-  transition:all 0.2s; background:rgba(124,58,237,0.04); margin-bottom:16px;
-}
-.drop-zone:hover, .drop-zone.over { border-color:var(--purple); background:rgba(124,58,237,0.1); }
-.drop-icon { font-size:52px; margin-bottom:12px; }
-.drop-title { font-size:17px; font-weight:700; margin-bottom:6px; }
-.drop-sub { font-size:13px; color:var(--muted); }
-.drop-hint { font-size:11px; color:rgba(255,255,255,0.25); margin-top:12px; }
-.or-sep { font-size:12px; color:var(--muted); margin:12px 0; width:100%; max-width:480px; text-align:center; }
-.btn-files {
-  width:100%; max-width:480px; padding:14px;
-  background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.3);
-  color:var(--purple-light); border-radius:12px; font-size:14px; font-weight:600;
-  cursor:pointer; transition:all 0.2s;
-}
-.btn-files:hover { background:rgba(124,58,237,0.25); }
-.formats-note {
-  margin-top:20px; width:100%; max-width:480px;
-  padding:10px 14px; background:rgba(0,0,0,0.25); border-radius:10px;
-  font-size:11px; color:var(--muted); line-height:1.7; text-align:center;
-}
-
-/* Player */
-.player-area {
-  flex:1; display:flex; flex-direction:column; overflow:hidden;
-}
-.video-wrap { background:#000; flex-shrink:0; display:none; max-height:35vh; position:relative; }
-.video-wrap.visible { display:block; }
-video { width:100%; max-height:35vh; display:block; object-fit:contain; }
-
-.player-panel {
-  flex-shrink:0; padding:16px 20px 8px;
-  background:var(--card); border-bottom:1px solid var(--border);
-}
-.track-name {
-  font-size:15px; font-weight:700; text-align:center;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  margin-bottom:3px;
-}
-.track-sub { font-size:12px; color:var(--muted); text-align:center; margin-bottom:14px; }
-
-.progress-row { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
-.ptime { font-size:11px; color:var(--muted); min-width:36px; white-space:nowrap; }
-.pbar {
-  flex:1; -webkit-appearance:none; appearance:none; height:5px; border-radius:3px;
-  background:linear-gradient(90deg,var(--purple) var(--v,0%),rgba(255,255,255,0.1) var(--v,0%));
-  cursor:pointer; outline:none;
-}
-.pbar::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--purple); cursor:pointer; }
-
-.controls { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:14px; }
-.cbtn {
-  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
-  color:var(--text); border-radius:50%; width:44px; height:44px;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; font-size:17px; transition:all 0.2s; flex-shrink:0; user-select:none;
-}
-.cbtn:active { transform:scale(0.92); }
-.cbtn.main { width:60px; height:60px; font-size:26px; background:var(--purple); border-color:var(--purple); }
-.cbtn.main:active { background:var(--purple-light); }
-.cbtn.on { color:var(--purple-light); border-color:var(--purple); background:rgba(124,58,237,0.15); }
-
-.vol-row { display:flex; align-items:center; gap:10px; margin-bottom:4px; }
-.vbar {
-  flex:1; -webkit-appearance:none; appearance:none; height:4px; border-radius:2px;
-  background:rgba(255,255,255,0.12); cursor:pointer; outline:none;
-}
-.vbar::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:var(--muted); cursor:pointer; }
-
-/* Playlist */
-.playlist-header {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:10px 16px; border-bottom:1px solid var(--border); flex-shrink:0;
-  background:var(--card2);
-}
-.pl-title { font-size:13px; font-weight:700; }
-.pl-count { font-size:12px; color:var(--muted); }
-.pl-actions { display:flex; gap:6px; }
-.pl-btn {
-  font-size:11px; padding:4px 10px; border-radius:6px;
-  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
-  color:var(--muted); cursor:pointer; transition:background 0.15s;
-}
-.pl-btn:hover { background:rgba(255,255,255,0.12); color:var(--text); }
-.pl-btn.danger { color:var(--danger); border-color:rgba(239,68,68,0.25); }
-
-.playlist { flex:1; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
-.pl-item {
-  display:flex; align-items:center; gap:10px; padding:10px 16px;
-  border-left:3px solid transparent; cursor:pointer; transition:background 0.12s;
-  border-bottom:1px solid rgba(255,255,255,0.03);
-}
-.pl-item:active { background:rgba(255,255,255,0.04); }
-.pl-item.active { background:rgba(124,58,237,0.1); border-left-color:var(--purple); }
-.pl-num { font-size:11px; color:var(--muted); min-width:24px; text-align:right; flex-shrink:0; }
-.pl-icon { font-size:15px; flex-shrink:0; }
-.pl-name { font-size:13px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.pl-item.active .pl-name { color:var(--purple-light); }
-.pl-ext { font-size:10px; padding:2px 6px; border-radius:4px; background:rgba(124,58,237,0.12); color:var(--purple-light); flex-shrink:0; }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="player.css">
 </head>
 <body>
+
 <div class="app">
 
-  <!-- Header -->
+  <!-- HEADER -->
   <div class="header">
-    <div class="header-title">
-      <div class="logo">🎲</div>
-      <div>
-        <div class="app-name">D_a_N Player</div>
-        <div class="app-sub">Zufalls-Player</div>
-      </div>
-    </div>
-    <div class="header-btns">
-      <button class="hbtn" onclick="rpOpenPicker('folder')">📂 Ordner</button>
-      <button class="hbtn" onclick="rpOpenPicker('files')">🎵 Dateien</button>
-    </div>
+    <div class="header-logo">D_a_N</div>
+    <div class="header-title">MIXTAPE PLAYER</div>
+    <button class="header-load-btn" onclick="rpOpenPicker('folder')">📂</button>
   </div>
 
-  <div class="body" id="rpBody">
+  <!-- EMPTY STATE -->
+  <div class="empty-state" id="rpEmpty">
+    <div class="drop-zone" id="rpDrop" onclick="rpOpenPicker('folder')">
+      <div class="drop-vinyl">◉</div>
+      <div class="drop-title">TRACKS LADEN</div>
+      <div class="drop-sub">Ordner oder Dateien auswählen</div>
+    </div>
+    <button class="btn-load-files" onclick="rpOpenPicker('files')">🎵 EINZELNE DATEIEN</button>
+    <div class="drop-formats">MP3 · WAV · FLAC · AAC · OGG · MP4 · MKV u.v.m.</div>
+  </div>
 
-    <!-- Empty State -->
-    <div class="empty-state" id="rpEmpty">
-      <div class="drop-zone" id="rpDrop" onclick="rpOpenPicker('folder')">
-        <div class="drop-icon">📂</div>
-        <div class="drop-title">Ordner laden</div>
-        <div class="drop-sub">Alle Songs aus einem Ordner automatisch laden</div>
-        <div class="drop-hint">Tippen zum Auswählen · oder Dateien hierher ziehen</div>
-      </div>
-      <div class="or-sep">— oder —</div>
-      <button class="btn-files" onclick="rpOpenPicker('files')">🎵 Einzelne Dateien auswählen</button>
-      <div class="formats-note">
-        <strong style="color:var(--text);">Unterstützte Formate</strong><br>
-        🎵 MP3 · WAV · OGG · FLAC · AAC · M4A · OPUS · WMA<br>
-        🎬 MP4 · WebM · MOV · MKV · AVI · M4V u.v.m.
+  <!-- PLAYER -->
+  <div class="player-wrap" id="rpPlayer" style="display:none">
+
+    <!-- VIDEO -->
+    <div class="video-wrap" id="rpVideoWrap">
+      <video id="rpVideo" playsinline></video>
+    </div>
+
+    <!-- VINYL -->
+    <div class="vinyl-section">
+      <div class="vinyl-outer">
+        <div class="vinyl-disc" id="rpVinyl">
+          <div class="vinyl-groove g1"></div>
+          <div class="vinyl-groove g2"></div>
+          <div class="vinyl-groove g3"></div>
+          <div class="vinyl-label">
+            <div class="vinyl-label-name">D_a_N</div>
+            <div class="vinyl-label-dot">●</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Player -->
-    <div class="player-area" id="rpPlayer" style="display:none">
-
-      <!-- Video -->
-      <div class="video-wrap" id="rpVideoWrap">
-        <video id="rpVideo" playsinline></video>
+    <!-- TRACK INFO -->
+    <div class="track-info-section">
+      <div class="track-marquee-wrap">
+        <div class="track-marquee" id="rpTrackName">– – –</div>
       </div>
-
-      <!-- Controls panel -->
-      <div class="player-panel">
-        <div class="track-name" id="rpTrackName">–</div>
-        <div class="track-sub" id="rpTrackSub">Kein Titel</div>
-
-        <div class="progress-row">
-          <span class="ptime" id="rpCur">0:00</span>
-          <input type="range" class="pbar" id="rpBar" min="0" max="100" value="0" step="0.1" oninput="rpSeek(this.value)">
-          <span class="ptime" id="rpTot">0:00</span>
-        </div>
-
-        <div class="controls">
-          <button class="cbtn" id="rpShuffleBtn" onclick="rpToggleShuffle()" title="Zufällig">🔀</button>
-          <button class="cbtn" onclick="rpPrev()">⏮</button>
-          <button class="cbtn main" id="rpPlayBtn" onclick="rpTogglePlay()">▶</button>
-          <button class="cbtn" onclick="rpNext()">⏭</button>
-          <button class="cbtn" id="rpRepeatBtn" onclick="rpToggleRepeat()">🔁</button>
-        </div>
-
-        <div class="vol-row">
-          <span style="font-size:16px;">🔈</span>
-          <input type="range" class="vbar" id="rpVol" min="0" max="1" step="0.01" value="1" oninput="rpSetVol(this.value)">
-          <span style="font-size:16px;">🔊</span>
-        </div>
-      </div>
-
-      <!-- Playlist -->
-      <div class="playlist-header">
-        <div>
-          <span class="pl-title">Playlist</span>
-          <span class="pl-count" id="rpCount"> · 0 Titel</span>
-        </div>
-        <div class="pl-actions">
-          <button class="pl-btn" onclick="rpOpenPicker('files')">+ Mehr</button>
-          <button class="pl-btn danger" onclick="rpClear()">✕ Leeren</button>
-        </div>
-      </div>
-      <div class="playlist" id="rpList"></div>
+      <div class="track-sub" id="rpTrackSub">TRACK 0 / 0</div>
     </div>
+
+    <!-- EQUALIZER VISUALIZER -->
+    <div class="eq-section" id="rpEq">
+      <div class="eq-bar" id="eq0"></div>
+      <div class="eq-bar" id="eq1"></div>
+      <div class="eq-bar" id="eq2"></div>
+      <div class="eq-bar" id="eq3"></div>
+      <div class="eq-bar" id="eq4"></div>
+      <div class="eq-bar" id="eq5"></div>
+      <div class="eq-bar" id="eq6"></div>
+      <div class="eq-bar" id="eq7"></div>
+      <div class="eq-bar" id="eq8"></div>
+      <div class="eq-bar" id="eq9"></div>
+      <div class="eq-bar" id="eq10"></div>
+      <div class="eq-bar" id="eq11"></div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-section">
+      <span class="p-time" id="rpCur">0:00</span>
+      <input type="range" class="p-bar" id="rpBar" min="0" max="100" value="0" step="0.1" oninput="rpSeek(this.value)">
+      <span class="p-time" id="rpTot">0:00</span>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls">
+      <button class="ctrl-btn" id="rpShuffleBtn" onclick="rpToggleShuffle()">🔀</button>
+      <button class="ctrl-btn" onclick="rpPrev()">⏮</button>
+      <button class="ctrl-btn play-btn" id="rpPlayBtn" onclick="rpTogglePlay()">▶</button>
+      <button class="ctrl-btn" onclick="rpNext()">⏭</button>
+      <button class="ctrl-btn" id="rpRepeatBtn" onclick="rpToggleRepeat()">🔁</button>
+    </div>
+
+    <!-- VOLUME -->
+    <div class="vol-section">
+      <span class="vol-icon">🔈</span>
+      <input type="range" class="vol-bar" id="rpVol" min="0" max="1" step="0.01" value="1" oninput="rpSetVol(this.value)">
+      <span class="vol-icon">🔊</span>
+    </div>
+
+    <!-- PLAYLIST HEADER -->
+    <div class="pl-header">
+      <span class="pl-title">TRACKLIST</span>
+      <span class="pl-count" id="rpCount">0 TRACKS</span>
+      <div class="pl-actions">
+        <button class="pl-btn" onclick="rpOpenPicker('files')">+ ADD</button>
+        <button class="pl-btn danger" onclick="rpClear()">✕</button>
+      </div>
+    </div>
+
+    <!-- PLAYLIST -->
+    <div class="playlist" id="rpList"></div>
 
   </div>
 </div>
 
-<!-- Hidden inputs -->
+<!-- HIDDEN INPUTS -->
 <input type="file" id="rpFolderIn" webkitdirectory multiple style="display:none" onchange="rpLoad(event)">
 <input type="file" id="rpFilesIn" multiple accept="audio/*,video/*,.mp3,.wav,.ogg,.flac,.aac,.m4a,.opus,.mp4,.webm,.mov,.mkv,.avi,.m4v,.wma" style="display:none" onchange="rpLoad(event)">
 
-<script>
-// ── State ──────────────────────────────────────────────────
-const AUDIO_EXT = ['mp3','wav','ogg','flac','aac','m4a','opus','wma','oga','m4b'];
-const VIDEO_EXT = ['mp4','webm','mov','avi','mkv','m4v','wmv','3gp','flv','ogv','ts'];
-
-let files = [], playlist = [], cur = -1;
-let shuffle = true, repeat = 'off'; // 'off'|'all'|'one'
-let playing = false, objUrl = null, audioEl = null, media = null;
-
-// ── Helpers ────────────────────────────────────────────────
-const $ = id => document.getElementById(id);
-const ext = n => (n.split('.').pop() || '').toLowerCase();
-const isVid = n => VIDEO_EXT.includes(ext(n));
-const fmt = s => {
-  if (!isFinite(s)||isNaN(s)) return '0:00';
-  return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
-};
-const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-
-// ── File loading ───────────────────────────────────────────
-function rpOpenPicker(t) { $(t==='folder'?'rpFolderIn':'rpFilesIn').click(); }
-
-function rpLoad(e) {
-  const valid = Array.from(e.target.files).filter(f => {
-    const x = ext(f.name);
-    return AUDIO_EXT.includes(x) || VIDEO_EXT.includes(x);
-  });
-  if (!valid.length) { alert('Keine Musik- oder Videodateien gefunden.'); return; }
-  const seen = new Set(files.map(f => f.name+f.size));
-  valid.forEach(f => { if (!seen.has(f.name+f.size)) files.push(f); });
-  buildPlaylist(true);
-  e.target.value = '';
-}
-
-function buildPlaylist(autoplay) {
-  const idx = files.map((_,i)=>i);
-  if (shuffle) {
-    for (let i=idx.length-1;i>0;i--) {
-      const j=Math.floor(Math.random()*(i+1));
-      [idx[i],idx[j]]=[idx[j],idx[i]];
-    }
-  }
-  playlist = idx; cur = files.length ? 0 : -1;
-  renderUI();
-  if (autoplay && files.length) playTrack(0);
-}
-
-// ── Playback ───────────────────────────────────────────────
-function ensureAudio() {
-  if (audioEl) return;
-  audioEl = new Audio();
-  audioEl.addEventListener('timeupdate', onTime);
-  audioEl.addEventListener('ended', onEnded);
-  audioEl.addEventListener('loadedmetadata', onMeta);
-}
-
-function playTrack(pi) {
-  if (pi<0||pi>=playlist.length) return;
-  cur = pi;
-  const f = files[playlist[pi]];
-  if (objUrl) { URL.revokeObjectURL(objUrl); objUrl=null; }
-  objUrl = URL.createObjectURL(f);
-  ensureAudio();
-
-  const vid=$('rpVideo'), vw=$('rpVideoWrap');
-  if (isVid(f.name)) {
-    audioEl.pause(); audioEl.src='';
-    vid.removeEventListener('timeupdate',onTime);
-    vid.removeEventListener('ended',onEnded);
-    vid.removeEventListener('loadedmetadata',onMeta);
-    vid.addEventListener('timeupdate',onTime);
-    vid.addEventListener('ended',onEnded);
-    vid.addEventListener('loadedmetadata',onMeta);
-    vid.src=objUrl; vw.className='video-wrap visible'; media=vid;
-  } else {
-    vid.pause(); vid.src=''; vw.className='video-wrap';
-    audioEl.src=objUrl; media=audioEl;
-  }
-  media.volume = parseFloat($('rpVol').value);
-  media.play().then(()=>{playing=true;updatePlayBtn();}).catch(()=>{playing=false;updatePlayBtn();});
-  updateMediaSession(f);
-
-  const clean = f.name.replace(/\.[^.]+$/,'');
-  $('rpTrackName').textContent = clean;
-  $('rpTrackSub').textContent = (pi+1)+' / '+playlist.length+'  ·  '+ext(f.name).toUpperCase();
-  $('rpBar').value=0; $('rpBar').style.setProperty('--v','0%');
-  $('rpCur').textContent='0:00'; $('rpTot').textContent='–:––';
-  highlightItem(pi);
-}
-
-function onTime() {
-  if (!media) return;
-  const p = media.duration ? (media.currentTime/media.duration)*100 : 0;
-  $('rpBar').value=p; $('rpBar').style.setProperty('--v',p+'%');
-  $('rpCur').textContent=fmt(media.currentTime);
-}
-function onMeta() { if (media) $('rpTot').textContent=fmt(media.duration); }
-function onEnded() {
-  if (repeat==='one') { media.currentTime=0; media.play(); return; }
-  if (cur+1<playlist.length) playTrack(cur+1);
-  else if (repeat==='all') { if(shuffle) buildPlaylist(true); else playTrack(0); }
-  else { playing=false; updatePlayBtn(); }
-}
-
-function rpTogglePlay() {
-  if (!media) return;
-  if (playing) { media.pause(); playing=false; }
-  else { media.play(); playing=true; }
-  updatePlayBtn();
-}
-function rpNext() { if(!playlist.length)return; playTrack(cur+1<playlist.length?cur+1:0); }
-function rpPrev() {
-  if(!playlist.length)return;
-  if(media&&media.currentTime>3){media.currentTime=0;return;}
-  playTrack(cur>0?cur-1:playlist.length-1);
-}
-function rpSeek(v) { if(media&&media.duration) media.currentTime=(v/100)*media.duration; }
-function rpSetVol(v) {
-  const n=parseFloat(v);
-  if(audioEl)audioEl.volume=n;
-  $('rpVideo').volume=n;
-}
-
-// ── Shuffle / Repeat ───────────────────────────────────────
-function rpToggleShuffle() {
-  shuffle=!shuffle;
-  if (files.length) {
-    const cf=playlist[cur];
-    const rest=files.map((_,i)=>i).filter(i=>i!==cf);
-    if (shuffle) { for(let i=rest.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[rest[i],rest[j]]=[rest[j],rest[i]];} }
-    playlist=[cf,...rest]; cur=0; renderList(); highlightItem(0);
-  }
-  updateShuffleBtn();
-}
-function rpToggleRepeat() {
-  const m=['off','all','one'];
-  repeat=m[(m.indexOf(repeat)+1)%3];
-  updateRepeatBtn();
-}
-
-// ── UI updates ─────────────────────────────────────────────
-function updatePlayBtn() { $('rpPlayBtn').textContent=playing?'⏸':'▶'; }
-function updateShuffleBtn() { $('rpShuffleBtn').classList.toggle('on',shuffle); }
-function updateRepeatBtn() {
-  const b=$('rpRepeatBtn');
-  if(repeat==='off'){b.classList.remove('on');b.textContent='🔁';}
-  else if(repeat==='all'){b.classList.add('on');b.textContent='🔁';}
-  else{b.classList.add('on');b.textContent='🔂';}
-}
-
-function renderUI() {
-  const has=files.length>0;
-  $('rpEmpty').style.display=has?'none':'flex';
-  $('rpPlayer').style.display=has?'flex':'none';
-  $('rpCount').textContent=' · '+files.length+' Titel';
-  updateShuffleBtn(); updateRepeatBtn();
-  renderList();
-}
-
-function renderList() {
-  $('rpList').innerHTML=playlist.map((fi,pi)=>{
-    const f=files[fi];
-    const icon=isVid(f.name)?'🎬':'🎵';
-    const x=ext(f.name).toUpperCase();
-    const name=esc(f.name.replace(/\.[^.]+$/,''));
-    return `<div class="pl-item${pi===cur?' active':''}" id="pi${pi}" onclick="playTrack(${pi})">
-      <span class="pl-num">${pi+1}</span>
-      <span class="pl-icon">${icon}</span>
-      <span class="pl-name">${name}</span>
-      <span class="pl-ext">${x}</span>
-    </div>`;
-  }).join('');
-}
-
-function highlightItem(pi) {
-  document.querySelectorAll('.pl-item').forEach((el,i)=>el.classList.toggle('active',i===pi));
-  const el=$('pi'+pi);
-  if(el) el.scrollIntoView({behavior:'smooth',block:'nearest'});
-}
-
-function rpClear() {
-  if(!confirm('Playlist leeren?')) return;
-  if(media){media.pause();media.src='';}
-  if(audioEl)audioEl.src='';
-  const v=$('rpVideo'); v.pause(); v.src='';
-  $('rpVideoWrap').className='video-wrap';
-  if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null;}
-  files=[];playlist=[];cur=-1;playing=false;media=null;
-  $('rpTrackName').textContent='–';
-  $('rpTrackSub').textContent='Kein Titel';
-  renderUI();
-}
-
-// ── Drag & Drop ────────────────────────────────────────────
-const drop=$('rpDrop');
-drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over');});
-drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
-drop.addEventListener('drop',e=>{
-  e.preventDefault(); drop.classList.remove('over');
-  const valid=Array.from(e.dataTransfer.files).filter(f=>{const x=ext(f.name);return AUDIO_EXT.includes(x)||VIDEO_EXT.includes(x);});
-  if(!valid.length)return;
-  const seen=new Set(files.map(f=>f.name+f.size));
-  valid.forEach(f=>{if(!seen.has(f.name+f.size))files.push(f);});
-  buildPlaylist(true);
-});
-
-// ── Media session (Lock Screen Controls) ──────────────────
-function updateMediaSession(f) {
-  if (!('mediaSession' in navigator)) return;
-  navigator.mediaSession.metadata = new MediaMetadata({
-    title: f.name.replace(/\.[^.]+$/,''),
-    artist: 'D_a_N Player',
-  });
-  navigator.mediaSession.setActionHandler('play', rpTogglePlay);
-  navigator.mediaSession.setActionHandler('pause', rpTogglePlay);
-  navigator.mediaSession.setActionHandler('nexttrack', rpNext);
-  navigator.mediaSession.setActionHandler('previoustrack', rpPrev);
-}
-
-// Patch playTrack to also update media session
-const _origPlay = playTrack;
-// (inline above)
-
-// ── Service Worker ─────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(()=>{});
-}
-
-// Init shuffle active by default
-updateShuffleBtn();
-</script>
+<script src="player.js"></script>
 </body>
 </html>
