@@ -123,41 +123,81 @@ function rpCloseTrackInfo(){
   $('rpInfoOverlay').classList.remove('open');$('rpInfoPanel').classList.remove('open');
 }
 
-// ── Web Audio (Bass Boost + Kompressor) ───────────────────
-let audioCtx=null,bassFilter=null,audioSrcNode=null,compressor=null;
+// ── Web Audio – Mastering Chain ────────────────────────────
+let audioCtx=null,audioSrcNode=null,eqBands=[],compressor=null,limiter=null;
+
+// Bands: 80Hz  250Hz  1kHz  5kHz  12kHz
+const EQ_TYPES =['lowshelf','peaking','peaking','peaking','highshelf'];
+const EQ_FREQS =[80,250,1000,5000,12000];
+const EQ_QS    =[0.7,1.2,1.5,1.2,0.7];
+
+// Gains pro Preset: [80Hz, 250Hz, 1kHz, 5kHz, 12kHz]
+const EQ_PRESETS={
+  master:  [+3.0,-2.5, 0.0,+3.0,+2.5], // Warm · Klar · Luftig – Standard
+  flat:    [ 0.0, 0.0, 0.0, 0.0, 0.0],
+  bass:    [+7.0,-1.5,-1.0,+2.0,+1.5],
+  hiphop:  [+6.0,-2.0,-1.0,+3.0,+2.0],
+  rock:    [+4.0,-1.5,+1.0,+4.5,+3.0],
+  pop:     [+2.0,-1.0,+2.0,+4.5,+3.5],
+  vocal:   [-1.0,-2.5,+4.5,+5.0,+3.0],
+};
+
 function initWebAudio(){
   if(audioCtx||!audioEl)return;
   try{
     audioCtx=new(window.AudioContext||window.webkitAudioContext)();
     audioSrcNode=audioCtx.createMediaElementSource(audioEl);
-    bassFilter=audioCtx.createBiquadFilter();
-    bassFilter.type='lowshelf';
-    bassFilter.frequency.value=200;
-    bassFilter.gain.value=0;
+
+    // Hochpass: entfernt Subsonic-Rumble unter 30 Hz
+    const hpf=audioCtx.createBiquadFilter();
+    hpf.type='highpass';hpf.frequency.value=30;hpf.Q.value=0.7;
+
+    // 5-Band parametrischer EQ
+    eqBands=EQ_FREQS.map((freq,i)=>{
+      const f=audioCtx.createBiquadFilter();
+      f.type=EQ_TYPES[i];f.frequency.value=freq;
+      f.Q.value=EQ_QS[i];f.gain.value=0;return f;
+    });
+
+    // Kompressor – sanfter dynamischer Ausgleich
     compressor=audioCtx.createDynamicsCompressor();
-    compressor.threshold.value=-18;
-    compressor.knee.value=30;
-    compressor.ratio.value=8;
-    compressor.attack.value=0.003;
-    compressor.release.value=0.2;
-    audioSrcNode.connect(bassFilter);
-    bassFilter.connect(compressor);
-    compressor.connect(audioCtx.destination);
+    compressor.threshold.value=-24;compressor.knee.value=10;
+    compressor.ratio.value=4;compressor.attack.value=0.005;
+    compressor.release.value=0.1;
+
+    // Limiter – verhindert jegliches Clipping
+    limiter=audioCtx.createDynamicsCompressor();
+    limiter.threshold.value=-1;limiter.knee.value=0;
+    limiter.ratio.value=20;limiter.attack.value=0.001;
+    limiter.release.value=0.05;
+
+    // Chain: source → hpf → eq[0..4] → compressor → limiter → out
+    let node=audioSrcNode;
+    node.connect(hpf);node=hpf;
+    eqBands.forEach(b=>{node.connect(b);node=b;});
+    node.connect(compressor);
+    compressor.connect(limiter);
+    limiter.connect(audioCtx.destination);
   }catch(e){audioCtx=null}
 }
+
 function rpSetBass(val){
   const v=parseFloat(val);
   $('rpBassVal').textContent=(v>=0?'+':'')+v+' dB';
   const pct=((v-(-10))/(15-(-10)))*100;
   $('rpBass').style.setProperty('--v',pct+'%');
-  if(bassFilter)bassFilter.gain.value=v;
+  if(eqBands[0])eqBands[0].gain.value=v;
 }
 
 // ── EQ Presets ─────────────────────────────────────────────
-const EQ_PRESETS={flat:0,bass:8,hiphop:7,rock:5,pop:2,vocal:-3,electronic:6};
 function rpSetPreset(name){
-  const v=EQ_PRESETS[name]??0;
-  $('rpBass').value=v;rpSetBass(v);
+  const gains=EQ_PRESETS[name];if(!gains)return;
+  if(eqBands.length)gains.forEach((g,i)=>{if(eqBands[i])eqBands[i].gain.value=g});
+  // Bass-Slider auf 80Hz-Wert des Presets setzen
+  $('rpBass').value=gains[0];
+  $('rpBassVal').textContent=(gains[0]>=0?'+':'')+gains[0]+' dB';
+  const pct=((gains[0]-(-10))/(15-(-10)))*100;
+  $('rpBass').style.setProperty('--v',pct+'%');
   document.querySelectorAll('.eq-preset-btn').forEach(b=>b.classList.toggle('active',b.dataset.preset===name));
   try{localStorage.setItem('rp_preset',name)}catch(e){}
 }
@@ -518,7 +558,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catc
 
 // ── Start ──────────────────────────────────────────────────
 applyTheme(currentTheme);
-const savedPreset=localStorage.getItem('rp_preset')||'flat';
+const savedPreset=localStorage.getItem('rp_preset')||'master';
 rpSetPreset(savedPreset);
 updateUI();
 rpCheckSavedDir();
