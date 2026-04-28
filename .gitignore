@@ -1,1 +1,6 @@
 .aider*
+node_modules/
+.gradle/
+android/app/build/
+android/.gradle/
+android/local.properties

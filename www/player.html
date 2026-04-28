@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#d4a017">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>DaN Vibe</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;700&display=swap"></noscript>
+<link rel="stylesheet" href="player.css">
+</head>
+<body>
+
+<!-- INTRO SPLASH -->
+<div class="intro-splash" id="rpIntro">
+  <div class="intro-disc-wrap">
+    <div class="intro-disc">
+      <div class="intro-groove ig1"></div>
+      <div class="intro-groove ig2"></div>
+      <div class="intro-groove ig3"></div>
+      <div class="intro-groove ig4"></div>
+      <div class="intro-label">
+        <div class="intro-dan">DaN</div>
+        <div class="intro-dot">●</div>
+        <div class="intro-vibe">VIBE</div>
+      </div>
+    </div>
+  </div>
+  <div class="intro-tagline">DEIN PERSÖNLICHER PLAYER</div>
+</div>
+
+<div class="app" id="rpApp">
+
+  <!-- HEADER -->
+  <div class="header" id="rpHeader">
+    <div class="header-brand">
+      <div class="header-logo">DaN</div>
+      <div class="header-title">VIBE</div>
+    </div>
+    <button class="header-rescan-btn" id="rpRescanBtn" onclick="rpRescan()" style="display:none" title="Neu einlesen">🔄</button>
+    <button class="header-icon-btn" onclick="rpOpenThemePicker()" title="Farbthema">🎨</button>
+    <button class="header-load-btn" onclick="rpPickRootFolder()">📂</button>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" id="rpEmpty">
+    <div class="scan-box" id="rpScanBox" style="display:none">
+      <div class="scan-spinner">◉</div>
+      <div class="scan-label">Durchsuche Ordner...</div>
+      <div class="scan-count" id="rpScanCount">0 Dateien gefunden</div>
+    </div>
+    <div class="reload-box" id="rpReloadBox" style="display:none" onclick="rpReloadLast()">
+      <div class="reload-vinyl-icon">◉</div>
+      <div class="reload-title">DaN VIBE</div>
+      <div class="reload-sub">Tippe irgendwo um deine Musik zu laden</div>
+      <div class="reload-tap-hint">▶ MUSIK LADEN</div>
+      <button class="btn-change-folder" onclick="rpPickRootFolder();event.stopPropagation()">📂 Anderen Ordner wählen</button>
+    </div>
+    <div id="rpSetupBox">
+      <div class="drop-zone" id="rpDrop" onclick="rpPickRootFolder()">
+        <div class="drop-vinyl">◉</div>
+        <div class="drop-title">ALLE SONGS LADEN</div>
+        <div class="drop-sub">Wähle deinen Haupt-Ordner –<br>alle Unterordner werden automatisch durchsucht</div>
+      </div>
+      <div class="setup-note">📁 Einmalige Einrichtung · App merkt sich deinen Ordner</div>
+      <button class="btn-load-files" onclick="rpOpenFilePicker()">🎵 Einzelne Dateien auswählen</button>
+      <div class="drop-formats">MP3 · WAV · FLAC · AAC · OGG · MP4 · MKV u.v.m.</div>
+    </div>
+  </div>
+
+  <!-- PLAYER -->
+  <div class="player-wrap" id="rpPlayer" style="display:none">
+
+    <!-- VIDEO AREA -->
+    <div class="video-area" id="rpVideoArea">
+      <video id="rpVideo" playsinline></video>
+      <button class="video-fs-btn" onclick="rpVideoFullscreen()" title="Vollbild">⛶</button>
+    </div>
+
+    <!-- NOW PLAYING: Vinyl (audio mode) -->
+    <div class="vinyl-area" id="rpVinylArea">
+      <div class="vinyl-disc" id="rpVinyl">
+        <div class="vinyl-groove g1"></div>
+        <div class="vinyl-groove g2"></div>
+        <div class="vinyl-groove g3"></div>
+        <div class="vinyl-label">
+          <div class="vinyl-label-name" id="rpVinylLabelName">DaN</div>
+          <div class="vinyl-label-dot">●</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRACK INFO (klickbar für Details) -->
+    <div class="track-info-bar" onclick="rpShowTrackInfo()">
+      <div class="track-marquee-wrap">
+        <div class="track-marquee" id="rpTrackName">– – –</div>
+      </div>
+      <div class="track-sub" id="rpTrackSub">TRACK 0 / 0</div>
+    </div>
+
+    <!-- EQ VISUALIZER -->
+    <div class="eq-row" id="rpEq">
+      <div class="eq-bar" id="eq0"></div><div class="eq-bar" id="eq1"></div>
+      <div class="eq-bar" id="eq2"></div><div class="eq-bar" id="eq3"></div>
+      <div class="eq-bar" id="eq4"></div><div class="eq-bar" id="eq5"></div>
+      <div class="eq-bar" id="eq6"></div><div class="eq-bar" id="eq7"></div>
+      <div class="eq-bar" id="eq8"></div><div class="eq-bar" id="eq9"></div>
+      <div class="eq-bar" id="eq10"></div><div class="eq-bar" id="eq11"></div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-row">
+      <span class="p-time" id="rpCur">0:00</span>
+      <input type="range" class="p-bar" id="rpBar" min="0" max="100" value="0" step="0.1" oninput="rpSeek(this.value)">
+      <span class="p-time" id="rpTot">0:00</span>
+    </div>
+
+    <!-- BASS BOOST -->
+    <div class="bass-row">
+      <span class="bass-label">🔊 BASS</span>
+      <input type="range" class="bass-bar" id="rpBass" min="-10" max="20" value="0" step="1" oninput="rpSetBass(this.value)">
+      <span class="bass-val" id="rpBassVal">0 dB</span>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls-row">
+      <button class="ctrl-btn" id="rpShuffleBtn" onclick="rpToggleShuffle()">🔀</button>
+      <button class="ctrl-btn" onclick="rpPrev()">⏮</button>
+      <button class="ctrl-btn play-btn" id="rpPlayBtn" onclick="rpTogglePlay()">▶</button>
+      <button class="ctrl-btn" onclick="rpNext()">⏭</button>
+      <button class="ctrl-btn" id="rpRepeatBtn" onclick="rpToggleRepeat()">🔁</button>
+    </div>
+
+    <!-- VOLUME + ACTIONS -->
+    <div class="bottom-bar">
+      <span class="vol-icon">🔈</span>
+      <input type="range" class="vol-bar" id="rpVol" min="0" max="1" step="0.01" value="1" oninput="rpSetVol(this.value)">
+      <span class="vol-icon">🔊</span>
+      <button class="action-btn" id="rpSleepBtn" onclick="rpCycleSleep()" title="Sleep-Timer">🌙</button>
+      <button class="action-btn" id="rpFavFilterBtn" onclick="rpToggleFavFilter()" title="Nur Favoriten">❤️</button>
+      <button class="list-toggle-btn" id="rpListToggle" onclick="rpToggleList()">≡ TRACKS</button>
+    </div>
+
+  </div>
+
+  <!-- PLAYLIST OVERLAY -->
+  <div class="pl-overlay" id="rpPlOverlay" onclick="rpToggleList()"></div>
+  <div class="pl-panel" id="rpPlPanel">
+    <div class="pl-panel-header">
+      <span class="pl-panel-title">TRACKLIST</span>
+      <span class="pl-count" id="rpCount">0 TRACKS</span>
+      <div style="display:flex;gap:6px;margin-left:auto">
+        <button class="pl-btn" onclick="rpAddFolder();event.stopPropagation()">+ ORDNER</button>
+        <button class="pl-btn" onclick="rpOpenPicker('files');event.stopPropagation()">+ ADD</button>
+        <button class="pl-btn danger" onclick="rpClear();event.stopPropagation()">✕</button>
+        <button class="pl-btn" onclick="rpToggleList()">✕ CLOSE</button>
+      </div>
+    </div>
+    <!-- SEARCH -->
+    <div class="pl-search-bar">
+      <input type="text" class="pl-search-input" id="rpSearch" placeholder="🔍  Song suchen..." oninput="rpFilterList()" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="pl-list" id="rpList"></div>
+  </div>
+
+  <!-- THEME PICKER -->
+  <div class="modal-overlay" id="rpThemeOverlay" onclick="rpCloseThemePicker()"></div>
+  <div class="theme-panel" id="rpThemePanel">
+    <div class="theme-panel-title">FARBTHEMA</div>
+    <div class="theme-grid">
+      <button class="theme-btn" data-theme="gold" onclick="rpSetTheme('gold')"><span class="theme-dot" style="background:#d4a017"></span>Gold</button>
+      <button class="theme-btn" data-theme="blue" onclick="rpSetTheme('blue')"><span class="theme-dot" style="background:#1e90ff"></span>Blau</button>
+      <button class="theme-btn" data-theme="green" onclick="rpSetTheme('green')"><span class="theme-dot" style="background:#2ecc71"></span>Grün</button>
+      <button class="theme-btn" data-theme="purple" onclick="rpSetTheme('purple')"><span class="theme-dot" style="background:#9b59b6"></span>Lila</button>
+      <button class="theme-btn" data-theme="red" onclick="rpSetTheme('red')"><span class="theme-dot" style="background:#e74c3c"></span>Rot</button>
+    </div>
+  </div>
+
+  <!-- TRACK INFO MODAL -->
+  <div class="modal-overlay" id="rpInfoOverlay" onclick="rpCloseTrackInfo()"></div>
+  <div class="info-panel" id="rpInfoPanel">
+    <div class="info-title" id="rpInfoTitle">–</div>
+    <div class="info-grid" id="rpInfoGrid"></div>
+    <button class="info-close-btn" onclick="rpCloseTrackInfo()">SCHLIESSEN</button>
+  </div>
+
+  <!-- SLEEP TIMER DISPLAY -->
+  <div class="sleep-toast" id="rpSleepToast" style="display:none"></div>
+
+</div>
+
+<!-- HIDDEN INPUTS -->
+<input type="file" id="rpFolderIn" webkitdirectory multiple style="display:none" onchange="rpLoad(event)">
+<input type="file" id="rpFilesIn" multiple accept="audio/*,video/*,.mp3,.wav,.ogg,.flac,.aac,.m4a,.opus,.mp4,.webm,.mov,.mkv,.avi,.m4v,.wma" style="display:none" onchange="rpLoad(event)">
+
+<script src="player.js"></script>
+<script src="auto-sort.js"></script>
+</body>
+</html>
