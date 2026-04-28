@@ -120,10 +120,19 @@
       <span class="p-time" id="rpTot">0:00</span>
     </div>
 
+    <!-- EQ PRESETS -->
+    <div class="eq-presets-row">
+      <button class="eq-preset-btn active" data-preset="flat" onclick="rpSetPreset('flat')">FLAT</button>
+      <button class="eq-preset-btn" data-preset="bass" onclick="rpSetPreset('bass')">BASS+</button>
+      <button class="eq-preset-btn" data-preset="hiphop" onclick="rpSetPreset('hiphop')">HIP-HOP</button>
+      <button class="eq-preset-btn" data-preset="rock" onclick="rpSetPreset('rock')">ROCK</button>
+      <button class="eq-preset-btn" data-preset="pop" onclick="rpSetPreset('pop')">POP</button>
+      <button class="eq-preset-btn" data-preset="vocal" onclick="rpSetPreset('vocal')">VOCAL</button>
+    </div>
     <!-- BASS BOOST -->
     <div class="bass-row">
       <span class="bass-label">🔊 BASS</span>
-      <input type="range" class="bass-bar" id="rpBass" min="-10" max="20" value="0" step="1" oninput="rpSetBass(this.value)">
+      <input type="range" class="bass-bar" id="rpBass" min="-10" max="15" value="0" step="1" oninput="rpSetBass(this.value)">
       <span class="bass-val" id="rpBassVal">0 dB</span>
     </div>
 

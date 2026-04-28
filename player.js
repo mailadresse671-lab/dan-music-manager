@@ -123,8 +123,8 @@ function rpCloseTrackInfo(){
   $('rpInfoOverlay').classList.remove('open');$('rpInfoPanel').classList.remove('open');
 }
 
-// ── Web Audio (Bass Boost) ─────────────────────────────────
-let audioCtx=null,bassFilter=null,bassGain=null,audioSrcNode=null;
+// ── Web Audio (Bass Boost + Kompressor) ───────────────────
+let audioCtx=null,bassFilter=null,audioSrcNode=null,compressor=null;
 function initWebAudio(){
   if(audioCtx||!audioEl)return;
   try{
@@ -132,48 +132,34 @@ function initWebAudio(){
     audioSrcNode=audioCtx.createMediaElementSource(audioEl);
     bassFilter=audioCtx.createBiquadFilter();
     bassFilter.type='lowshelf';
-    bassFilter.frequency.value=250;
+    bassFilter.frequency.value=200;
     bassFilter.gain.value=0;
+    compressor=audioCtx.createDynamicsCompressor();
+    compressor.threshold.value=-18;
+    compressor.knee.value=30;
+    compressor.ratio.value=8;
+    compressor.attack.value=0.003;
+    compressor.release.value=0.2;
     audioSrcNode.connect(bassFilter);
-    bassFilter.connect(audioCtx.destination);
+    bassFilter.connect(compressor);
+    compressor.connect(audioCtx.destination);
   }catch(e){audioCtx=null}
 }
 function rpSetBass(val){
   const v=parseFloat(val);
   $('rpBassVal').textContent=(v>=0?'+':'')+v+' dB';
-  const pct=((v-(-10))/(20-(-10)))*100;
+  const pct=((v-(-10))/(15-(-10)))*100;
   $('rpBass').style.setProperty('--v',pct+'%');
   if(bassFilter)bassFilter.gain.value=v;
 }
 
-// ── Crossfade ──────────────────────────────────────────────
-const CROSSFADE_SEC=3;
-let cfActive=false,cfEl=null,cfUrl=null,cfFadeTimer=null;
-function initCrossfadeEl(){
-  if(cfEl)return;
-  cfEl=new Audio();
-}
-function startCrossfade(){
-  if(!cfEl||cur<0||!media||isVid(files[playlist[cur]].name))return;
-  const nextPi=repeat==='one'?cur:(cur+1<playlist.length?cur+1:repeat==='all'?0:-1);
-  if(nextPi<0||nextPi===cur)return;
-  const nf=files[playlist[nextPi]];
-  if(isVid(nf.name))return;
-  if(cfUrl)URL.revokeObjectURL(cfUrl);
-  cfUrl=URL.createObjectURL(nf);
-  cfEl.src=cfUrl;cfEl.volume=0;
-  cfEl.play().catch(()=>{cfActive=false});
-  const volAtStart=parseFloat($('rpVol').value);
-  const steps=CROSSFADE_SEC*10;
-  let step=0;
-  clearInterval(cfFadeTimer);
-  cfFadeTimer=setInterval(()=>{
-    step++;
-    const t=step/steps;
-    if(media)media.volume=Math.max(0,volAtStart*(1-t));
-    cfEl.volume=Math.min(volAtStart,volAtStart*t);
-    if(step>=steps)clearInterval(cfFadeTimer);
-  },100);
+// ── EQ Presets ─────────────────────────────────────────────
+const EQ_PRESETS={flat:0,bass:8,hiphop:7,rock:5,pop:2,vocal:-3,electronic:6};
+function rpSetPreset(name){
+  const v=EQ_PRESETS[name]??0;
+  $('rpBass').value=v;rpSetBass(v);
+  document.querySelectorAll('.eq-preset-btn').forEach(b=>b.classList.toggle('active',b.dataset.preset===name));
+  try{localStorage.setItem('rp_preset',name)}catch(e){}
 }
 
 // ── IndexedDB ──────────────────────────────────────────────
@@ -300,18 +286,11 @@ function ensureAudio(){
   audioEl.addEventListener('timeupdate',onTime);
   audioEl.addEventListener('ended',onEnded);
   audioEl.addEventListener('loadedmetadata',onMeta);
-  initCrossfadeEl();
 }
 
 function playTrack(pi){
   if(pi<0||pi>=playlist.length)return;
-  cfActive=false;clearInterval(cfFadeTimer);
-  // Reset crossfade element volume
-  if(cfEl){cfEl.pause();cfEl.src='';cfEl.volume=0}
-  if(cfUrl){URL.revokeObjectURL(cfUrl);cfUrl=null}
-
-  cur=pi;
-  const f=files[playlist[pi]];
+  cur=pi;const f=files[playlist[pi]];
   if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}
   objUrl=URL.createObjectURL(f);
   ensureAudio();
@@ -353,19 +332,9 @@ function onTime(){
   const p=media.duration?(media.currentTime/media.duration)*100:0;
   $('rpBar').value=p;$('rpBar').style.setProperty('--v',p+'%');
   $('rpCur').textContent=fmt(media.currentTime);
-
-  // Crossfade: start when CROSSFADE_SEC seconds remain
-  if(media.duration&&!cfActive&&playing&&!isVid(files[playlist[cur]]?.name||'')){
-    const left=media.duration-media.currentTime;
-    if(left>0&&left<=CROSSFADE_SEC){
-      cfActive=true;startCrossfade();
-    }
-  }
 }
 function onMeta(){if(media)$('rpTot').textContent=fmt(media.duration)}
 function onEnded(){
-  cfActive=false;clearInterval(cfFadeTimer);
-  // Restore user volume
   if(media)media.volume=parseFloat($('rpVol').value);
   if(repeat==='one'){media.currentTime=0;media.play();return}
   if(cur+1<playlist.length)playTrack(cur+1);
@@ -549,6 +518,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catc
 
 // ── Start ──────────────────────────────────────────────────
 applyTheme(currentTheme);
-rpSetBass(0);
+const savedPreset=localStorage.getItem('rp_preset')||'flat';
+rpSetPreset(savedPreset);
 updateUI();
 rpCheckSavedDir();
