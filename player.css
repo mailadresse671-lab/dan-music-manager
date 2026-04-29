@@ -59,7 +59,7 @@ body{
   width:min(72vw,280px);height:min(72vw,280px);border-radius:50%;
   background:radial-gradient(circle,#2a2a2a 0%,#111 18%,#1a1a1a 19%,#0a0a0a 34%,#1a1a1a 35%,#0a0a0a 50%,#1a1a1a 51%,#0a0a0a 66%,#1a1a1a 67%,#111 82%,#222 100%);
   position:relative;display:flex;align-items:center;justify-content:center;
-  animation:spin 2.5s linear infinite;
+  animation:spin 2.5s linear infinite;animation-play-state:paused;
   box-shadow:0 0 80px rgba(212,160,23,0.3),0 0 160px rgba(212,160,23,0.1),0 12px 60px rgba(0,0,0,0.9);
 }
 .intro-groove{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,0.05)}

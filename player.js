@@ -401,7 +401,7 @@ function playTrack(pi){
 
   // Vinyl label: Song-Name (rotiert mit, CSS übernimmt Umbruch/Clamp)
   $('rpVinylLabelName').textContent=clean;
-  $('rpVinyl').classList.toggle('playing',!isVid(f.name));
+  $('rpVinyl').classList.remove('playing');
 
   startEq();highlightItem(pi);updateMediaSession(f);
   loadCoverArt(f);
