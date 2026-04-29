@@ -692,8 +692,11 @@ function updateMediaSession(f){
 let djElA=null,djElB=null,djUrlA=null,djUrlB=null;
 let djPlayA=false,djPlayB=false,djCFVal=50;
 let djLoopA=false,djLoopB=false;
-let djHotCues={A:[null,null,null],B:[null,null,null]};
+let djHotCues={A:[null,null,null,null,null,null,null,null],B:[null,null,null,null,null,null,null,null]};
 let djVuInterval=null,djTimeInterval=null;
+let djChanVolA=1,djChanVolB=1,djMasterVol=1;
+let djFX={A:{echo:false,flng:false,filt:false,rvs:false},B:{echo:false,flng:false,filt:false,rvs:false}};
+let djSessionStart=null,djWaveRaf=null;
 let djScratchData={A:{active:false,lastX:0,lastT:0,rot:0,wasPlaying:false},B:{active:false,lastX:0,lastT:0,rot:0,wasPlaying:false}};
 
 function rpOpenDJ(){
@@ -715,15 +718,16 @@ function rpOpenDJ(){
   $('rpDJOverlay').style.display='flex';
   rpDJRenderList();
   rpDJCrossfade(50);
-  // VU meter animation
+  djSessionStart=Date.now();
   djVuInterval=setInterval(rpDJAnimateVU,80);
-  // Time display
   djTimeInterval=setInterval(rpDJUpdateTime,500);
+  djWaveRaf=requestAnimationFrame(rpDJWaveLoop);
 }
 
 function rpCloseDJ(){
   $('rpDJOverlay').style.display='none';
   clearInterval(djVuInterval);clearInterval(djTimeInterval);
+  if(djWaveRaf){cancelAnimationFrame(djWaveRaf);djWaveRaf=null;}
 }
 
 function rpDJRenderList(){
@@ -746,14 +750,16 @@ function rpDJLoad(deck,pi){
   const prevUrl=deck==='A'?djUrlA:djUrlB;
   if(prevUrl)URL.revokeObjectURL(prevUrl);
   const url=URL.createObjectURL(f);
-  if(deck==='A'){djUrlA=url;djPlayA=false;djHotCues.A=[null,null,null]}
-  else{djUrlB=url;djPlayB=false;djHotCues.B=[null,null,null]}
+  if(deck==='A'){djUrlA=url;djPlayA=false;djHotCues.A=[null,null,null,null,null,null,null,null]}
+  else{djUrlB=url;djPlayB=false;djHotCues.B=[null,null,null,null,null,null,null,null]}
   el.src=url;el.load();el.currentTime=0;
   $('rpDJName'+deck).textContent=getDisplayName(f);
   $('rpDJVinyl'+deck).classList.remove('playing');
+  $('rpDJBass'+deck)?.classList.remove('active');
   rpDJUpdateBtn(deck);
-  // Reset hot cues visual
-  document.querySelectorAll(`.dj-hc`).forEach(b=>b.classList.remove('set'));
+  // Reset hot cue visuals
+  document.querySelectorAll('.dj-hc').forEach(b=>b.classList.remove('set'));
+  document.querySelectorAll('.dj-pad').forEach(b=>b.classList.remove('set'));
   rpToast('Deck '+deck+': '+getDisplayName(f));
 }
 
@@ -766,10 +772,12 @@ function rpDJToggle(deck){
     el.pause();
     if(deck==='A'){djPlayA=false;$('rpDJVinylA').classList.remove('playing')}
     else{djPlayB=false;$('rpDJVinylB').classList.remove('playing')}
+    $('rpDJBass'+deck)?.classList.remove('active');
   }else{
     el.play().catch(()=>{});
     if(deck==='A'){djPlayA=true;$('rpDJVinylA').classList.add('playing')}
     else{djPlayB=true;$('rpDJVinylB').classList.add('playing')}
+    $('rpDJBass'+deck)?.classList.add('active');
   }
   rpDJUpdateBtn(deck);
 }
@@ -786,11 +794,17 @@ function rpDJCue(deck){
   if(el)el.currentTime=0;
 }
 
+function rpDJSetVolumes(){
+  const a=djCFVal/100*Math.PI/2;
+  const cfA=Math.max(0,Math.min(1,Math.cos(a)));
+  const cfB=Math.max(0,Math.min(1,Math.sin(a)));
+  if(djElA)djElA.volume=djChanVolA*djMasterVol*cfA;
+  if(djElB)djElB.volume=djChanVolB*djMasterVol*cfB;
+}
+
 function rpDJCrossfade(val){
   djCFVal=parseFloat(val);
-  const a=val/100*Math.PI/2;
-  if(djElA)djElA.volume=Math.max(0,Math.min(1,Math.cos(a)));
-  if(djElB)djElB.volume=Math.max(0,Math.min(1,Math.sin(a)));
+  rpDJSetVolumes();
 }
 
 function rpDJPitch(deck,val){
@@ -802,8 +816,9 @@ function rpDJPitch(deck,val){
 }
 
 function rpDJChanVol(deck,val){
-  const el=deck==='A'?djElA:djElB;
-  if(el)el.volume=Math.max(0,Math.min(1,parseFloat(val)));
+  if(deck==='A')djChanVolA=Math.max(0,Math.min(1,parseFloat(val)));
+  else djChanVolB=Math.max(0,Math.min(1,parseFloat(val)));
+  rpDJSetVolumes();
 }
 
 let djKills={A:{hi:false,mid:false,lo:false},B:{hi:false,mid:false,lo:false}};
@@ -827,6 +842,45 @@ function rpDJSync(deck){
   rpToast('Deck '+deck+' SYNC → '+(pct>0?'+':'')+pct+'%');
 }
 
+function rpDJMasterVol(val){
+  djMasterVol=Math.max(0,Math.min(1,parseFloat(val)));
+  rpDJSetVolumes();
+}
+
+function rpDJFX(deck,fx){
+  djFX[deck][fx]=!djFX[deck][fx];
+  document.getElementById('rpDJFX_'+fx+deck)?.classList.toggle('fx-on',djFX[deck][fx]);
+}
+
+function rpDJWaveLoop(){
+  rpDJDrawWave('A');
+  rpDJDrawWave('B');
+  djWaveRaf=requestAnimationFrame(rpDJWaveLoop);
+}
+
+function rpDJDrawWave(deck){
+  const canvas=document.getElementById('rpDJWave'+deck);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const isPlaying=deck==='A'?djPlayA:djPlayB;
+  const w=canvas.width,h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+  if(!isPlaying){
+    ctx.strokeStyle='rgba(0,180,60,0.12)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();
+    return;
+  }
+  const t=Date.now()/180;
+  ctx.shadowColor='#00dd77';ctx.shadowBlur=5;
+  ctx.strokeStyle='#00dd77';ctx.lineWidth=1.5;
+  ctx.beginPath();
+  for(let x=0;x<w;x++){
+    const y=h/2+(Math.sin(x*0.12+t)*0.55+Math.sin(x*0.31+t*1.7)*0.25+Math.sin(x*0.07-t*0.5)*0.2)*(h*0.38);
+    x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
 function rpDJLoop(deck){
   if(deck==='A'){
     djLoopA=!djLoopA;
@@ -844,19 +898,15 @@ function rpDJHotCue(deck,idx){
   if(!el||!el.src)return;
   const cues=djHotCues[deck];
   if(cues[idx]===null){
-    // Set cue
     cues[idx]=el.currentTime;
-    // Find the button and mark it
-    const allHc=document.querySelectorAll('.dj-hotcue-row');
-    const deckIdx=deck==='A'?0:1;
-    if(allHc[deckIdx]){
-      const btns=allHc[deckIdx].querySelectorAll('.dj-hc');
-      if(btns[idx])btns[idx].classList.add('set');
-    }
-    rpToast('H'+(idx+1)+' gesetzt: '+fmt(cues[idx]));
+    $('rpDJHc'+idx+deck)?.classList.add('set');
+    $('rpDJPad'+idx+deck)?.classList.add('set');
+    rpToast('CUE '+(idx+1)+' gesetzt · '+fmt(cues[idx]));
   }else{
-    // Jump to cue
     el.currentTime=cues[idx];
+    // Flash the pad
+    const p=$('rpDJPad'+idx+deck);
+    if(p){p.classList.add('flash');setTimeout(()=>p.classList.remove('flash'),180);}
   }
 }
 
@@ -866,14 +916,18 @@ function rpDJUpdateTime(){
     if(!el)return;
     const t=$('rpDJTime'+d);
     if(t)t.textContent=fmt(el.currentTime||0);
-    // Fake BPM based on pitch
     const rate=el.playbackRate||1;
     const bpmEl=$('rpDJBpm'+d);
-    if(bpmEl&&el.src){
-      const fakeBpm=Math.round(128*rate);
-      bpmEl.textContent=fakeBpm+' BPM';
-    }
+    if(bpmEl&&el.src)bpmEl.textContent=Math.round(128*rate)+' BPM';
   });
+  // Session clock
+  if(djSessionStart){
+    const s=Math.floor((Date.now()-djSessionStart)/1000);
+    const m=String(Math.floor(s/60)).padStart(2,'0');
+    const ss=String(s%60).padStart(2,'0');
+    const el=$('rpDJSession');
+    if(el)el.textContent=m+':'+ss;
+  }
 }
 
 function rpDJAnimateVU(){
