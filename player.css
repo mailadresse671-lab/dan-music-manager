@@ -447,3 +447,61 @@ video{width:100%;max-height:40vh;display:block;object-fit:contain}
 
 /* ── VIDEO FULLSCREEN ──────────────────────────────────── */
 video:fullscreen,video:-webkit-full-screen{width:100vw;height:100vh;object-fit:contain;background:#000}
+
+/* ── DJ MODE ───────────────────────────────────────────── */
+.dj-overlay{
+  position:fixed;inset:0;z-index:300;background:var(--bg);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.dj-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.dj-title{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);letter-spacing:2px}
+.dj-close{background:none;border:1px solid var(--border);color:var(--cream);padding:4px 12px;border-radius:6px;font-size:14px;cursor:pointer}
+
+.dj-decks{display:flex;gap:8px;padding:10px 8px 6px;flex-shrink:0}
+.dj-deck{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--card);border-radius:12px;padding:10px 6px}
+.dj-deck-tag{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--gold);letter-spacing:2px}
+
+.dj-vinyl{
+  width:min(40vw,160px);height:min(40vw,160px);border-radius:50%;
+  background:radial-gradient(circle,#2a2a2a 0%,#111 18%,#1a1a1a 19%,#0d0d0d 34%,#1a1a1a 35%,#0d0d0d 55%,#1a1a1a 56%,#111 80%,#222 100%);
+  position:relative;display:flex;align-items:center;justify-content:center;
+  animation:spin 3s linear infinite;animation-play-state:paused;
+  box-shadow:0 0 30px rgba(212,160,23,0.15),0 4px 20px rgba(0,0,0,0.8);
+  touch-action:none;cursor:grab;flex-shrink:0;
+}
+.dj-vinyl.playing{animation-play-state:running}
+.dj-vinyl.scratching{animation:none!important}
+.dj-vinyl-groove{position:absolute;width:70%;height:70%;border-radius:50%;border:1px solid rgba(255,255,255,0.05)}
+.dj-vinyl-label{
+  width:32%;height:32%;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:18px;color:#0d0b08;
+  box-shadow:0 0 10px rgba(212,160,23,0.4);
+}
+.dj-track-name{font-size:11px;color:var(--cream);text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 4px}
+.dj-deck-btns{display:flex;gap:6px}
+.dj-btn{padding:5px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card2);color:var(--cream);font-family:'Bebas Neue',sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px}
+.dj-btn.dj-play{background:var(--gold);color:#0d0b08;border-color:var(--gold);min-width:40px}
+.dj-pitch-row{display:flex;align-items:center;gap:4px;width:100%}
+.dj-pitch-lbl{font-size:9px;color:var(--muted);font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:30px}
+.dj-pitch{flex:1;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--border);cursor:pointer}
+.dj-pitch::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--gold);cursor:pointer}
+.dj-pitch-val{font-size:9px;color:var(--gold-dark);min-width:30px;text-align:right;font-family:'Bebas Neue',sans-serif}
+
+.dj-cf-section{padding:4px 16px 8px;flex-shrink:0}
+.dj-cf-labels{display:flex;justify-content:space-between;font-family:'Bebas Neue',sans-serif;font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:4px}
+.dj-cf{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--gold) 0%,var(--border) 50%,var(--gold) 100%);cursor:pointer}
+.dj-cf::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--cream);box-shadow:0 2px 8px rgba(0,0,0,0.5);cursor:grab}
+
+.dj-list-header{padding:6px 16px 4px;flex-shrink:0;border-top:1px solid var(--border)}
+.dj-list-title{font-family:'Bebas Neue',sans-serif;font-size:12px;color:var(--muted);letter-spacing:2px}
+.dj-list{flex:1;overflow-y:auto;padding:0 8px 8px}
+.dj-list-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04)}
+.dj-list-item:active{background:var(--card)}
+.dj-list-item-name{flex:1;font-size:12px;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dj-load-btn{padding:3px 8px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:11px;cursor:pointer;flex-shrink:0}
+.dj-load-btn:active{background:var(--gold);color:#0d0b08}

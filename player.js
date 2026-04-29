@@ -688,6 +688,143 @@ function updateMediaSession(f){
   navigator.mediaSession.setActionHandler('previoustrack',rpPrev);
 }
 
+// ── DJ MODE ────────────────────────────────────────────────
+let djElA=null,djElB=null,djUrlA=null,djUrlB=null;
+let djPlayA=false,djPlayB=false,djCFVal=50;
+let djScratchData={A:{active:false,lastX:0,lastT:0,rot:0,wasPlaying:false},B:{active:false,lastX:0,lastT:0,rot:0,wasPlaying:false}};
+
+function rpOpenDJ(){
+  if(!files.length){rpToast('Erst Musik laden!');return}
+  if(!djElA){
+    djElA=new Audio();
+    djElA.addEventListener('ended',()=>{djPlayA=false;rpDJUpdateBtn('A')});
+  }
+  if(!djElB){
+    djElB=new Audio();
+    djElB.addEventListener('ended',()=>{djPlayB=false;rpDJUpdateBtn('B')});
+  }
+  $('rpDJOverlay').style.display='flex';
+  rpDJRenderList();
+  rpDJCrossfade(50);
+}
+function rpCloseDJ(){$('rpDJOverlay').style.display='none'}
+
+function rpDJRenderList(){
+  const el=$('rpDJList');if(!el)return;
+  const items=playlist.filter(pi=>!isVid(files[pi].name));
+  el.innerHTML=items.map(pi=>{
+    const name=esc(getDisplayName(files[pi]));
+    return`<div class="dj-list-item">
+      <span class="dj-list-item-name">${name}</span>
+      <button class="dj-load-btn" onclick="rpDJLoad('A',${pi})">→ A</button>
+      <button class="dj-load-btn" onclick="rpDJLoad('B',${pi})">→ B</button>
+    </div>`;
+  }).join('');
+}
+
+function rpDJLoad(deck,pi){
+  const f=files[pi];
+  const el=deck==='A'?djElA:djElB;
+  const prevUrl=deck==='A'?djUrlA:djUrlB;
+  if(prevUrl)URL.revokeObjectURL(prevUrl);
+  const url=URL.createObjectURL(f);
+  if(deck==='A'){djUrlA=url;djPlayA=false}else{djUrlB=url;djPlayB=false}
+  el.src=url;el.load();
+  el.currentTime=0;
+  $('rpDJName'+deck).textContent=getDisplayName(f);
+  $('rpDJVinyl'+deck).classList.remove('playing');
+  rpDJUpdateBtn(deck);
+  rpToast('Deck '+deck+': '+getDisplayName(f));
+}
+
+function rpDJToggle(deck){
+  const el=deck==='A'?djElA:djElB;
+  const url=deck==='A'?djUrlA:djUrlB;
+  if(!url){rpToast('Erst Track laden → '+deck);return}
+  if(deck==='A'){
+    if(djPlayA){el.pause();djPlayA=false;$('rpDJVinylA').classList.remove('playing')}
+    else{el.play().catch(()=>{});djPlayA=true;$('rpDJVinylA').classList.add('playing')}
+  }else{
+    if(djPlayB){el.pause();djPlayB=false;$('rpDJVinylB').classList.remove('playing')}
+    else{el.play().catch(()=>{});djPlayB=true;$('rpDJVinylB').classList.add('playing')}
+  }
+  rpDJUpdateBtn(deck);
+}
+
+function rpDJUpdateBtn(deck){
+  const playing=deck==='A'?djPlayA:djPlayB;
+  $('rpDJPlayBtn'+deck).textContent=playing?'⏸':'▶';
+}
+
+function rpDJCue(deck){
+  const el=deck==='A'?djElA:djElB;
+  if(el){el.currentTime=0}
+}
+
+function rpDJCrossfade(val){
+  djCFVal=parseFloat(val);
+  const a=val/100*Math.PI/2;
+  const volA=Math.cos(a),volB=Math.sin(a);
+  if(djElA)djElA.volume=Math.max(0,Math.min(1,volA));
+  if(djElB)djElB.volume=Math.max(0,Math.min(1,volB));
+}
+
+function rpDJPitch(deck,val){
+  const r=parseFloat(val);
+  const el=deck==='A'?djElA:djElB;
+  if(el)el.playbackRate=r;
+  $('rpDJPitchVal'+deck).textContent=r.toFixed(2)+'×';
+}
+
+// DJ Scratch (direkt auf den DJ-Vinyls)
+function rpDJScratchStart(e,deck){
+  e.preventDefault();
+  const t=e.touches[0];
+  const d=djScratchData[deck];
+  d.lastX=t.clientX;d.lastT=Date.now();d.active=false;
+  const el=deck==='A'?djElA:djElB;
+  d.wasPlaying=deck==='A'?djPlayA:djPlayB;
+  // Vinyl visuell einfrieren
+  const v=$('rpDJVinyl'+deck);
+  const m=getComputedStyle(v).transform;
+  if(m&&m!=='none'){const p=m.match(/matrix\(([^,]+),([^,]+)/);if(p)d.rot=Math.atan2(parseFloat(p[2]),parseFloat(p[1]))*180/Math.PI}
+}
+function rpDJScratchMove(e,deck){
+  e.preventDefault();
+  const t=e.touches[0];
+  const d=djScratchData[deck];
+  const dx=t.clientX-d.lastX;
+  if(!d.active&&Math.abs(dx)>8){
+    d.active=true;
+    const el=deck==='A'?djElA:djElB;
+    const url=deck==='A'?djUrlA:djUrlB;
+    if(url&&el.paused){el.play().catch(()=>{});if(deck==='A')djPlayA=true;else djPlayB=true;rpDJUpdateBtn(deck);$('rpDJVinyl'+deck).classList.add('playing')}
+    $('rpDJVinyl'+deck).classList.add('scratching');
+  }
+  if(!d.active)return;
+  const now=Date.now();
+  const dt=Math.max(8,now-d.lastT);
+  const vel=dx/dt;
+  const el=deck==='A'?djElA:djElB;
+  if(Math.abs(vel)<0.05){if(el)el.playbackRate=0.1}
+  else if(vel>0){if(el)el.playbackRate=Math.max(0.5,Math.min(4,vel*18))}
+  else{if(el){el.playbackRate=Math.max(0.08,Math.min(0.6,Math.abs(vel)*12));if(el.duration)el.currentTime=Math.max(0,el.currentTime+vel*0.1)}}
+  d.rot+=dx*1.5;
+  $('rpDJVinyl'+deck).style.transform=`rotate(${d.rot}deg)`;
+  d.lastX=t.clientX;d.lastT=now;
+}
+function rpDJScratchEnd(e,deck){
+  const d=djScratchData[deck];
+  if(d.active){
+    d.active=false;
+    $('rpDJVinyl'+deck).classList.remove('scratching');
+    $('rpDJVinyl'+deck).style.transform='';
+    const el=deck==='A'?djElA:djElB;
+    if(el)el.playbackRate=parseFloat($('rpDJPitch'+deck).value)||1;
+    if(!d.wasPlaying&&el){el.pause();if(deck==='A')djPlayA=false;else djPlayB=false;rpDJUpdateBtn(deck);$('rpDJVinyl'+deck).classList.remove('playing')}
+  }
+}
+
 // ── Service Worker ─────────────────────────────────────────
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 

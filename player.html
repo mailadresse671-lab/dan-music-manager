@@ -44,8 +44,69 @@
       <div class="header-title">VIBE</div>
     </div>
     <button class="header-rescan-btn" id="rpRescanBtn" onclick="rpRescan()" style="display:none" title="Neu einlesen">🔄</button>
+    <button class="header-icon-btn" onclick="rpOpenDJ()" title="DJ Mode">🎛️</button>
     <button class="header-icon-btn" onclick="rpOpenThemePicker()" title="Farbthema">🎨</button>
     <button class="header-load-btn" onclick="rpPickRootFolder()">📂</button>
+  </div>
+
+  <!-- DJ MODE OVERLAY -->
+  <div class="dj-overlay" id="rpDJOverlay" style="display:none">
+    <div class="dj-topbar">
+      <span class="dj-title">🎛️ DJ MODE</span>
+      <button class="dj-close" onclick="rpCloseDJ()">✕</button>
+    </div>
+
+    <div class="dj-decks">
+      <!-- DECK A -->
+      <div class="dj-deck">
+        <div class="dj-deck-tag">DECK A</div>
+        <div class="dj-vinyl" id="rpDJVinylA" ontouchstart="rpDJScratchStart(event,'A')" ontouchmove="rpDJScratchMove(event,'A')" ontouchend="rpDJScratchEnd(event,'A')">
+          <div class="dj-vinyl-groove"></div>
+          <div class="dj-vinyl-label">A</div>
+        </div>
+        <div class="dj-track-name" id="rpDJNameA">– kein Track –</div>
+        <div class="dj-deck-btns">
+          <button class="dj-btn" onclick="rpDJCue('A')">⏮ CUE</button>
+          <button class="dj-btn dj-play" id="rpDJPlayBtnA" onclick="rpDJToggle('A')">▶</button>
+        </div>
+        <div class="dj-pitch-row">
+          <span class="dj-pitch-lbl">PITCH</span>
+          <input type="range" class="dj-pitch" id="rpDJPitchA" min="0.5" max="2" step="0.02" value="1" oninput="rpDJPitch('A',this.value)">
+          <span class="dj-pitch-val" id="rpDJPitchValA">1.00×</span>
+        </div>
+      </div>
+
+      <!-- DECK B -->
+      <div class="dj-deck">
+        <div class="dj-deck-tag">DECK B</div>
+        <div class="dj-vinyl" id="rpDJVinylB" ontouchstart="rpDJScratchStart(event,'B')" ontouchmove="rpDJScratchMove(event,'B')" ontouchend="rpDJScratchEnd(event,'B')">
+          <div class="dj-vinyl-groove"></div>
+          <div class="dj-vinyl-label">B</div>
+        </div>
+        <div class="dj-track-name" id="rpDJNameB">– kein Track –</div>
+        <div class="dj-deck-btns">
+          <button class="dj-btn" onclick="rpDJCue('B')">⏮ CUE</button>
+          <button class="dj-btn dj-play" id="rpDJPlayBtnB" onclick="rpDJToggle('B')">▶</button>
+        </div>
+        <div class="dj-pitch-row">
+          <span class="dj-pitch-lbl">PITCH</span>
+          <input type="range" class="dj-pitch" id="rpDJPitchB" min="0.5" max="2" step="0.02" value="1" oninput="rpDJPitch('B',this.value)">
+          <span class="dj-pitch-val" id="rpDJPitchValB">1.00×</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CROSSFADER -->
+    <div class="dj-cf-section">
+      <div class="dj-cf-labels"><span>A</span><span>CROSSFADER</span><span>B</span></div>
+      <input type="range" class="dj-cf" id="rpDJCF" min="0" max="100" value="50" oninput="rpDJCrossfade(this.value)">
+    </div>
+
+    <!-- TRACK LISTE -->
+    <div class="dj-list-header">
+      <span class="dj-list-title">TRACK AUSWÄHLEN</span>
+    </div>
+    <div class="dj-list" id="rpDJList"></div>
   </div>
 
   <!-- EMPTY STATE -->
