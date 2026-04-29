@@ -180,14 +180,20 @@ video{width:100%;max-height:40vh;display:block;object-fit:contain}
 .video-fs-btn:active{background:rgba(212,160,23,0.4)}
 
 /* ── VINYL AREA ────────────────────────────────────────── */
-.vinyl-area{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:8px}
+.vinyl-area{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:8px;position:relative;overflow:hidden;border-radius:12px}
+.vinyl-bg-art{
+  position:absolute;inset:-20px;background-size:cover;background-position:center;
+  filter:blur(24px) brightness(0.25) saturate(1.4);
+  opacity:0;transition:opacity 1.2s;pointer-events:none;z-index:0;
+}
+.vinyl-bg-art.show{opacity:1}
 .vinyl-disc{
   width:min(62vw,300px);height:min(62vw,300px);border-radius:50%;
   background:radial-gradient(circle,#2a2a2a 0%,#111 20%,#1a1a1a 21%,#0d0d0d 35%,#1a1a1a 36%,#0d0d0d 50%,#1a1a1a 51%,#0d0d0d 65%,#1a1a1a 66%,#111 80%,#222 100%);
   position:relative;display:flex;align-items:center;justify-content:center;
   animation:spin 4s linear infinite;animation-play-state:paused;
   box-shadow:0 0 60px rgba(212,160,23,0.12),0 8px 40px rgba(0,0,0,0.8);
-  touch-action:none;
+  touch-action:none;z-index:1;
 }
 .vinyl-disc.playing{animation-play-state:running}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -200,15 +206,20 @@ video{width:100%;max-height:40vh;display:block;object-fit:contain}
   background:linear-gradient(135deg,var(--gold),var(--gold-dark));
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   position:relative;z-index:2;box-shadow:0 0 16px rgba(212,160,23,0.5);
+  overflow:hidden;
+}
+.vinyl-art-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;border-radius:50%;z-index:3;
 }
 .vinyl-label-name{
   font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;
   font-size:clamp(6px,1.8vw,9px);color:#0d0b08;letter-spacing:0.3px;
   max-width:86%;text-align:center;line-height:1.25;
   display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
-  overflow:hidden;word-break:break-all;
+  overflow:hidden;word-break:break-all;z-index:4;position:relative;
 }
-.vinyl-label-dot{font-size:6px;color:#0d0b08;margin-top:2px}
+.vinyl-label-dot{font-size:6px;color:#0d0b08;margin-top:2px;z-index:4;position:relative}
 
 /* ── TRACK INFO ────────────────────────────────────────── */
 .track-info-bar{padding:8px 20px 0;flex-shrink:0;overflow:hidden;cursor:pointer}

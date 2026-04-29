@@ -124,7 +124,8 @@ function rpCloseTrackInfo(){
 }
 
 // ── Web Audio – Mastering Chain ────────────────────────────
-let audioCtx=null,audioSrcNode=null,eqBands=[],compressor=null,limiter=null;
+let audioCtx=null,audioSrcNode=null,eqBands=[],compressor=null,limiter=null,analyser=null,analyserData=null,animFrame=null;
+let coverArtUrl=null;
 
 // Bands: 80Hz  250Hz  1kHz  5kHz  12kHz
 const EQ_TYPES =['lowshelf','peaking','peaking','peaking','highshelf'];
@@ -178,7 +179,45 @@ function initWebAudio(){
     node.connect(compressor);
     compressor.connect(limiter);
     limiter.connect(audioCtx.destination);
+
+    // Analyser als Tap-Point für Visualizer (kein Einfluss auf Klang)
+    analyser=audioCtx.createAnalyser();
+    analyser.fftSize=256;
+    analyser.smoothingTimeConstant=0.82;
+    analyserData=new Uint8Array(analyser.frequencyBinCount);
+    limiter.connect(analyser);
   }catch(e){audioCtx=null}
+}
+
+// ── Cover Art ──────────────────────────────────────────────
+async function loadCoverArt(file){
+  if(coverArtUrl){URL.revokeObjectURL(coverArtUrl);coverArtUrl=null}
+  const img=$('rpVinylArt'),dot=$('rpVinylDot'),name=$('rpVinylLabelName'),bg=$('rpBgArt');
+  img.style.display='none';dot.style.display='';name.style.display='';
+  bg.classList.remove('show');bg.style.backgroundImage='';
+  if(typeof jsmediatags==='undefined')return;
+  const ext_=file.name.split('.').pop().toLowerCase();
+  if(!['mp3','mp4','m4a','aac','ogg','flac'].includes(ext_))return;
+  try{
+    await new Promise((res)=>{
+      jsmediatags.read(file,{
+        onSuccess(tag){
+          const pic=tag.tags.picture;
+          if(!pic){res();return}
+          const blob=new Blob([new Uint8Array(pic.data)],{type:pic.format||'image/jpeg'});
+          coverArtUrl=URL.createObjectURL(blob);
+          img.src=coverArtUrl;
+          img.style.display='block';
+          dot.style.display='none';
+          name.style.display='none';
+          bg.style.backgroundImage=`url(${coverArtUrl})`;
+          bg.classList.add('show');
+          res();
+        },
+        onError(){res()}
+      });
+    });
+  }catch(e){}
 }
 
 function rpSetBass(val){
@@ -365,6 +404,7 @@ function playTrack(pi){
   $('rpVinyl').classList.toggle('playing',!isVid(f.name));
 
   startEq();highlightItem(pi);updateMediaSession(f);
+  loadCoverArt(f);
 }
 
 function onTime(){
@@ -455,10 +495,35 @@ function rpToggleList(){
   if(listOpen){$('rpSearch').value='';searchTerm='';renderList()}
 }
 
-// ── EQ ────────────────────────────────────────────────────
+// ── EQ Visualizer (echt) ───────────────────────────────────
 const EQ_N=12;
-function startEq(){stopEq();eqInterval=setInterval(()=>{for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height=(12+Math.random()*78)+'%'}},130)}
-function stopEq(){clearInterval(eqInterval);for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height='10%'}}
+function startEq(){
+  stopEq();
+  if(analyser){
+    const bins=analyserData.length;
+    const update=()=>{
+      analyser.getByteFrequencyData(analyserData);
+      for(let i=0;i<EQ_N;i++){
+        const b=$('eq'+i);if(!b)continue;
+        const s=Math.floor((i/EQ_N)*bins*0.7);
+        const e=Math.floor(((i+1)/EQ_N)*bins*0.7);
+        let sum=0;for(let j=s;j<e;j++)sum+=analyserData[j];
+        const avg=e>s?sum/(e-s):analyserData[s]||0;
+        b.style.height=Math.max(6,(avg/255)*96)+'%';
+      }
+      animFrame=requestAnimationFrame(update);
+    };
+    update();
+  }else{
+    eqInterval=setInterval(()=>{for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height=(12+Math.random()*78)+'%'}},130);
+  }
+}
+function stopEq(){
+  clearInterval(eqInterval);
+  cancelAnimationFrame(animFrame);
+  animFrame=null;
+  for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height='10%'}
+}
 
 // ── UI update ──────────────────────────────────────────────
 function updateUI(){
