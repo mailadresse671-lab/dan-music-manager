@@ -455,7 +455,8 @@ function rpSetSpeed(v){
 (function(){
   const v=$('rpVinyl');
   let startX=0,startY=0,startT=0;
-  let scratching=false,lastAngle=0,visualRot=0;
+  let scratching=false,lastAngle=0,visualRot=0,lastMoveT=0;
+  let wasPlaying=false,savedRate=1;
 
   function angle(touch){
     const r=v.getBoundingClientRect();
@@ -473,7 +474,7 @@ function rpSetSpeed(v){
   v.addEventListener('touchstart',e=>{
     const t=e.touches[0];
     startX=t.clientX;startY=t.clientY;startT=Date.now();
-    lastAngle=angle(t);
+    lastAngle=angle(t);lastMoveT=Date.now();
     visualRot=currentRotation();
     scratching=false;
   },{passive:true});
@@ -483,22 +484,45 @@ function rpSetSpeed(v){
     const dist=Math.hypot(t.clientX-startX,t.clientY-startY);
     if(!scratching&&dist>6){
       scratching=true;
+      wasPlaying=playing;
+      savedRate=parseFloat(localStorage.getItem('rp_speed')||'1');
+      // Musik abspielen während Scratch (für den Sound)
+      if(media&&media.paused){media.play().catch(()=>{})}
       v.classList.add('scratching');
       v.style.transform=`rotate(${visualRot}deg)`;
     }
     if(!scratching)return;
     e.preventDefault();
+
+    const now=Date.now();
+    const dt=Math.max(1,now-lastMoveT);
     const a=angle(t);
     let delta=a-lastAngle;
     if(delta>180)delta-=360;
     if(delta<-180)delta+=360;
+
+    // Winkelgeschwindigkeit → Playback-Rate (DJ-Sound)
+    const angVel=delta/dt; // Grad pro ms
+    if(delta>0){
+      // Vorwärts: schnell drehen = hoher Ton
+      const rate=Math.max(0.15,Math.min(3.5,Math.abs(angVel)*18));
+      if(media)media.playbackRate=rate;
+    }else if(delta<0){
+      // Rückwärts: tiefer Ton + manuell zurückspulen
+      const rate=Math.max(0.05,Math.min(0.5,Math.abs(angVel)*8));
+      if(media)media.playbackRate=rate;
+    }else{
+      if(media)media.playbackRate=0.05;
+    }
+
+    // Visuell + Seek
     visualRot+=delta;
     v.style.transform=`rotate(${visualRot}deg)`;
-    // Scrub: 1 Umdrehung = 4 Sekunden Audio
-    if(media&&media.duration){
-      media.currentTime=Math.max(0,Math.min(media.duration,media.currentTime+(delta/360)*4));
+    if(media&&media.duration&&delta<0){
+      media.currentTime=Math.max(0,media.currentTime+(delta/360)*4);
     }
-    lastAngle=a;
+
+    lastAngle=a;lastMoveT=now;
   },{passive:false});
 
   v.addEventListener('touchend',e=>{
@@ -508,6 +532,9 @@ function rpSetSpeed(v){
       scratching=false;
       v.classList.remove('scratching');
       v.style.transform='';
+      // Playback-Rate wiederherstellen
+      if(media)media.playbackRate=savedRate;
+      if(!wasPlaying&&media){media.pause();playing=false;updateUI()}
     } else if(Math.abs(dx)<20&&Math.abs(dy)<20&&dt<300){
       rpTogglePlay();
     } else if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){
