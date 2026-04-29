@@ -806,6 +806,27 @@ function rpDJChanVol(deck,val){
   if(el)el.volume=Math.max(0,Math.min(1,parseFloat(val)));
 }
 
+let djKills={A:{hi:false,mid:false,lo:false},B:{hi:false,mid:false,lo:false}};
+
+function rpDJKill(deck,band){
+  djKills[deck][band]=!djKills[deck][band];
+  const id='rpDJKill'+band.charAt(0).toUpperCase()+band.slice(1)+deck;
+  $(id)?.classList.toggle('killed',djKills[deck][band]);
+  rpToast('Kill '+band.toUpperCase()+' '+deck+': '+(djKills[deck][band]?'AN':'AUS'));
+}
+
+function rpDJSync(deck){
+  const src=deck==='A'?djElA:djElB;
+  const ref=deck==='A'?djElB:djElA;
+  if(!src||!ref||!ref.src)return;
+  const refRate=ref.playbackRate||1;
+  src.playbackRate=refRate;
+  const pct=Math.round((refRate-1)*100);
+  $('rpDJPitchVal'+deck).textContent=(pct>0?'+':'')+pct+'%';
+  $('rpDJPitch'+deck).value=refRate;
+  rpToast('Deck '+deck+' SYNC → '+(pct>0?'+':'')+pct+'%');
+}
+
 function rpDJLoop(deck){
   if(deck==='A'){
     djLoopA=!djLoopA;

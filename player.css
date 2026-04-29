@@ -448,359 +448,271 @@ video{width:100%;max-height:40vh;display:block;object-fit:contain}
 /* ── VIDEO FULLSCREEN ──────────────────────────────────── */
 video:fullscreen,video:-webkit-full-screen{width:100vw;height:100vh;object-fit:contain;background:#000}
 
-/* ── DJ LAUNCH BUTTON (neben Schallplatte) ──────────────── */
+/* ── DJ LAUNCH BUTTON ──────────────────────────────────── */
 .dj-launch-btn{
   position:absolute;top:10px;left:10px;z-index:10;
   display:flex;flex-direction:column;align-items:center;gap:2px;
   padding:7px 10px;
-  background:rgba(5,0,8,0.85);
-  border:1px solid #aa00ff;
-  border-radius:10px;
-  color:#cc88ff;
+  background:rgba(8,4,0,0.88);
+  border:1px solid rgba(180,130,0,0.55);
+  border-radius:8px;
+  color:#c8a030;
   font-family:'Bebas Neue',sans-serif;
   font-size:10px;letter-spacing:2px;
   cursor:pointer;
-  box-shadow:0 0 12px rgba(170,0,255,0.35), inset 0 0 8px rgba(170,0,255,0.1);
+  box-shadow:0 0 10px rgba(180,130,0,0.25), inset 0 0 6px rgba(180,130,0,0.08);
   transition:all 0.2s;
 }
 .dj-launch-btn:active{
-  background:rgba(170,0,255,0.25);
-  box-shadow:0 0 24px rgba(170,0,255,0.7);
+  background:rgba(180,120,0,0.2);
+  box-shadow:0 0 20px rgba(200,150,0,0.5);
   transform:scale(0.95);
 }
 
-/* ── DJ OVERLAY – 90s UNDERGROUND CLUB ──────────────────── */
+/* ── DJ OVERLAY – COMPTON AFTERMATH STUDIOS ─────────────── */
 @keyframes djRoomEnter{
-  0%{opacity:0;transform:scale(1.06)}
-  100%{opacity:1;transform:scale(1)}
+  0%{opacity:0;transform:scale(1.04) translateY(8px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
 }
-@keyframes djLightPulse1{
-  0%,100%{transform:translate(0,0) scale(1);opacity:0.55}
-  40%{transform:translate(20px,-15px) scale(1.3);opacity:0.75}
-  70%{transform:translate(-10px,20px) scale(0.85);opacity:0.45}
-}
-@keyframes djLightPulse2{
-  0%,100%{transform:translate(0,0) scale(1);opacity:0.5}
-  30%{transform:translate(-25px,10px) scale(1.2);opacity:0.7}
-  65%{transform:translate(15px,-25px) scale(0.9);opacity:0.4}
-}
-@keyframes djLightPulse3{
-  0%,100%{transform:translate(0,0) scale(1);opacity:0.45}
-  50%{transform:translate(10px,20px) scale(1.4);opacity:0.65}
-}
+@keyframes djSpGlow{0%,100%{opacity:0.5;transform:scale(1)}50%{opacity:0.75;transform:scale(1.1)}}
 
 .dj-overlay{
   position:fixed;inset:0;z-index:300;
-  background:#030006;
+  background:#060402;
   display:flex;flex-direction:column;overflow:hidden;
-  animation:djRoomEnter 0.55s cubic-bezier(0.16,1,0.3,1) forwards;
+  animation:djRoomEnter 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
 }
 
-/* Neon-Gitter Boden */
-.dj-club-bg{
+/* Holz-Maserung Hintergrund */
+.dj-studio-bg{
   position:absolute;inset:0;pointer-events:none;z-index:0;
-  background-image:
-    linear-gradient(rgba(100,0,180,0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(100,0,180,0.12) 1px, transparent 1px);
-  background-size:32px 32px;
-  background-position:center center;
+  background:
+    repeating-linear-gradient(88deg,transparent,transparent 3px,rgba(0,0,0,0.06) 3px,rgba(0,0,0,0.06) 5px),
+    repeating-linear-gradient(0deg,transparent,transparent 80px,rgba(160,100,0,0.025) 80px,rgba(160,100,0,0.025) 82px),
+    linear-gradient(180deg,#100804 0%,#080502 60%,#060302 100%);
 }
 
-/* Animierte Lichter */
-.dj-club-lights{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden}
-.dj-light{position:absolute;border-radius:50%;filter:blur(55px)}
-.dj-light-1{
-  width:260px;height:260px;top:-60px;left:-40px;
-  background:radial-gradient(circle,rgba(255,0,100,0.55),transparent 70%);
-  animation:djLightPulse1 6s ease-in-out infinite;
-}
-.dj-light-2{
-  width:220px;height:220px;top:-40px;right:-30px;
-  background:radial-gradient(circle,rgba(0,200,255,0.5),transparent 70%);
-  animation:djLightPulse2 7.5s ease-in-out infinite;
-}
-.dj-light-3{
-  width:200px;height:200px;bottom:80px;left:50%;margin-left:-100px;
-  background:radial-gradient(circle,rgba(120,0,255,0.45),transparent 70%);
-  animation:djLightPulse3 5s ease-in-out infinite;
-}
+/* Studio-Spotlights (warmes Amber/Gold) */
+.dj-sp{position:absolute;border-radius:50%;filter:blur(65px);pointer-events:none;z-index:1}
+.dj-sp1{width:220px;height:220px;top:-70px;left:8%;background:radial-gradient(circle,rgba(200,130,0,0.28),transparent 70%);animation:djSpGlow 7s ease-in-out infinite}
+.dj-sp2{width:200px;height:200px;top:-70px;right:8%;background:radial-gradient(circle,rgba(180,60,10,0.22),transparent 70%);animation:djSpGlow 9s ease-in-out infinite 2s}
 
 /* Top-Bar */
 .dj-topbar{
   position:relative;z-index:10;
   display:flex;align-items:center;justify-content:space-between;
   padding:8px 14px;
-  background:rgba(0,0,0,0.7);
-  border-bottom:1px solid rgba(170,0,255,0.4);
+  background:linear-gradient(180deg,rgba(20,10,0,0.95),rgba(10,5,0,0.88));
+  border-bottom:1px solid rgba(160,110,0,0.4);
   flex-shrink:0;
 }
 .dj-title{
-  font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;
-  background:linear-gradient(90deg,#ff0066,#aa00ff,#00ffff,#aa00ff,#ff0066);
-  background-size:200%;
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:gradShift 4s linear infinite;
+  font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;
+  color:#c8a020;
+  text-shadow:0 0 12px rgba(200,160,0,0.4),0 1px 0 rgba(0,0,0,0.8);
 }
-@keyframes gradShift{0%{background-position:0%}100%{background-position:200%}}
 .dj-close{
-  background:none;border:1px solid rgba(255,0,80,0.5);
-  color:#ff4466;padding:4px 12px;border-radius:6px;
+  background:rgba(100,40,0,0.4);border:1px solid rgba(180,80,0,0.5);
+  color:#d4802a;padding:4px 12px;border-radius:6px;
   font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;cursor:pointer;
+  transition:all 0.15s;
 }
-.dj-close:active{background:rgba(255,0,80,0.2)}
+.dj-close:active{background:rgba(180,80,0,0.3)}
 
-/* DJ-Tisch (Draufsicht) */
+/* DJ-Tisch */
 .dj-table{
   position:relative;z-index:5;
-  display:flex;align-items:flex-start;gap:6px;
-  padding:8px 6px 4px;flex-shrink:0;
+  display:flex;align-items:flex-start;gap:5px;
+  padding:8px 5px 4px;flex-shrink:0;
   background:
-    linear-gradient(180deg,rgba(20,10,35,0.95),rgba(10,5,20,0.98));
-  border-bottom:1px solid rgba(120,0,200,0.3);
+    repeating-linear-gradient(87deg,transparent,transparent 2px,rgba(0,0,0,0.05) 2px,rgba(0,0,0,0.05) 4px),
+    linear-gradient(180deg,rgba(25,12,2,0.97),rgba(14,7,1,0.99));
+  border-bottom:1px solid rgba(140,90,0,0.3);
 }
 
-/* Turntable */
+/* Turntable – kein overflow:hidden damit SVG-Arm sichtbar ist */
 .dj-turntable{
   flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
-  background:linear-gradient(180deg,rgba(20,12,40,0.9),rgba(10,6,22,0.95));
-  border:1px solid rgba(100,0,160,0.35);
-  border-radius:10px;padding:6px 4px;
-  min-width:0;
+  background:
+    repeating-linear-gradient(87deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px),
+    linear-gradient(180deg,#1e0e04,#130804);
+  border:1px solid rgba(140,90,0,0.28);
+  border-radius:8px;padding:5px 4px;
+  min-width:0;overflow:visible;
 }
 .dj-tt-label{
   font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;
-  color:#aa44ff;text-shadow:0 0 8px rgba(170,68,255,0.7);
+  color:#c8a020;text-shadow:0 0 6px rgba(200,160,0,0.35);
 }
 
-/* Platter + Tonearm Container */
-.dj-platter-wrap{position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* Platter-Wrapper – muss overflow:visible haben */
+.dj-platter-wrap{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  overflow:visible;flex-shrink:0;
+}
 
-/* Vinyl Schallplatte (Draufsicht) */
+/* Vinyl */
 .dj-vinyl{
-  width:min(36vw,130px);height:min(36vw,130px);border-radius:50%;
-  background:
-    radial-gradient(circle at 50% 50%,
-      #1a0a00 0%, #000 12%,
-      #110808 13%, #050202 28%,
-      #110808 29%, #050202 44%,
-      #110808 45%, #050202 60%,
-      #110808 61%, #050202 75%,
-      #181010 76%, #222 100%);
+  width:min(34vw,126px);height:min(34vw,126px);border-radius:50%;
+  background:radial-gradient(circle at 50% 50%,
+    #1e0c02 0%,#040100 10%,
+    #140800 11%,#030100 26%,
+    #140800 27%,#030100 42%,
+    #140800 43%,#030100 58%,
+    #140800 59%,#030100 73%,
+    #1e1204 74%,#2a1a08 100%);
   position:relative;display:flex;align-items:center;justify-content:center;
-  animation:spin 2.8s linear infinite;animation-play-state:paused;
-  box-shadow:0 0 0 2px #1a0a20,0 0 20px rgba(180,0,255,0.2),0 4px 20px rgba(0,0,0,0.9);
+  animation:spin 3s linear infinite;animation-play-state:paused;
+  box-shadow:0 0 0 2px #2a1500,0 0 16px rgba(180,100,0,0.12),0 4px 20px rgba(0,0,0,0.95);
   touch-action:none;cursor:grab;flex-shrink:0;z-index:2;
 }
 .dj-vinyl.playing{
   animation-play-state:running;
-  box-shadow:0 0 0 2px #330066,0 0 30px rgba(180,0,255,0.5),0 4px 20px rgba(0,0,0,0.9);
+  box-shadow:0 0 0 2px #5a3008,0 0 28px rgba(200,120,0,0.3),0 4px 20px rgba(0,0,0,0.9);
 }
 .dj-vinyl.scratching{animation:none!important;cursor:grabbing}
 
 /* Rillen */
-.dj-vg{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,0.04);pointer-events:none}
+.dj-vg{position:absolute;border-radius:50%;border:1px solid rgba(255,200,100,0.04);pointer-events:none}
 .dj-vg1{width:88%;height:88%}
 .dj-vg2{width:72%;height:72%}
 .dj-vg3{width:56%;height:56%}
 .dj-vg4{width:40%;height:40%}
 
-/* Vinyl-Label (Mitte) */
+/* Label */
 .dj-vlbl{
-  width:28%;height:28%;border-radius:50%;
-  background:radial-gradient(circle at 40% 35%,#cc0033,#660011);
+  width:29%;height:29%;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,#991100,#4a0800);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 8px rgba(200,0,50,0.6),inset 0 0 6px rgba(0,0,0,0.5);
-  font-family:'Bebas Neue',sans-serif;font-size:10px;color:rgba(255,200,200,0.8);
-  letter-spacing:0.5px;text-align:center;padding:2px;position:relative;z-index:2;
+  box-shadow:0 0 8px rgba(180,0,20,0.5),inset 0 0 5px rgba(0,0,0,0.6);
+  font-family:'Bebas Neue',sans-serif;font-size:9px;
+  color:rgba(255,200,180,0.75);letter-spacing:0.5px;
+  text-align:center;padding:2px;position:relative;z-index:2;
 }
-.dj-vlbl span{
-  display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  max-width:90%;font-size:8px;
+.dj-vlbl span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90%;font-size:7px}
+
+/* ── SVG TONEARM ─────────────────────────────────────────── */
+.dj-arm{
+  position:absolute;z-index:12;pointer-events:none;overflow:visible;
+}
+/* Deck A: Pivot oben-rechts, Arm zeigt nach links-unten */
+.dj-arm-a{
+  top:-8px;right:-26px;
+  width:58px;height:96px;
+  filter:drop-shadow(1px 2px 4px rgba(0,0,0,0.9));
+}
+/* Deck B: Pivot oben-links (SVG intern gespiegelt) */
+.dj-arm-b{
+  top:-8px;left:-26px;
+  width:58px;height:96px;
+  filter:drop-shadow(-1px 2px 4px rgba(0,0,0,0.9));
 }
 
-/* ── TONEARM (Draufsicht) ───────────────────────────────── */
-/* Deck A: Tonearm kommt von rechts, Pivot oben-rechts außerhalb */
-.dj-tonearm{position:absolute;pointer-events:none;z-index:8}
-.dj-tonearm-a{top:-6px;right:-22px;width:52px;height:72px}
-.dj-tonearm-b{top:-6px;left:-22px;width:52px;height:72px;transform:scaleX(-1)}
-
-.dj-ta-pivot{
-  position:absolute;top:0;right:0;
-  width:13px;height:13px;border-radius:50%;
-  background:radial-gradient(circle at 35% 35%,#d4d0bc,#6a6858);
-  box-shadow:0 0 5px rgba(0,0,0,0.9),0 2px 4px rgba(0,0,0,0.7);
-  z-index:3;
-}
-.dj-ta-pivot::after{
-  content:'';position:absolute;inset:3px;border-radius:50%;
-  background:radial-gradient(circle at 40% 40%,rgba(255,255,255,0.4),transparent);
-}
-
-.dj-ta-arm{
-  position:absolute;top:6px;right:5px;
-  width:2.5px;height:58px;
-  background:linear-gradient(180deg,#c8c4b0,#888878,#aaa898);
-  border-radius:2px;
-  box-shadow:1px 0 3px rgba(0,0,0,0.7);
-  transform-origin:top center;
-  transform:rotate(-20deg);
-}
-
-.dj-ta-head{
-  position:absolute;bottom:4px;right:-1px;
-  width:13px;height:5px;
-  background:linear-gradient(135deg,#bbb8a4,#68685a);
-  border-radius:2px;
-  box-shadow:0 1px 3px rgba(0,0,0,0.7);
-  transform:rotate(70deg);
-}
-
-.dj-ta-needle{
-  position:absolute;bottom:1px;right:2px;
-  width:3px;height:3px;border-radius:50%;
-  background:#ff3300;
-  box-shadow:0 0 4px rgba(255,50,0,0.9);
-}
-
-/* Track Meta (Zeit + BPM) */
-.dj-tt-meta{
-  display:flex;justify-content:space-between;width:100%;
-  padding:0 4px;
-}
-.dj-tt-time{
-  font-family:'Bebas Neue',sans-serif;font-size:12px;color:#00ffaa;
-  letter-spacing:1px;text-shadow:0 0 6px rgba(0,255,170,0.5);
-}
-.dj-tt-bpm{
-  font-family:'Bebas Neue',sans-serif;font-size:10px;color:#ff6688;
-  letter-spacing:1px;
-}
+/* Track Meta */
+.dj-tt-meta{display:flex;justify-content:space-between;width:100%;padding:0 3px}
+.dj-tt-time{font-family:'Bebas Neue',sans-serif;font-size:12px;color:#50e0a0;letter-spacing:1px;text-shadow:0 0 5px rgba(60,200,130,0.45)}
+.dj-tt-bpm{font-family:'Bebas Neue',sans-serif;font-size:10px;color:#d44422;letter-spacing:1px}
 
 /* Deck-Buttons */
-.dj-tt-ctrl{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
+.dj-tt-ctrl{display:flex;gap:3px;flex-wrap:wrap;justify-content:center}
 .dj-tc{
-  padding:4px 7px;border-radius:6px;
-  background:rgba(20,5,40,0.9);
-  border:1px solid rgba(120,0,200,0.5);
-  color:#bb88ff;
-  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;cursor:pointer;
+  padding:4px 6px;border-radius:5px;
+  background:rgba(25,12,2,0.9);
+  border:1px solid rgba(140,90,0,0.45);
+  color:#c8a020;
+  font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:1px;cursor:pointer;
   transition:all 0.15s;
 }
-.dj-tc:active{background:rgba(120,0,200,0.3);border-color:#aa00ff}
-.dj-tc-play{background:rgba(0,200,120,0.15);border-color:#00cc77;color:#00ffaa;min-width:34px}
-.dj-tc-play.playing-state{background:rgba(255,80,0,0.15);border-color:#ff5500;color:#ff7733}
-.dj-tc.loop-active{background:rgba(255,200,0,0.15);border-color:#ffcc00;color:#ffcc00}
+.dj-tc:active{background:rgba(160,100,0,0.25);border-color:#c8a020}
+.dj-tc-play{background:rgba(0,80,40,0.3);border-color:#00a050;color:#00cc66;min-width:34px}
+.dj-tc-play.playing-state{background:rgba(180,50,0,0.25);border-color:#cc4400;color:#ff6622}
+.dj-tc.loop-active{background:rgba(200,160,0,0.2);border-color:#c8a020;color:#f0c030}
+.dj-tc-sync{background:rgba(0,60,120,0.3);border-color:#0066cc;color:#44aaff}
+.dj-tc-sync:active{background:rgba(0,80,180,0.3)}
 
 /* Pitch */
 .dj-pitch-row{display:flex;align-items:center;gap:4px;width:100%}
-.dj-pitch-lbl{font-size:8px;color:#6644aa;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:28px}
-.dj-pitch{flex:1;-webkit-appearance:none;height:2px;border-radius:2px;background:rgba(100,0,180,0.4);cursor:pointer}
-.dj-pitch::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:#aa00ff;cursor:pointer;box-shadow:0 0 5px rgba(170,0,255,0.7)}
-.dj-pitch-val{font-size:9px;color:#aa66ff;min-width:28px;text-align:right;font-family:'Bebas Neue',sans-serif}
+.dj-pitch-lbl{font-size:8px;color:#7a5010;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:26px}
+.dj-pitch{flex:1;-webkit-appearance:none;height:2px;border-radius:2px;background:rgba(140,80,0,0.3);cursor:pointer}
+.dj-pitch::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:#c8a020;cursor:pointer;box-shadow:0 0 5px rgba(200,160,0,0.5)}
+.dj-pitch-val{font-size:9px;color:#a08020;min-width:26px;text-align:right;font-family:'Bebas Neue',sans-serif}
 
-/* Hot Cue Buttons */
-.dj-hotcue-row{display:flex;gap:4px;justify-content:center}
+/* EQ Kill Buttons */
+.dj-kill-row{display:flex;gap:3px;justify-content:center;align-items:center}
+.dj-kill{
+  padding:3px 7px;border-radius:4px;
+  background:rgba(20,10,2,0.8);border:1px solid rgba(140,90,0,0.4);
+  color:#a07820;font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;
+  transition:all 0.15s;
+}
+.dj-kill:active,.dj-kill.killed{
+  background:rgba(180,30,0,0.35);border-color:#cc2200;color:#ff4422;
+  box-shadow:0 0 6px rgba(200,0,0,0.35);
+}
+
+/* Hot Cue */
+.dj-hotcue-row{display:flex;gap:3px;justify-content:center}
 .dj-hc{
   padding:3px 8px;border-radius:4px;
-  background:rgba(255,60,0,0.12);
-  border:1px solid rgba(255,80,0,0.4);
-  color:#ff6622;
-  font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;
+  background:rgba(150,80,0,0.15);border:1px solid rgba(180,100,0,0.38);
+  color:#b07818;font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;
 }
-.dj-hc:active{background:rgba(255,80,0,0.35)}
-.dj-hc.set{background:rgba(255,80,0,0.3);border-color:#ff5500;color:#ffaa44}
+.dj-hc:active{background:rgba(200,120,0,0.25)}
+.dj-hc.set{background:rgba(200,140,0,0.3);border-color:#c8a020;color:#f0c030}
 
 /* ── MIXER ───────────────────────────────────────────────── */
 .dj-mixer{
-  width:min(22vw,80px);flex-shrink:0;
-  display:flex;flex-direction:column;align-items:center;gap:5px;
-  background:linear-gradient(180deg,rgba(12,5,25,0.95),rgba(8,3,18,0.98));
-  border:1px solid rgba(0,200,255,0.2);
-  border-radius:10px;padding:6px 4px;
+  width:min(21vw,78px);flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:
+    repeating-linear-gradient(87deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px),
+    linear-gradient(180deg,#160b01,#0e0600);
+  border:1px solid rgba(140,90,0,0.3);border-radius:8px;padding:5px 4px;
 }
-.dj-mixer-label{
-  font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:3px;
-  color:#00ccff;text-shadow:0 0 6px rgba(0,200,255,0.6);
-}
+.dj-mixer-label{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:3px;color:#c8a020;text-shadow:0 0 5px rgba(200,160,0,0.35)}
 
 /* VU Meter */
-.dj-vu-pair{display:flex;gap:4px;align-items:flex-end}
+.dj-vu-pair{display:flex;gap:4px}
 .dj-vu-col{display:flex;flex-direction:column;align-items:center;gap:2px}
-.dj-vu-bar{
-  display:flex;flex-direction:column-reverse;gap:1.5px;
-  width:12px;height:60px;justify-content:flex-start;
-}
-.dj-vs{
-  height:5px;border-radius:1px;flex-shrink:0;
-  background:rgba(0,200,100,0.15);
-  transition:background 0.08s;
-}
-.dj-vs.active{background:#00cc66;box-shadow:0 0 3px rgba(0,200,100,0.6)}
-.dj-vs-red{background:rgba(255,0,60,0.15)}
-.dj-vs-red.active{background:#ff0040;box-shadow:0 0 3px rgba(255,0,60,0.8)}
-.dj-vu-lbl{font-family:'Bebas Neue',sans-serif;font-size:9px;color:#336655;letter-spacing:1px}
+.dj-vu-bar{display:flex;flex-direction:column-reverse;gap:1.5px;width:12px;height:58px;justify-content:flex-start}
+.dj-vs{height:5px;border-radius:1px;flex-shrink:0;background:rgba(0,150,60,0.12);transition:background 0.07s}
+.dj-vs.active{background:#00aa44;box-shadow:0 0 3px rgba(0,160,60,0.55)}
+.dj-vs-red{background:rgba(200,40,0,0.1)}
+.dj-vs-red.active{background:#cc2200;box-shadow:0 0 3px rgba(200,40,0,0.7)}
+.dj-vu-lbl{font-family:'Bebas Neue',sans-serif;font-size:8px;color:#5a4010;letter-spacing:1px}
 
 /* Channel Faders */
 .dj-ch-faders{display:flex;gap:8px;align-items:flex-end;justify-content:center}
 .dj-ch-col{display:flex;flex-direction:column;align-items:center;gap:3px}
-.dj-ch-lbl{font-family:'Bebas Neue',sans-serif;font-size:9px;color:#6644aa;letter-spacing:1px}
+.dj-ch-lbl{font-family:'Bebas Neue',sans-serif;font-size:9px;color:#7a5010;letter-spacing:1px}
 .dj-ch-fader{
   -webkit-appearance:none;appearance:none;
   writing-mode:vertical-lr;direction:rtl;
-  width:20px;height:55px;
-  background:rgba(80,0,150,0.25);
-  border-radius:10px;cursor:pointer;outline:none;
+  width:20px;height:52px;
+  background:rgba(120,70,0,0.2);border-radius:10px;cursor:pointer;outline:none;
 }
 .dj-ch-fader::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  width:18px;height:10px;border-radius:4px;
-  background:linear-gradient(90deg,#cc88ff,#8833cc);
-  cursor:pointer;
-  box-shadow:0 0 5px rgba(170,80,255,0.5);
+  -webkit-appearance:none;width:18px;height:10px;border-radius:4px;
+  background:linear-gradient(90deg,#d4a830,#7a5010);
+  cursor:pointer;box-shadow:0 0 5px rgba(180,130,0,0.4);
 }
 
 /* Crossfader */
 .dj-cf-wrap{width:100%}
-.dj-cf-lbl{
-  display:flex;justify-content:space-between;
-  font-family:'Bebas Neue',sans-serif;font-size:9px;color:#334466;letter-spacing:1px;
-  margin-bottom:3px;
-}
-.dj-cf{
-  width:100%;-webkit-appearance:none;
-  height:8px;border-radius:4px;cursor:pointer;outline:none;
-  background:linear-gradient(90deg,#00ccff,#8800ff,#ff0066);
-}
-.dj-cf::-webkit-slider-thumb{
-  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
-  background:#eeeeee;box-shadow:0 2px 8px rgba(0,0,0,0.6);cursor:grab;
-}
+.dj-cf-lbl{display:flex;justify-content:space-between;font-family:'Bebas Neue',sans-serif;font-size:9px;color:#5a3808;letter-spacing:1px;margin-bottom:3px}
+.dj-cf{width:100%;-webkit-appearance:none;height:7px;border-radius:4px;cursor:pointer;outline:none;background:linear-gradient(90deg,#c8a020,#502000,#c8a020)}
+.dj-cf::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#e8d880,#a08020);box-shadow:0 2px 8px rgba(0,0,0,0.7);cursor:grab}
 
 /* ── TRACK LISTE ─────────────────────────────────────────── */
 .dj-list-hdr{
-  position:relative;z-index:5;
-  padding:5px 14px 3px;flex-shrink:0;
-  border-top:1px solid rgba(100,0,180,0.3);
-  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;
-  color:#6633aa;
+  position:relative;z-index:5;padding:5px 14px 3px;flex-shrink:0;
+  border-top:1px solid rgba(140,90,0,0.25);
+  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:#6a4a10;
 }
-.dj-list{
-  position:relative;z-index:5;
-  flex:1;overflow-y:auto;padding:2px 8px 8px;
-  -webkit-overflow-scrolling:touch;
-}
-.dj-list-item{
-  display:flex;align-items:center;gap:6px;padding:7px 8px;
-  border-radius:6px;border-bottom:1px solid rgba(80,0,120,0.2);cursor:pointer;
-}
-.dj-list-item:active{background:rgba(100,0,180,0.15)}
-.dj-list-item-name{
-  flex:1;font-size:11px;color:#ccaaff;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-.dj-load-btn{
-  padding:3px 8px;border:1px solid rgba(0,200,255,0.4);border-radius:5px;
-  background:rgba(0,150,200,0.1);color:#00ccff;
-  font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:1px;cursor:pointer;flex-shrink:0;
-}
-.dj-load-btn:active{background:rgba(0,200,255,0.25)}
+.dj-list{position:relative;z-index:5;flex:1;overflow-y:auto;padding:2px 8px 8px;-webkit-overflow-scrolling:touch}
+.dj-list-item{display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:6px;border-bottom:1px solid rgba(100,60,0,0.2);cursor:pointer}
+.dj-list-item:active{background:rgba(140,80,0,0.15)}
+.dj-list-item-name{flex:1;font-size:11px;color:#c8a060;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dj-load-btn{padding:3px 8px;border:1px solid rgba(160,110,0,0.45);border-radius:5px;background:rgba(120,70,0,0.15);color:#c8a020;font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:1px;cursor:pointer;flex-shrink:0}
+.dj-load-btn:active{background:rgba(180,120,0,0.3)}

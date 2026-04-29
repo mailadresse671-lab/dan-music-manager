@@ -48,21 +48,17 @@
     <button class="header-load-btn" onclick="rpPickRootFolder()">📂</button>
   </div>
 
-  <!-- DJ MODE OVERLAY – 90s UNDERGROUND CLUB -->
+  <!-- DJ MODE OVERLAY – COMPTON AFTERMATH STUDIOS -->
   <div class="dj-overlay" id="rpDJOverlay" style="display:none">
-    <div class="dj-club-bg"></div>
-    <div class="dj-club-lights">
-      <div class="dj-light dj-light-1"></div>
-      <div class="dj-light dj-light-2"></div>
-      <div class="dj-light dj-light-3"></div>
-    </div>
+    <div class="dj-studio-bg"></div>
+    <div class="dj-sp dj-sp1"></div>
+    <div class="dj-sp dj-sp2"></div>
 
     <div class="dj-topbar">
-      <div class="dj-title">⬡ UNDERGROUND · DJ BOOTH · 1994 ⬡</div>
+      <div class="dj-title">COMPTON · AFTERMATH STUDIOS · '94</div>
       <button class="dj-close" onclick="rpCloseDJ()">✕ EXIT</button>
     </div>
 
-    <!-- DJ TISCH (Draufsicht von oben) -->
     <div class="dj-table">
 
       <!-- TURNTABLE A -->
@@ -73,19 +69,29 @@
             ontouchstart="rpDJScratchStart(event,'A')"
             ontouchmove="rpDJScratchMove(event,'A')"
             ontouchend="rpDJScratchEnd(event,'A')">
-            <div class="dj-vg dj-vg1"></div>
-            <div class="dj-vg dj-vg2"></div>
-            <div class="dj-vg dj-vg3"></div>
-            <div class="dj-vg dj-vg4"></div>
+            <div class="dj-vg dj-vg1"></div><div class="dj-vg dj-vg2"></div>
+            <div class="dj-vg dj-vg3"></div><div class="dj-vg dj-vg4"></div>
             <div class="dj-vlbl"><span id="rpDJNameA">A</span></div>
           </div>
-          <!-- TONEARM A -->
-          <div class="dj-tonearm dj-tonearm-a" id="rpDJTonearmA">
-            <div class="dj-ta-pivot"></div>
-            <div class="dj-ta-arm"></div>
-            <div class="dj-ta-head"></div>
-            <div class="dj-ta-needle"></div>
-          </div>
+          <!-- SVG TONEARM A: Pivot oben-rechts, Nadel berührt äußere Rille -->
+          <svg class="dj-arm dj-arm-a" id="rpDJTonearmA" viewBox="0 0 58 96" xmlns="http://www.w3.org/2000/svg">
+            <line x1="49" y1="7" x2="11" y2="79" stroke="#c8a850" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="49" y1="7" x2="46" y2="24" stroke="#a08030" stroke-width="1.2" stroke-dasharray="2,2" opacity="0.6"/>
+            <circle cx="49" cy="7" r="8.5" fill="url(#pivGrad)" stroke="#7a6020" stroke-width="1.5"/>
+            <circle cx="49" cy="7" r="3.5" fill="#4a3810"/>
+            <circle cx="46" cy="5" r="1.8" fill="rgba(255,230,140,0.5)"/>
+            <g transform="translate(11,79) rotate(-56)">
+              <rect x="-8" y="-3.5" width="17" height="7" rx="2" fill="#b89840" stroke="#7a6020" stroke-width="0.8"/>
+            </g>
+            <circle cx="11" cy="79" r="4" fill="#cc1100"/>
+            <circle cx="11" cy="79" r="2" fill="#ff5533"/>
+            <defs>
+              <radialGradient id="pivGrad" cx="35%" cy="35%">
+                <stop offset="0%" stop-color="#e0c870"/>
+                <stop offset="100%" stop-color="#7a6020"/>
+              </radialGradient>
+            </defs>
+          </svg>
         </div>
         <div class="dj-tt-meta">
           <span class="dj-tt-time" id="rpDJTimeA">0:00</span>
@@ -102,10 +108,16 @@
           <input type="range" class="dj-pitch" id="rpDJPitchA" min="0.5" max="2" step="0.02" value="1" oninput="rpDJPitch('A',this.value)">
           <span class="dj-pitch-val" id="rpDJPitchValA">±0%</span>
         </div>
+        <div class="dj-kill-row">
+          <button class="dj-kill" id="rpDJKillHiA" onclick="rpDJKill('A','hi')">HI</button>
+          <button class="dj-kill" id="rpDJKillMidA" onclick="rpDJKill('A','mid')">MID</button>
+          <button class="dj-kill" id="rpDJKillLoA" onclick="rpDJKill('A','lo')">LO</button>
+          <button class="dj-tc dj-tc-sync" onclick="rpDJSync('A')">SYNC</button>
+        </div>
         <div class="dj-hotcue-row">
-          <button class="dj-hc" onclick="rpDJHotCue('A',0)">H1</button>
-          <button class="dj-hc" onclick="rpDJHotCue('A',1)">H2</button>
-          <button class="dj-hc" onclick="rpDJHotCue('A',2)">H3</button>
+          <button class="dj-hc" id="rpDJHc0A" onclick="rpDJHotCue('A',0)">H1</button>
+          <button class="dj-hc" id="rpDJHc1A" onclick="rpDJHotCue('A',1)">H2</button>
+          <button class="dj-hc" id="rpDJHc2A" onclick="rpDJHotCue('A',2)">H3</button>
         </div>
       </div>
 
@@ -146,7 +158,7 @@
         </div>
       </div>
 
-      <!-- TURNTABLE B (gespiegelt) -->
+      <!-- TURNTABLE B -->
       <div class="dj-turntable">
         <div class="dj-tt-label">DECK B</div>
         <div class="dj-platter-wrap">
@@ -154,19 +166,23 @@
             ontouchstart="rpDJScratchStart(event,'B')"
             ontouchmove="rpDJScratchMove(event,'B')"
             ontouchend="rpDJScratchEnd(event,'B')">
-            <div class="dj-vg dj-vg1"></div>
-            <div class="dj-vg dj-vg2"></div>
-            <div class="dj-vg dj-vg3"></div>
-            <div class="dj-vg dj-vg4"></div>
+            <div class="dj-vg dj-vg1"></div><div class="dj-vg dj-vg2"></div>
+            <div class="dj-vg dj-vg3"></div><div class="dj-vg dj-vg4"></div>
             <div class="dj-vlbl"><span id="rpDJNameB">B</span></div>
           </div>
-          <!-- TONEARM B (gespiegelt) -->
-          <div class="dj-tonearm dj-tonearm-b" id="rpDJTonearmB">
-            <div class="dj-ta-pivot"></div>
-            <div class="dj-ta-arm"></div>
-            <div class="dj-ta-head"></div>
-            <div class="dj-ta-needle"></div>
-          </div>
+          <!-- SVG TONEARM B: gespiegelt (Pivot oben-links) -->
+          <svg class="dj-arm dj-arm-b" id="rpDJTonearmB" viewBox="0 0 58 96" xmlns="http://www.w3.org/2000/svg">
+            <line x1="9" y1="7" x2="47" y2="79" stroke="#c8a850" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="9" y1="7" x2="12" y2="24" stroke="#a08030" stroke-width="1.2" stroke-dasharray="2,2" opacity="0.6"/>
+            <circle cx="9" cy="7" r="8.5" fill="url(#pivGrad)" stroke="#7a6020" stroke-width="1.5"/>
+            <circle cx="9" cy="7" r="3.5" fill="#4a3810"/>
+            <circle cx="6" cy="5" r="1.8" fill="rgba(255,230,140,0.5)"/>
+            <g transform="translate(47,79) rotate(56)">
+              <rect x="-8" y="-3.5" width="17" height="7" rx="2" fill="#b89840" stroke="#7a6020" stroke-width="0.8"/>
+            </g>
+            <circle cx="47" cy="79" r="4" fill="#cc1100"/>
+            <circle cx="47" cy="79" r="2" fill="#ff5533"/>
+          </svg>
         </div>
         <div class="dj-tt-meta">
           <span class="dj-tt-time" id="rpDJTimeB">0:00</span>
@@ -183,16 +199,21 @@
           <input type="range" class="dj-pitch" id="rpDJPitchB" min="0.5" max="2" step="0.02" value="1" oninput="rpDJPitch('B',this.value)">
           <span class="dj-pitch-val" id="rpDJPitchValB">±0%</span>
         </div>
+        <div class="dj-kill-row">
+          <button class="dj-kill" id="rpDJKillHiB" onclick="rpDJKill('B','hi')">HI</button>
+          <button class="dj-kill" id="rpDJKillMidB" onclick="rpDJKill('B','mid')">MID</button>
+          <button class="dj-kill" id="rpDJKillLoB" onclick="rpDJKill('B','lo')">LO</button>
+          <button class="dj-tc dj-tc-sync" onclick="rpDJSync('B')">SYNC</button>
+        </div>
         <div class="dj-hotcue-row">
-          <button class="dj-hc" onclick="rpDJHotCue('B',0)">H1</button>
-          <button class="dj-hc" onclick="rpDJHotCue('B',1)">H2</button>
-          <button class="dj-hc" onclick="rpDJHotCue('B',2)">H3</button>
+          <button class="dj-hc" id="rpDJHc0B" onclick="rpDJHotCue('B',0)">H1</button>
+          <button class="dj-hc" id="rpDJHc1B" onclick="rpDJHotCue('B',1)">H2</button>
+          <button class="dj-hc" id="rpDJHc2B" onclick="rpDJHotCue('B',2)">H3</button>
         </div>
       </div>
 
     </div><!-- /dj-table -->
 
-    <!-- TRACK LISTE -->
     <div class="dj-list-hdr">▶ TRACK AUSWÄHLEN</div>
     <div class="dj-list" id="rpDJList"></div>
   </div>
