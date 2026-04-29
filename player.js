@@ -705,14 +705,14 @@ function rpOpenDJ(){
     djElA=new Audio();
     djElA.addEventListener('ended',()=>{
       if(djLoopA&&djElA.duration){djElA.currentTime=0;djElA.play().catch(()=>{})}
-      else{djPlayA=false;$('rpDJVinylA').classList.remove('playing');rpDJUpdateBtn('A')}
+      else{djPlayA=false;$('rpDJVinylA').classList.remove('playing');$('rpDJBassA')?.classList.remove('active');$('rpDJTapeA')?.classList.remove('running');rpDJUpdateBtn('A')}
     });
   }
   if(!djElB){
     djElB=new Audio();
     djElB.addEventListener('ended',()=>{
       if(djLoopB&&djElB.duration){djElB.currentTime=0;djElB.play().catch(()=>{})}
-      else{djPlayB=false;$('rpDJVinylB').classList.remove('playing');rpDJUpdateBtn('B')}
+      else{djPlayB=false;$('rpDJVinylB').classList.remove('playing');$('rpDJBassB')?.classList.remove('active');$('rpDJTapeB')?.classList.remove('running');rpDJUpdateBtn('B')}
     });
   }
   $('rpDJOverlay').style.display='flex';
@@ -756,6 +756,7 @@ function rpDJLoad(deck,pi){
   $('rpDJName'+deck).textContent=getDisplayName(f);
   $('rpDJVinyl'+deck).classList.remove('playing');
   $('rpDJBass'+deck)?.classList.remove('active');
+  $('rpDJTape'+deck)?.classList.remove('running');
   rpDJUpdateBtn(deck);
   // Reset hot cue visuals
   document.querySelectorAll('.dj-hc').forEach(b=>b.classList.remove('set'));
@@ -773,11 +774,13 @@ function rpDJToggle(deck){
     if(deck==='A'){djPlayA=false;$('rpDJVinylA').classList.remove('playing')}
     else{djPlayB=false;$('rpDJVinylB').classList.remove('playing')}
     $('rpDJBass'+deck)?.classList.remove('active');
+    $('rpDJTape'+deck)?.classList.remove('running');
   }else{
     el.play().catch(()=>{});
     if(deck==='A'){djPlayA=true;$('rpDJVinylA').classList.add('playing')}
     else{djPlayB=true;$('rpDJVinylB').classList.add('playing')}
     $('rpDJBass'+deck)?.classList.add('active');
+    $('rpDJTape'+deck)?.classList.add('running');
   }
   rpDJUpdateBtn(deck);
 }
