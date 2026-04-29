@@ -278,6 +278,16 @@ video{width:100%;max-height:40vh;display:block;object-fit:contain}
 
 /* ── CONTROLS ──────────────────────────────────────────── */
 .controls-row{display:flex;align-items:center;justify-content:center;gap:12px;padding:6px 20px;flex-shrink:0}
+/* ── SPEED ─────────────────────────────────────────────── */
+.speed-row{display:flex;align-items:center;gap:5px;padding:2px 16px 4px;flex-shrink:0}
+.speed-label{font-size:10px;color:var(--muted);letter-spacing:1px;font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;min-width:44px}
+.speed-btn{
+  padding:3px 8px;border:1px solid var(--border);border-radius:20px;
+  background:transparent;color:var(--muted);font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;
+  font-size:10px;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;
+}
+.speed-btn.active{background:var(--gold);color:#0d0b08;border-color:var(--gold)}
+.speed-btn:active{transform:scale(0.93)}
 .ctrl-btn{
   width:46px;height:46px;border-radius:50%;
   background:linear-gradient(145deg,#2a2418,#161210);
@@ -372,6 +382,7 @@ video{width:100%;max-height:40vh;display:block;object-fit:contain}
 .pl-name{font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:0.5px}
 .pl-item.active .pl-name{color:var(--gold)}
 .pl-ext{font-size:10px;padding:2px 6px;border-radius:3px;background:rgba(212,160,23,0.1);color:var(--gold-dark);letter-spacing:1px;flex-shrink:0}
+.pl-dur{font-size:10px;color:var(--muted);min-width:34px;text-align:right;font-family:'Bebas Neue','Impact','Arial Narrow',sans-serif;flex-shrink:0}
 .pl-fav-btn{
   background:none;border:none;font-size:15px;cursor:pointer;
   opacity:0.3;padding:2px 4px;flex-shrink:0;transition:opacity 0.15s;

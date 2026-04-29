@@ -1,7 +1,7 @@
 const AUDIO_EXT=['mp3','wav','ogg','flac','aac','m4a','opus','wma','oga','m4b'];
 const VIDEO_EXT=['mp4','webm','mov','avi','mkv','m4v','wmv','3gp','flv','ogv'];
 
-let files=[],playlist=[],cur=-1;
+let files=[],playlist=[],cur=-1,fileDurations={};
 let shuffle=true,repeat='off';
 let playing=false,objUrl=null,audioEl=null,media=null;
 let eqInterval=null,listOpen=false;
@@ -413,7 +413,11 @@ function onTime(){
   $('rpBar').value=p;$('rpBar').style.setProperty('--v',p+'%');
   $('rpCur').textContent=fmt(media.currentTime);
 }
-function onMeta(){if(media)$('rpTot').textContent=fmt(media.duration)}
+function onMeta(){
+  if(!media)return;
+  $('rpTot').textContent=fmt(media.duration);
+  if(cur>=0){fileDurations[playlist[cur]]=media.duration;renderList()}
+}
 function onEnded(){
   if(media)media.volume=parseFloat($('rpVol').value);
   if(repeat==='one'){media.currentTime=0;media.play();return}
@@ -439,6 +443,13 @@ function rpPrev(){
 }
 function rpSeek(v){if(media&&media.duration)media.currentTime=(v/100)*media.duration}
 function rpSetVol(v){const n=parseFloat(v);if(audioEl)audioEl.volume=n;$('rpVideo').volume=n}
+function rpSetSpeed(v){
+  const n=parseFloat(v);
+  if(audioEl)audioEl.playbackRate=n;
+  $('rpVideo').playbackRate=n;
+  document.querySelectorAll('.speed-btn').forEach(b=>b.classList.toggle('active',parseFloat(b.dataset.speed)===n));
+  try{localStorage.setItem('rp_speed',v)}catch(e){}
+}
 
 // ── Vinyl Touch Gestures ───────────────────────────────────
 (function(){
@@ -555,11 +566,12 @@ function renderList(){
     const x=ext(f.name).toUpperCase();
     const name=esc(getDisplayName(f));
     const isFav=favorites.has(fileKey(f));
+    const dur=fileDurations[fi]?fmt(fileDurations[fi]):'';
     return`<div class="pl-item${pi===cur?' active':''}" id="pi${pi}" onclick="playTrack(${pi});rpToggleList()">
       <span class="pl-num">${pi+1}</span>
       <span class="pl-icon">${icon}</span>
       <span class="pl-name">${name}</span>
-      <span class="pl-ext">${x}</span>
+      <span class="pl-dur">${dur}</span>
       <button class="pl-fav-btn${isFav?' active':''}" onclick="rpToggleFav(${pi},event)" title="Favorit">❤️</button>
       <button class="pl-rename-btn" onclick="rpRenameTrack(${pi},event)" title="Umbenennen">✏️</button>
     </div>`;
@@ -625,5 +637,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catc
 applyTheme(currentTheme);
 const savedPreset=localStorage.getItem('rp_preset')||'master';
 rpSetPreset(savedPreset);
+const savedSpeed=parseFloat(localStorage.getItem('rp_speed')||'1');
+rpSetSpeed(savedSpeed);
 updateUI();
 rpCheckSavedDir();
