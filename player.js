@@ -455,14 +455,9 @@ function rpSetSpeed(v){
 (function(){
   const v=$('rpVinyl');
   let startX=0,startY=0,startT=0;
-  let scratching=false,lastAngle=0,visualRot=0,lastMoveT=0;
+  let scratching=false,lastX=0,lastMoveT=0,visualRot=0;
   let wasPlaying=false,savedRate=1;
 
-  function angle(touch){
-    const r=v.getBoundingClientRect();
-    const cx=r.left+r.width/2,cy=r.top+r.height/2;
-    return Math.atan2(touch.clientY-cy,touch.clientX-cx)*180/Math.PI;
-  }
   function currentRotation(){
     const m=getComputedStyle(v).transform;
     if(!m||m==='none')return 0;
@@ -473,21 +468,25 @@ function rpSetSpeed(v){
 
   v.addEventListener('touchstart',e=>{
     const t=e.touches[0];
-    startX=t.clientX;startY=t.clientY;startT=Date.now();
-    lastAngle=angle(t);lastMoveT=Date.now();
+    startX=lastX=t.clientX;startY=t.clientY;startT=Date.now();
+    lastMoveT=Date.now();
     visualRot=currentRotation();
     scratching=false;
   },{passive:true});
 
   v.addEventListener('touchmove',e=>{
     const t=e.touches[0];
-    const dist=Math.hypot(t.clientX-startX,t.clientY-startY);
-    if(!scratching&&dist>6){
+    const dx=t.clientX-startX,dy=t.clientY-startY;
+
+    if(!scratching&&Math.hypot(dx,dy)>10){
       scratching=true;
       wasPlaying=playing;
       savedRate=parseFloat(localStorage.getItem('rp_speed')||'1');
-      // Musik abspielen während Scratch (für den Sound)
-      if(media&&media.paused){media.play().catch(()=>{})}
+      // Musik MUSS spielen damit playbackRate einen Ton erzeugt
+      if(media){
+        if(media.paused){media.play().catch(()=>{});playing=true;updateUI()}
+        if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();
+      }
       v.classList.add('scratching');
       v.style.transform=`rotate(${visualRot}deg)`;
     }
@@ -495,34 +494,31 @@ function rpSetSpeed(v){
     e.preventDefault();
 
     const now=Date.now();
-    const dt=Math.max(1,now-lastMoveT);
-    const a=angle(t);
-    let delta=a-lastAngle;
-    if(delta>180)delta-=360;
-    if(delta<-180)delta+=360;
+    const dt=Math.max(8,now-lastMoveT);
+    const moveDelta=t.clientX-lastX; // Pixel pro Frame
+    const velocity=moveDelta/dt;     // px/ms
 
-    // Winkelgeschwindigkeit → Playback-Rate (DJ-Sound)
-    const angVel=delta/dt; // Grad pro ms
-    if(delta>0){
-      // Vorwärts: schnell drehen = hoher Ton
-      const rate=Math.max(0.15,Math.min(3.5,Math.abs(angVel)*18));
-      if(media)media.playbackRate=rate;
-    }else if(delta<0){
-      // Rückwärts: tiefer Ton + manuell zurückspulen
-      const rate=Math.max(0.05,Math.min(0.5,Math.abs(angVel)*8));
-      if(media)media.playbackRate=rate;
+    if(Math.abs(velocity)<0.05){
+      // Finger kaum bewegt → Musik bremst stark ab
+      if(media)media.playbackRate=0.12;
+    }else if(velocity>0){
+      // Vorwärts schieben → Ton wird höher/schneller
+      const rate=Math.max(0.5,Math.min(4.0,velocity*20));
+      if(media){media.playbackRate=rate;}
     }else{
-      if(media)media.playbackRate=0.05;
+      // Rückwärts schieben → tiefer Ton + zurückspulen
+      const rate=Math.max(0.08,Math.min(0.6,Math.abs(velocity)*12));
+      if(media){
+        media.playbackRate=rate;
+        if(media.duration)media.currentTime=Math.max(0,media.currentTime+velocity*0.08);
+      }
     }
 
-    // Visuell + Seek
-    visualRot+=delta;
+    // Visuelle Rotation (1px = 1.5°)
+    visualRot+=moveDelta*1.5;
     v.style.transform=`rotate(${visualRot}deg)`;
-    if(media&&media.duration&&delta<0){
-      media.currentTime=Math.max(0,media.currentTime+(delta/360)*4);
-    }
 
-    lastAngle=a;lastMoveT=now;
+    lastX=t.clientX;lastMoveT=now;
   },{passive:false});
 
   v.addEventListener('touchend',e=>{
@@ -532,12 +528,12 @@ function rpSetSpeed(v){
       scratching=false;
       v.classList.remove('scratching');
       v.style.transform='';
-      // Playback-Rate wiederherstellen
       if(media)media.playbackRate=savedRate;
-      if(!wasPlaying&&media){media.pause();playing=false;updateUI()}
-    } else if(Math.abs(dx)<20&&Math.abs(dy)<20&&dt<300){
+      if(!wasPlaying&&media){media.pause();playing=false;stopEq();updateUI()}
+      else if(wasPlaying)startEq();
+    }else if(Math.abs(dx)<20&&Math.abs(dy)<20&&dt<300){
       rpTogglePlay();
-    } else if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){
+    }else if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){
       if(dx<0)rpNext();else rpPrev();
     }
   },{passive:true});
