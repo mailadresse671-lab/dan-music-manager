@@ -1,7 +1,7 @@
 const AUDIO_EXT=['mp3','wav','ogg','flac','aac','m4a','opus','wma','oga','m4b'];
 const VIDEO_EXT=['mp4','webm','mov','avi','mkv','m4v','wmv','3gp','flv','ogv'];
 
-let files=[],playlist=[],cur=-1;
+let files=[],playlist=[],cur=-1,fileDurations={};
 let shuffle=true,repeat='off';
 let playing=false,objUrl=null,audioEl=null,media=null;
 let eqInterval=null,listOpen=false;
@@ -123,57 +123,122 @@ function rpCloseTrackInfo(){
   $('rpInfoOverlay').classList.remove('open');$('rpInfoPanel').classList.remove('open');
 }
 
-// ── Web Audio (Bass Boost) ─────────────────────────────────
-let audioCtx=null,bassFilter=null,bassGain=null,audioSrcNode=null;
+// ── Web Audio – Mastering Chain ────────────────────────────
+let audioCtx=null,audioSrcNode=null,eqBands=[],compressor=null,limiter=null,analyser=null,analyserData=null,animFrame=null;
+let coverArtUrl=null;
+
+// Bands: 80Hz  250Hz  1kHz  5kHz  12kHz
+const EQ_TYPES =['lowshelf','peaking','peaking','peaking','highshelf'];
+const EQ_FREQS =[80,250,1000,5000,12000];
+const EQ_QS    =[0.7,1.2,1.5,1.2,0.7];
+
+// Gains pro Preset: [80Hz, 250Hz, 1kHz, 5kHz, 12kHz]
+const EQ_PRESETS={
+  master:  [+3.0,-2.5, 0.0,+3.0,+2.5], // Warm · Klar · Luftig – Standard
+  flat:    [ 0.0, 0.0, 0.0, 0.0, 0.0],
+  bass:    [+7.0,-1.5,-1.0,+2.0,+1.5],
+  hiphop:  [+6.0,-2.0,-1.0,+3.0,+2.0],
+  rock:    [+4.0,-1.5,+1.0,+4.5,+3.0],
+  pop:     [+2.0,-1.0,+2.0,+4.5,+3.5],
+  vocal:   [-1.0,-2.5,+4.5,+5.0,+3.0],
+};
+
 function initWebAudio(){
   if(audioCtx||!audioEl)return;
   try{
     audioCtx=new(window.AudioContext||window.webkitAudioContext)();
     audioSrcNode=audioCtx.createMediaElementSource(audioEl);
-    bassFilter=audioCtx.createBiquadFilter();
-    bassFilter.type='lowshelf';
-    bassFilter.frequency.value=250;
-    bassFilter.gain.value=0;
-    audioSrcNode.connect(bassFilter);
-    bassFilter.connect(audioCtx.destination);
+
+    // Hochpass: entfernt Subsonic-Rumble unter 30 Hz
+    const hpf=audioCtx.createBiquadFilter();
+    hpf.type='highpass';hpf.frequency.value=30;hpf.Q.value=0.7;
+
+    // 5-Band parametrischer EQ
+    eqBands=EQ_FREQS.map((freq,i)=>{
+      const f=audioCtx.createBiquadFilter();
+      f.type=EQ_TYPES[i];f.frequency.value=freq;
+      f.Q.value=EQ_QS[i];f.gain.value=0;return f;
+    });
+
+    // Kompressor – sanfter dynamischer Ausgleich
+    compressor=audioCtx.createDynamicsCompressor();
+    compressor.threshold.value=-24;compressor.knee.value=10;
+    compressor.ratio.value=4;compressor.attack.value=0.005;
+    compressor.release.value=0.1;
+
+    // Limiter – verhindert jegliches Clipping
+    limiter=audioCtx.createDynamicsCompressor();
+    limiter.threshold.value=-1;limiter.knee.value=0;
+    limiter.ratio.value=20;limiter.attack.value=0.001;
+    limiter.release.value=0.05;
+
+    // Chain: source → hpf → eq[0..4] → compressor → limiter → out
+    let node=audioSrcNode;
+    node.connect(hpf);node=hpf;
+    eqBands.forEach(b=>{node.connect(b);node=b;});
+    node.connect(compressor);
+    compressor.connect(limiter);
+    limiter.connect(audioCtx.destination);
+
+    // Analyser als Tap-Point für Visualizer (kein Einfluss auf Klang)
+    analyser=audioCtx.createAnalyser();
+    analyser.fftSize=256;
+    analyser.smoothingTimeConstant=0.82;
+    analyserData=new Uint8Array(analyser.frequencyBinCount);
+    limiter.connect(analyser);
   }catch(e){audioCtx=null}
 }
+
+// ── Cover Art ──────────────────────────────────────────────
+async function loadCoverArt(file){
+  if(coverArtUrl){URL.revokeObjectURL(coverArtUrl);coverArtUrl=null}
+  const img=$('rpVinylArt'),dot=$('rpVinylDot'),name=$('rpVinylLabelName'),bg=$('rpBgArt');
+  img.style.display='none';dot.style.display='';name.style.display='';
+  bg.classList.remove('show');bg.style.backgroundImage='';
+  if(typeof jsmediatags==='undefined')return;
+  const ext_=file.name.split('.').pop().toLowerCase();
+  if(!['mp3','mp4','m4a','aac','ogg','flac'].includes(ext_))return;
+  try{
+    await new Promise((res)=>{
+      jsmediatags.read(file,{
+        onSuccess(tag){
+          const pic=tag.tags.picture;
+          if(!pic){res();return}
+          const blob=new Blob([new Uint8Array(pic.data)],{type:pic.format||'image/jpeg'});
+          coverArtUrl=URL.createObjectURL(blob);
+          img.src=coverArtUrl;
+          img.style.display='block';
+          dot.style.display='none';
+          name.style.display='none';
+          bg.style.backgroundImage=`url(${coverArtUrl})`;
+          bg.classList.add('show');
+          res();
+        },
+        onError(){res()}
+      });
+    });
+  }catch(e){}
+}
+
 function rpSetBass(val){
   const v=parseFloat(val);
   $('rpBassVal').textContent=(v>=0?'+':'')+v+' dB';
-  const pct=((v-(-10))/(20-(-10)))*100;
+  const pct=((v-(-10))/(15-(-10)))*100;
   $('rpBass').style.setProperty('--v',pct+'%');
-  if(bassFilter)bassFilter.gain.value=v;
+  if(eqBands[0])eqBands[0].gain.value=v;
 }
 
-// ── Crossfade ──────────────────────────────────────────────
-const CROSSFADE_SEC=3;
-let cfActive=false,cfEl=null,cfUrl=null,cfFadeTimer=null;
-function initCrossfadeEl(){
-  if(cfEl)return;
-  cfEl=new Audio();
-}
-function startCrossfade(){
-  if(!cfEl||cur<0||!media||isVid(files[playlist[cur]].name))return;
-  const nextPi=repeat==='one'?cur:(cur+1<playlist.length?cur+1:repeat==='all'?0:-1);
-  if(nextPi<0||nextPi===cur)return;
-  const nf=files[playlist[nextPi]];
-  if(isVid(nf.name))return;
-  if(cfUrl)URL.revokeObjectURL(cfUrl);
-  cfUrl=URL.createObjectURL(nf);
-  cfEl.src=cfUrl;cfEl.volume=0;
-  cfEl.play().catch(()=>{cfActive=false});
-  const volAtStart=parseFloat($('rpVol').value);
-  const steps=CROSSFADE_SEC*10;
-  let step=0;
-  clearInterval(cfFadeTimer);
-  cfFadeTimer=setInterval(()=>{
-    step++;
-    const t=step/steps;
-    if(media)media.volume=Math.max(0,volAtStart*(1-t));
-    cfEl.volume=Math.min(volAtStart,volAtStart*t);
-    if(step>=steps)clearInterval(cfFadeTimer);
-  },100);
+// ── EQ Presets ─────────────────────────────────────────────
+function rpSetPreset(name){
+  const gains=EQ_PRESETS[name];if(!gains)return;
+  if(eqBands.length)gains.forEach((g,i)=>{if(eqBands[i])eqBands[i].gain.value=g});
+  // Bass-Slider auf 80Hz-Wert des Presets setzen
+  $('rpBass').value=gains[0];
+  $('rpBassVal').textContent=(gains[0]>=0?'+':'')+gains[0]+' dB';
+  const pct=((gains[0]-(-10))/(15-(-10)))*100;
+  $('rpBass').style.setProperty('--v',pct+'%');
+  document.querySelectorAll('.eq-preset-btn').forEach(b=>b.classList.toggle('active',b.dataset.preset===name));
+  try{localStorage.setItem('rp_preset',name)}catch(e){}
 }
 
 // ── IndexedDB ──────────────────────────────────────────────
@@ -300,18 +365,11 @@ function ensureAudio(){
   audioEl.addEventListener('timeupdate',onTime);
   audioEl.addEventListener('ended',onEnded);
   audioEl.addEventListener('loadedmetadata',onMeta);
-  initCrossfadeEl();
 }
 
 function playTrack(pi){
   if(pi<0||pi>=playlist.length)return;
-  cfActive=false;clearInterval(cfFadeTimer);
-  // Reset crossfade element volume
-  if(cfEl){cfEl.pause();cfEl.src='';cfEl.volume=0}
-  if(cfUrl){URL.revokeObjectURL(cfUrl);cfUrl=null}
-
-  cur=pi;
-  const f=files[playlist[pi]];
+  cur=pi;const f=files[playlist[pi]];
   if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}
   objUrl=URL.createObjectURL(f);
   ensureAudio();
@@ -346,6 +404,7 @@ function playTrack(pi){
   $('rpVinyl').classList.toggle('playing',!isVid(f.name));
 
   startEq();highlightItem(pi);updateMediaSession(f);
+  loadCoverArt(f);
 }
 
 function onTime(){
@@ -353,19 +412,13 @@ function onTime(){
   const p=media.duration?(media.currentTime/media.duration)*100:0;
   $('rpBar').value=p;$('rpBar').style.setProperty('--v',p+'%');
   $('rpCur').textContent=fmt(media.currentTime);
-
-  // Crossfade: start when CROSSFADE_SEC seconds remain
-  if(media.duration&&!cfActive&&playing&&!isVid(files[playlist[cur]]?.name||'')){
-    const left=media.duration-media.currentTime;
-    if(left>0&&left<=CROSSFADE_SEC){
-      cfActive=true;startCrossfade();
-    }
-  }
 }
-function onMeta(){if(media)$('rpTot').textContent=fmt(media.duration)}
+function onMeta(){
+  if(!media)return;
+  $('rpTot').textContent=fmt(media.duration);
+  if(cur>=0){fileDurations[playlist[cur]]=media.duration;renderList()}
+}
 function onEnded(){
-  cfActive=false;clearInterval(cfFadeTimer);
-  // Restore user volume
   if(media)media.volume=parseFloat($('rpVol').value);
   if(repeat==='one'){media.currentTime=0;media.play();return}
   if(cur+1<playlist.length)playTrack(cur+1);
@@ -390,22 +443,97 @@ function rpPrev(){
 }
 function rpSeek(v){if(media&&media.duration)media.currentTime=(v/100)*media.duration}
 function rpSetVol(v){const n=parseFloat(v);if(audioEl)audioEl.volume=n;$('rpVideo').volume=n}
+function rpSetSpeed(v){
+  const n=parseFloat(v);
+  if(audioEl)audioEl.playbackRate=n;
+  $('rpVideo').playbackRate=n;
+  document.querySelectorAll('.speed-btn').forEach(b=>b.classList.toggle('active',parseFloat(b.dataset.speed)===n));
+  try{localStorage.setItem('rp_speed',v)}catch(e){}
+}
 
-// ── Vinyl Touch Gestures ───────────────────────────────────
+// ── Vinyl DJ-Scratch ───────────────────────────────────────
 (function(){
-  let tx=0,ty=0,tt=0;
   const v=$('rpVinyl');
+  let startX=0,startY=0,startT=0;
+  let scratching=false,lastX=0,lastMoveT=0,visualRot=0;
+  let wasPlaying=false,savedRate=1;
+
+  function currentRotation(){
+    const m=getComputedStyle(v).transform;
+    if(!m||m==='none')return 0;
+    const p=m.match(/matrix\(([^,]+),([^,]+)/);
+    if(!p)return 0;
+    return Math.atan2(parseFloat(p[2]),parseFloat(p[1]))*180/Math.PI;
+  }
+
   v.addEventListener('touchstart',e=>{
-    const t=e.touches[0];tx=t.clientX;ty=t.clientY;tt=Date.now();
+    const t=e.touches[0];
+    startX=lastX=t.clientX;startY=t.clientY;startT=Date.now();
+    lastMoveT=Date.now();
+    visualRot=currentRotation();
+    scratching=false;
   },{passive:true});
+
+  v.addEventListener('touchmove',e=>{
+    const t=e.touches[0];
+    const dx=t.clientX-startX,dy=t.clientY-startY;
+
+    if(!scratching&&Math.hypot(dx,dy)>10){
+      scratching=true;
+      wasPlaying=playing;
+      savedRate=parseFloat(localStorage.getItem('rp_speed')||'1');
+      // Musik MUSS spielen damit playbackRate einen Ton erzeugt
+      if(media){
+        if(media.paused){media.play().catch(()=>{});playing=true;updateUI()}
+        if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();
+      }
+      v.classList.add('scratching');
+      v.style.transform=`rotate(${visualRot}deg)`;
+    }
+    if(!scratching)return;
+    e.preventDefault();
+
+    const now=Date.now();
+    const dt=Math.max(8,now-lastMoveT);
+    const moveDelta=t.clientX-lastX; // Pixel pro Frame
+    const velocity=moveDelta/dt;     // px/ms
+
+    if(Math.abs(velocity)<0.05){
+      // Finger kaum bewegt → Musik bremst stark ab
+      if(media)media.playbackRate=0.12;
+    }else if(velocity>0){
+      // Vorwärts schieben → Ton wird höher/schneller
+      const rate=Math.max(0.5,Math.min(4.0,velocity*20));
+      if(media){media.playbackRate=rate;}
+    }else{
+      // Rückwärts schieben → tiefer Ton + zurückspulen
+      const rate=Math.max(0.08,Math.min(0.6,Math.abs(velocity)*12));
+      if(media){
+        media.playbackRate=rate;
+        if(media.duration)media.currentTime=Math.max(0,media.currentTime+velocity*0.08);
+      }
+    }
+
+    // Visuelle Rotation (1px = 1.5°)
+    visualRot+=moveDelta*1.5;
+    v.style.transform=`rotate(${visualRot}deg)`;
+
+    lastX=t.clientX;lastMoveT=now;
+  },{passive:false});
+
   v.addEventListener('touchend',e=>{
     const t=e.changedTouches[0];
-    const dx=t.clientX-tx,dy=t.clientY-ty,dt=Date.now()-tt;
-    if(Math.abs(dx)<20&&Math.abs(dy)<20&&dt<300){
-      // Tap → play/pause
+    const dx=t.clientX-startX,dy=t.clientY-startY,dt=Date.now()-startT;
+    if(scratching){
+      scratching=false;
+      v.classList.remove('scratching');
+      v.style.transform='';
+      if(media)media.playbackRate=savedRate;
+      if(!wasPlaying&&media){media.pause();playing=false;stopEq();updateUI()}
+      else if(wasPlaying)startEq();
+    }else if(Math.abs(dx)<20&&Math.abs(dy)<20&&dt<300){
       rpTogglePlay();
     }else if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){
-      // Swipe → skip
       if(dx<0)rpNext();else rpPrev();
     }
   },{passive:true});
@@ -446,10 +574,35 @@ function rpToggleList(){
   if(listOpen){$('rpSearch').value='';searchTerm='';renderList()}
 }
 
-// ── EQ ────────────────────────────────────────────────────
+// ── EQ Visualizer (echt) ───────────────────────────────────
 const EQ_N=12;
-function startEq(){stopEq();eqInterval=setInterval(()=>{for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height=(12+Math.random()*78)+'%'}},130)}
-function stopEq(){clearInterval(eqInterval);for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height='10%'}}
+function startEq(){
+  stopEq();
+  if(analyser){
+    const bins=analyserData.length;
+    const update=()=>{
+      analyser.getByteFrequencyData(analyserData);
+      for(let i=0;i<EQ_N;i++){
+        const b=$('eq'+i);if(!b)continue;
+        const s=Math.floor((i/EQ_N)*bins*0.7);
+        const e=Math.floor(((i+1)/EQ_N)*bins*0.7);
+        let sum=0;for(let j=s;j<e;j++)sum+=analyserData[j];
+        const avg=e>s?sum/(e-s):analyserData[s]||0;
+        b.style.height=Math.max(6,(avg/255)*96)+'%';
+      }
+      animFrame=requestAnimationFrame(update);
+    };
+    update();
+  }else{
+    eqInterval=setInterval(()=>{for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height=(12+Math.random()*78)+'%'}},130);
+  }
+}
+function stopEq(){
+  clearInterval(eqInterval);
+  cancelAnimationFrame(animFrame);
+  animFrame=null;
+  for(let i=0;i<EQ_N;i++){const b=$('eq'+i);if(b)b.style.height='10%'}
+}
 
 // ── UI update ──────────────────────────────────────────────
 function updateUI(){
@@ -481,11 +634,12 @@ function renderList(){
     const x=ext(f.name).toUpperCase();
     const name=esc(getDisplayName(f));
     const isFav=favorites.has(fileKey(f));
+    const dur=fileDurations[fi]?fmt(fileDurations[fi]):'';
     return`<div class="pl-item${pi===cur?' active':''}" id="pi${pi}" onclick="playTrack(${pi});rpToggleList()">
       <span class="pl-num">${pi+1}</span>
       <span class="pl-icon">${icon}</span>
       <span class="pl-name">${name}</span>
-      <span class="pl-ext">${x}</span>
+      <span class="pl-dur">${dur}</span>
       <button class="pl-fav-btn${isFav?' active':''}" onclick="rpToggleFav(${pi},event)" title="Favorit">❤️</button>
       <button class="pl-rename-btn" onclick="rpRenameTrack(${pi},event)" title="Umbenennen">✏️</button>
     </div>`;
@@ -534,12 +688,168 @@ function updateMediaSession(f){
   navigator.mediaSession.setActionHandler('previoustrack',rpPrev);
 }
 
+// ── DJ MODE ────────────────────────────────────────────────
+let djElA=null,djElB=null,djUrlA=null,djUrlB=null;
+let djPlayA=false,djPlayB=false,djCFVal=50;
+let djScratchData={A:{active:false,lastX:0,lastT:0,rot:0,wasPlaying:false},B:{active:false,lastX:0,lastT:0,rot:0,wasPlaying:false}};
+
+function rpOpenDJ(){
+  if(!files.length){rpToast('Erst Musik laden!');return}
+  if(!djElA){
+    djElA=new Audio();
+    djElA.addEventListener('ended',()=>{djPlayA=false;rpDJUpdateBtn('A')});
+  }
+  if(!djElB){
+    djElB=new Audio();
+    djElB.addEventListener('ended',()=>{djPlayB=false;rpDJUpdateBtn('B')});
+  }
+  $('rpDJOverlay').style.display='flex';
+  rpDJRenderList();
+  rpDJCrossfade(50);
+}
+function rpCloseDJ(){$('rpDJOverlay').style.display='none'}
+
+function rpDJRenderList(){
+  const el=$('rpDJList');if(!el)return;
+  const items=playlist.filter(pi=>!isVid(files[pi].name));
+  el.innerHTML=items.map(pi=>{
+    const name=esc(getDisplayName(files[pi]));
+    return`<div class="dj-list-item">
+      <span class="dj-list-item-name">${name}</span>
+      <button class="dj-load-btn" onclick="rpDJLoad('A',${pi})">→ A</button>
+      <button class="dj-load-btn" onclick="rpDJLoad('B',${pi})">→ B</button>
+    </div>`;
+  }).join('');
+}
+
+function rpDJLoad(deck,pi){
+  if(pi<0){rpToast('Track aus der Liste wählen ↓');return}
+  const f=files[pi];
+  const el=deck==='A'?djElA:djElB;
+  const prevUrl=deck==='A'?djUrlA:djUrlB;
+  if(prevUrl)URL.revokeObjectURL(prevUrl);
+  const url=URL.createObjectURL(f);
+  if(deck==='A'){djUrlA=url;djPlayA=false}else{djUrlB=url;djPlayB=false}
+  el.src=url;el.load();
+  el.currentTime=0;
+  $('rpDJName'+deck).textContent=getDisplayName(f);
+  $('rpDJVinyl'+deck).classList.remove('playing');
+  rpDJUpdateBtn(deck);
+  rpToast('Deck '+deck+': '+getDisplayName(f));
+}
+
+function rpDJToggle(deck){
+  const el=deck==='A'?djElA:djElB;
+  const url=deck==='A'?djUrlA:djUrlB;
+  if(!url){rpToast('Erst Track laden → '+deck);return}
+  if(deck==='A'){
+    if(djPlayA){el.pause();djPlayA=false;$('rpDJVinylA').classList.remove('playing')}
+    else{el.play().catch(()=>{});djPlayA=true;$('rpDJVinylA').classList.add('playing')}
+  }else{
+    if(djPlayB){el.pause();djPlayB=false;$('rpDJVinylB').classList.remove('playing')}
+    else{el.play().catch(()=>{});djPlayB=true;$('rpDJVinylB').classList.add('playing')}
+  }
+  rpDJUpdateBtn(deck);
+}
+
+function rpDJUpdateBtn(deck){
+  const playing=deck==='A'?djPlayA:djPlayB;
+  $('rpDJPlayBtn'+deck).textContent=playing?'⏸':'▶';
+}
+
+function rpDJCue(deck){
+  const el=deck==='A'?djElA:djElB;
+  if(el){el.currentTime=0}
+}
+
+function rpDJCrossfade(val){
+  djCFVal=parseFloat(val);
+  const a=val/100*Math.PI/2;
+  const volA=Math.cos(a),volB=Math.sin(a);
+  if(djElA)djElA.volume=Math.max(0,Math.min(1,volA));
+  if(djElB)djElB.volume=Math.max(0,Math.min(1,volB));
+}
+
+function rpDJPitch(deck,val){
+  const r=parseFloat(val);
+  const el=deck==='A'?djElA:djElB;
+  if(el)el.playbackRate=r;
+  const pct=Math.round((r-1)*100);
+  $('rpDJPitchVal'+deck).textContent=(pct>0?'+':'')+pct+'%';
+}
+
+function rpDJChanVol(deck,val){
+  const el=deck==='A'?djElA:djElB;
+  if(el)el.volume=Math.max(0,Math.min(1,parseFloat(val)));
+}
+
+// DJ Scratch (direkt auf den DJ-Vinyls)
+function rpDJScratchStart(e,deck){
+  e.preventDefault();
+  const t=e.touches[0];
+  const d=djScratchData[deck];
+  d.lastX=t.clientX;d.lastT=Date.now();d.active=false;
+  const el=deck==='A'?djElA:djElB;
+  d.wasPlaying=deck==='A'?djPlayA:djPlayB;
+  // Vinyl visuell einfrieren
+  const v=$('rpDJVinyl'+deck);
+  const m=getComputedStyle(v).transform;
+  if(m&&m!=='none'){const p=m.match(/matrix\(([^,]+),([^,]+)/);if(p)d.rot=Math.atan2(parseFloat(p[2]),parseFloat(p[1]))*180/Math.PI}
+}
+function rpDJScratchMove(e,deck){
+  e.preventDefault();
+  const t=e.touches[0];
+  const d=djScratchData[deck];
+  const dx=t.clientX-d.lastX;
+  if(!d.active&&Math.abs(dx)>8){
+    d.active=true;
+    const el=deck==='A'?djElA:djElB;
+    const url=deck==='A'?djUrlA:djUrlB;
+    if(url&&el.paused){el.play().catch(()=>{});if(deck==='A')djPlayA=true;else djPlayB=true;rpDJUpdateBtn(deck);$('rpDJVinyl'+deck).classList.add('playing')}
+    $('rpDJVinyl'+deck).classList.add('scratching');
+  }
+  if(!d.active)return;
+  const now=Date.now();
+  const dt=Math.max(8,now-d.lastT);
+  const vel=dx/dt;
+  const el=deck==='A'?djElA:djElB;
+  if(Math.abs(vel)<0.05){if(el)el.playbackRate=0.1}
+  else if(vel>0){if(el)el.playbackRate=Math.max(0.5,Math.min(4,vel*18))}
+  else{if(el){el.playbackRate=Math.max(0.08,Math.min(0.6,Math.abs(vel)*12));if(el.duration)el.currentTime=Math.max(0,el.currentTime+vel*0.1)}}
+  d.rot+=dx*1.5;
+  $('rpDJVinyl'+deck).style.transform=`rotate(${d.rot}deg)`;
+  d.lastX=t.clientX;d.lastT=now;
+}
+function rpDJScratchEnd(e,deck){
+  const d=djScratchData[deck];
+  if(d.active){
+    d.active=false;
+    $('rpDJVinyl'+deck).classList.remove('scratching');
+    $('rpDJVinyl'+deck).style.transform='';
+    const el=deck==='A'?djElA:djElB;
+    if(el)el.playbackRate=parseFloat($('rpDJPitch'+deck).value)||1;
+    if(!d.wasPlaying&&el){el.pause();if(deck==='A')djPlayA=false;else djPlayB=false;rpDJUpdateBtn(deck);$('rpDJVinyl'+deck).classList.remove('playing')}
+  }
+}
+
 // ── Service Worker ─────────────────────────────────────────
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
+// ── Intro Splash ───────────────────────────────────────────
+(function(){
+  const intro=document.getElementById('rpIntro');
+  if(!intro)return;
+  setTimeout(()=>{
+    intro.classList.add('hiding');
+    setTimeout(()=>{intro.style.display='none'},700);
+  },2300);
+})();
+
 // ── Start ──────────────────────────────────────────────────
 applyTheme(currentTheme);
-// Init bass slider visual
-rpSetBass(0);
+const savedPreset=localStorage.getItem('rp_preset')||'master';
+rpSetPreset(savedPreset);
+const savedSpeed=parseFloat(localStorage.getItem('rp_speed')||'1');
+rpSetSpeed(savedSpeed);
 updateUI();
 rpCheckSavedDir();

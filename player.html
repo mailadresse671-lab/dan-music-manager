@@ -8,10 +8,32 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>DaN Vibe</title>
 <link rel="manifest" href="manifest.json">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;700&display=swap"></noscript>
 <link rel="stylesheet" href="player.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.7/jsmediatags.min.js"></script>
 </head>
 <body>
+
+<!-- INTRO SPLASH -->
+<div class="intro-splash" id="rpIntro">
+  <div class="intro-disc-wrap">
+    <div class="intro-disc">
+      <div class="intro-groove ig1"></div>
+      <div class="intro-groove ig2"></div>
+      <div class="intro-groove ig3"></div>
+      <div class="intro-groove ig4"></div>
+      <div class="intro-label">
+        <div class="intro-dan">DaN</div>
+        <div class="intro-dot">●</div>
+        <div class="intro-vibe">VIBE</div>
+      </div>
+    </div>
+  </div>
+  <div class="intro-tagline">DEIN PERSÖNLICHER PLAYER</div>
+</div>
 
 <div class="app" id="rpApp">
 
@@ -24,6 +46,125 @@
     <button class="header-rescan-btn" id="rpRescanBtn" onclick="rpRescan()" style="display:none" title="Neu einlesen">🔄</button>
     <button class="header-icon-btn" onclick="rpOpenThemePicker()" title="Farbthema">🎨</button>
     <button class="header-load-btn" onclick="rpPickRootFolder()">📂</button>
+  </div>
+
+  <!-- DJ MODE OVERLAY (90s Underground Club) -->
+  <div class="dj-overlay" id="rpDJOverlay" style="display:none">
+    <div class="dj-club-bg"></div>
+    <div class="dj-club-lights">
+      <div class="dj-light dj-light-1"></div>
+      <div class="dj-light dj-light-2"></div>
+      <div class="dj-light dj-light-3"></div>
+    </div>
+
+    <div class="dj-topbar">
+      <div class="dj-title">⬡ UNDERGROUND · DJ BOOTH · 1994 ⬡</div>
+      <button class="dj-close" onclick="rpCloseDJ()">✕ EXIT</button>
+    </div>
+
+    <!-- DJ TISCH (Draufsicht) -->
+    <div class="dj-table">
+
+      <!-- TURNTABLE A -->
+      <div class="dj-turntable">
+        <div class="dj-tt-label">DECK A</div>
+        <div class="dj-platter-wrap">
+          <div class="dj-vinyl" id="rpDJVinylA" ontouchstart="rpDJScratchStart(event,'A')" ontouchmove="rpDJScratchMove(event,'A')" ontouchend="rpDJScratchEnd(event,'A')">
+            <div class="dj-vinyl-g1"></div>
+            <div class="dj-vinyl-g2"></div>
+            <div class="dj-vinyl-g3"></div>
+            <div class="dj-vinyl-g4"></div>
+            <div class="dj-vinyl-label">
+              <div class="dj-vinyl-label-text" id="rpDJNameA">A</div>
+            </div>
+          </div>
+          <!-- TONEARM A (zeigt nach links = von rechts oben) -->
+          <div class="dj-tonearm dj-tonearm-a" id="rpDJTonearmA">
+            <div class="dj-tonearm-arm"></div>
+            <div class="dj-tonearm-head"></div>
+            <div class="dj-tonearm-pivot"></div>
+          </div>
+        </div>
+        <div class="dj-tt-controls">
+          <button class="dj-tt-btn" onclick="rpDJCue('A')">⏮</button>
+          <button class="dj-tt-btn dj-tt-play" id="rpDJPlayBtnA" onclick="rpDJToggle('A')">▶</button>
+          <button class="dj-tt-btn" onclick="rpDJLoad('A',-1)">⏏</button>
+        </div>
+        <div class="dj-pitch-row">
+          <span class="dj-pitch-lbl">PITCH</span>
+          <input type="range" class="dj-pitch" id="rpDJPitchA" min="0.5" max="2" step="0.02" value="1" oninput="rpDJPitch('A',this.value)">
+          <span class="dj-pitch-val" id="rpDJPitchValA">±0%</span>
+        </div>
+      </div>
+
+      <!-- MIXER CENTER -->
+      <div class="dj-mixer">
+        <div class="dj-mixer-label">MIXER</div>
+        <div class="dj-vu-row">
+          <div class="dj-vu" id="rpDJVuA"></div>
+          <div class="dj-vu" id="rpDJVuB"></div>
+        </div>
+        <div class="dj-eq-knobs">
+          <div class="dj-knob-col">
+            <div class="dj-knob"></div><span class="dj-knob-lbl">HI</span>
+            <div class="dj-knob"></div><span class="dj-knob-lbl">MID</span>
+            <div class="dj-knob"></div><span class="dj-knob-lbl">LOW</span>
+          </div>
+          <div class="dj-ch-faders">
+            <input type="range" class="dj-ch-fader" orient="vertical" min="0" max="1" step="0.01" value="1" oninput="rpDJChanVol('A',this.value)">
+            <input type="range" class="dj-ch-fader" orient="vertical" min="0" max="1" step="0.01" value="1" oninput="rpDJChanVol('B',this.value)">
+          </div>
+          <div class="dj-knob-col">
+            <div class="dj-knob"></div><span class="dj-knob-lbl">HI</span>
+            <div class="dj-knob"></div><span class="dj-knob-lbl">MID</span>
+            <div class="dj-knob"></div><span class="dj-knob-lbl">LOW</span>
+          </div>
+        </div>
+        <div class="dj-cf-wrap">
+          <div class="dj-cf-labels"><span>A</span><span>X·FADER</span><span>B</span></div>
+          <input type="range" class="dj-cf" id="rpDJCF" min="0" max="100" value="50" oninput="rpDJCrossfade(this.value)">
+        </div>
+      </div>
+
+      <!-- TURNTABLE B -->
+      <div class="dj-turntable">
+        <div class="dj-tt-label">DECK B</div>
+        <div class="dj-platter-wrap">
+          <div class="dj-vinyl" id="rpDJVinylB" ontouchstart="rpDJScratchStart(event,'B')" ontouchmove="rpDJScratchMove(event,'B')" ontouchend="rpDJScratchEnd(event,'B')">
+            <div class="dj-vinyl-g1"></div>
+            <div class="dj-vinyl-g2"></div>
+            <div class="dj-vinyl-g3"></div>
+            <div class="dj-vinyl-g4"></div>
+            <div class="dj-vinyl-label">
+              <div class="dj-vinyl-label-text" id="rpDJNameB">B</div>
+            </div>
+          </div>
+          <!-- TONEARM B (spiegelt A) -->
+          <div class="dj-tonearm dj-tonearm-b" id="rpDJTonearmB">
+            <div class="dj-tonearm-arm"></div>
+            <div class="dj-tonearm-head"></div>
+            <div class="dj-tonearm-pivot"></div>
+          </div>
+        </div>
+        <div class="dj-tt-controls">
+          <button class="dj-tt-btn" onclick="rpDJCue('B')">⏮</button>
+          <button class="dj-tt-btn dj-tt-play" id="rpDJPlayBtnB" onclick="rpDJToggle('B')">▶</button>
+          <button class="dj-tt-btn" onclick="rpDJLoad('B',-1)">⏏</button>
+        </div>
+        <div class="dj-pitch-row">
+          <span class="dj-pitch-lbl">PITCH</span>
+          <input type="range" class="dj-pitch" id="rpDJPitchB" min="0.5" max="2" step="0.02" value="1" oninput="rpDJPitch('B',this.value)">
+          <span class="dj-pitch-val" id="rpDJPitchValB">±0%</span>
+        </div>
+      </div>
+
+    </div><!-- /dj-table -->
+
+    <!-- TRACK LISTE -->
+    <div class="dj-list-header">
+      <span class="dj-list-title">▶ TRACK AUSWÄHLEN</span>
+    </div>
+    <div class="dj-list" id="rpDJList"></div>
   </div>
 
   <!-- EMPTY STATE -->
@@ -63,13 +204,23 @@
 
     <!-- NOW PLAYING: Vinyl (audio mode) -->
     <div class="vinyl-area" id="rpVinylArea">
+      <div class="vinyl-bg-art" id="rpBgArt"></div>
+      <button class="dj-launch-btn" onclick="rpOpenDJ()" title="DJ Mode">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="8" cy="12" r="5"/><circle cx="8" cy="12" r="1.5" fill="currentColor"/>
+          <line x1="13" y1="7" x2="22" y2="5"/><line x1="13" y1="12" x2="22" y2="12"/>
+          <line x1="13" y1="17" x2="22" y2="19"/>
+        </svg>
+        <span>DJ</span>
+      </button>
       <div class="vinyl-disc" id="rpVinyl">
         <div class="vinyl-groove g1"></div>
         <div class="vinyl-groove g2"></div>
         <div class="vinyl-groove g3"></div>
         <div class="vinyl-label">
+          <img class="vinyl-art-img" id="rpVinylArt" src="" alt="" style="display:none">
           <div class="vinyl-label-name" id="rpVinylLabelName">DaN</div>
-          <div class="vinyl-label-dot">●</div>
+          <div class="vinyl-label-dot" id="rpVinylDot">●</div>
         </div>
       </div>
     </div>
@@ -99,10 +250,20 @@
       <span class="p-time" id="rpTot">0:00</span>
     </div>
 
+    <!-- EQ PRESETS -->
+    <div class="eq-presets-row">
+      <button class="eq-preset-btn active" data-preset="master" onclick="rpSetPreset('master')">⭐ MASTER</button>
+      <button class="eq-preset-btn" data-preset="hiphop" onclick="rpSetPreset('hiphop')">HIP-HOP</button>
+      <button class="eq-preset-btn" data-preset="bass" onclick="rpSetPreset('bass')">BASS+</button>
+      <button class="eq-preset-btn" data-preset="rock" onclick="rpSetPreset('rock')">ROCK</button>
+      <button class="eq-preset-btn" data-preset="pop" onclick="rpSetPreset('pop')">POP</button>
+      <button class="eq-preset-btn" data-preset="vocal" onclick="rpSetPreset('vocal')">VOCAL</button>
+      <button class="eq-preset-btn" data-preset="flat" onclick="rpSetPreset('flat')">FLAT</button>
+    </div>
     <!-- BASS BOOST -->
     <div class="bass-row">
       <span class="bass-label">🔊 BASS</span>
-      <input type="range" class="bass-bar" id="rpBass" min="-10" max="20" value="0" step="1" oninput="rpSetBass(this.value)">
+      <input type="range" class="bass-bar" id="rpBass" min="-10" max="15" value="0" step="1" oninput="rpSetBass(this.value)">
       <span class="bass-val" id="rpBassVal">0 dB</span>
     </div>
 
@@ -113,6 +274,16 @@
       <button class="ctrl-btn play-btn" id="rpPlayBtn" onclick="rpTogglePlay()">▶</button>
       <button class="ctrl-btn" onclick="rpNext()">⏭</button>
       <button class="ctrl-btn" id="rpRepeatBtn" onclick="rpToggleRepeat()">🔁</button>
+    </div>
+
+    <!-- SPEED -->
+    <div class="speed-row">
+      <span class="speed-label">SPEED</span>
+      <button class="speed-btn active" data-speed="1" onclick="rpSetSpeed(1)">1×</button>
+      <button class="speed-btn" data-speed="0.75" onclick="rpSetSpeed(0.75)">0.75×</button>
+      <button class="speed-btn" data-speed="1.25" onclick="rpSetSpeed(1.25)">1.25×</button>
+      <button class="speed-btn" data-speed="1.5" onclick="rpSetSpeed(1.5)">1.5×</button>
+      <button class="speed-btn" data-speed="2" onclick="rpSetSpeed(2)">2×</button>
     </div>
 
     <!-- VOLUME + ACTIONS -->
