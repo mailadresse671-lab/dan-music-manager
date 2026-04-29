@@ -26,7 +26,17 @@ body.theme-red{
   --accent:#e74c3c;--accent-light:#f17b6e;--accent-dark:#a93226;
   --border:#401010;--bg:#0f0808;--card:#1e0e0e;--card2:#281414;
 }
-html,body{height:100%;background:var(--bg);color:var(--cream);font-family:'Oswald','Arial Narrow',Arial,sans-serif;overflow:hidden}
+html{height:100%;background:var(--bg)}
+body{
+  height:100%;background:var(--bg);color:var(--cream);
+  font-family:'Oswald','Arial Narrow',Arial,sans-serif;
+  overflow:hidden;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-right:env(safe-area-inset-right,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-left:env(safe-area-inset-left,0px);
+  box-sizing:border-box;
+}
 
 /* ── INTRO SPLASH ──────────────────────────────────────── */
 .intro-splash{
@@ -481,6 +491,8 @@ video:fullscreen,video:-webkit-full-screen{width:100vw;height:100vh;object-fit:c
   background:#0d0b08;
   display:flex;flex-direction:column;overflow:clip;
   animation:djRoomEnter 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
 }
 
 /* Holz-Maserung Hintergrund */

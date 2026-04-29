@@ -998,6 +998,30 @@ function rpDJScratchEnd(e,deck){
 // ── Service Worker ─────────────────────────────────────────
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
+// ── Vollbild ───────────────────────────────────────────────
+(function(){
+  const isInstalled=()=>
+    window.matchMedia('(display-mode:fullscreen)').matches||
+    window.matchMedia('(display-mode:standalone)').matches||
+    navigator.standalone===true;
+
+  function goFullscreen(){
+    if(isInstalled())return;
+    const el=document.documentElement;
+    const req=el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen||el.msRequestFullscreen;
+    if(req)req.call(el).catch(()=>{});
+  }
+
+  // Beim ersten Tippen Vollbild aktivieren
+  document.addEventListener('touchstart',goFullscreen,{once:true,passive:true});
+  document.addEventListener('click',goFullscreen,{once:true});
+
+  // Vollbild wiederherstellen wenn App nach Pause zurückkommt
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'&&!isInstalled())goFullscreen();
+  });
+})();
+
 // ── Intro Splash ───────────────────────────────────────────
 (function(){
   const intro=document.getElementById('rpIntro');
