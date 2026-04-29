@@ -451,21 +451,66 @@ function rpSetSpeed(v){
   try{localStorage.setItem('rp_speed',v)}catch(e){}
 }
 
-// ── Vinyl Touch Gestures ───────────────────────────────────
+// ── Vinyl DJ-Scratch ───────────────────────────────────────
 (function(){
-  let tx=0,ty=0,tt=0;
   const v=$('rpVinyl');
+  let startX=0,startY=0,startT=0;
+  let scratching=false,lastAngle=0,visualRot=0;
+
+  function angle(touch){
+    const r=v.getBoundingClientRect();
+    const cx=r.left+r.width/2,cy=r.top+r.height/2;
+    return Math.atan2(touch.clientY-cy,touch.clientX-cx)*180/Math.PI;
+  }
+  function currentRotation(){
+    const m=getComputedStyle(v).transform;
+    if(!m||m==='none')return 0;
+    const p=m.match(/matrix\(([^,]+),([^,]+)/);
+    if(!p)return 0;
+    return Math.atan2(parseFloat(p[2]),parseFloat(p[1]))*180/Math.PI;
+  }
+
   v.addEventListener('touchstart',e=>{
-    const t=e.touches[0];tx=t.clientX;ty=t.clientY;tt=Date.now();
+    const t=e.touches[0];
+    startX=t.clientX;startY=t.clientY;startT=Date.now();
+    lastAngle=angle(t);
+    visualRot=currentRotation();
+    scratching=false;
   },{passive:true});
+
+  v.addEventListener('touchmove',e=>{
+    const t=e.touches[0];
+    const dist=Math.hypot(t.clientX-startX,t.clientY-startY);
+    if(!scratching&&dist>6){
+      scratching=true;
+      v.classList.add('scratching');
+      v.style.transform=`rotate(${visualRot}deg)`;
+    }
+    if(!scratching)return;
+    e.preventDefault();
+    const a=angle(t);
+    let delta=a-lastAngle;
+    if(delta>180)delta-=360;
+    if(delta<-180)delta+=360;
+    visualRot+=delta;
+    v.style.transform=`rotate(${visualRot}deg)`;
+    // Scrub: 1 Umdrehung = 4 Sekunden Audio
+    if(media&&media.duration){
+      media.currentTime=Math.max(0,Math.min(media.duration,media.currentTime+(delta/360)*4));
+    }
+    lastAngle=a;
+  },{passive:false});
+
   v.addEventListener('touchend',e=>{
     const t=e.changedTouches[0];
-    const dx=t.clientX-tx,dy=t.clientY-ty,dt=Date.now()-tt;
-    if(Math.abs(dx)<20&&Math.abs(dy)<20&&dt<300){
-      // Tap → play/pause
+    const dx=t.clientX-startX,dy=t.clientY-startY,dt=Date.now()-startT;
+    if(scratching){
+      scratching=false;
+      v.classList.remove('scratching');
+      v.style.transform='';
+    } else if(Math.abs(dx)<20&&Math.abs(dy)<20&&dt<300){
       rpTogglePlay();
-    }else if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){
-      // Swipe → skip
+    } else if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){
       if(dx<0)rpNext();else rpPrev();
     }
   },{passive:true});
