@@ -174,7 +174,8 @@ body{
 }
 
 /* ── PLAYER WRAP ───────────────────────────────────────── */
-.player-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.player-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;transition:filter 0.5s ease,transform 0.5s ease;will-change:filter,transform}
+.player-wrap.dj-active{filter:brightness(0.12);transform:scale(0.97)}
 
 /* ── VIDEO AREA ────────────────────────────────────────── */
 .video-area{display:none;position:relative;background:#000;flex-shrink:0}
@@ -481,8 +482,14 @@ video:fullscreen,video:-webkit-full-screen{width:100vw;height:100vh;object-fit:c
 
 /* ── DJ OVERLAY – COMPTON AFTERMATH STUDIOS ─────────────── */
 @keyframes djRoomEnter{
-  0%{opacity:0;transform:scale(1.04) translateY(8px)}
-  100%{opacity:1;transform:scale(1) translateY(0)}
+  0%  {clip-path:circle(3% at var(--ox,30%) var(--oy,25%));filter:brightness(0)}
+  45% {filter:brightness(0.55)}
+  100%{clip-path:circle(150% at var(--ox,30%) var(--oy,25%));filter:brightness(1)}
+}
+@keyframes djRoomExit{
+  0%  {clip-path:circle(150% at var(--ox,30%) var(--oy,25%));filter:brightness(1);opacity:1}
+  55% {filter:brightness(0.25);opacity:0.7}
+  100%{clip-path:circle(3% at var(--ox,30%) var(--oy,25%));filter:brightness(0);opacity:0}
 }
 @keyframes djSpGlow{0%,100%{opacity:0.5;transform:scale(1)}50%{opacity:0.75;transform:scale(1.1)}}
 
@@ -490,10 +497,12 @@ video:fullscreen,video:-webkit-full-screen{width:100vw;height:100vh;object-fit:c
   position:fixed;inset:0;z-index:300;
   background:#0d0b08;
   display:flex;flex-direction:column;overflow:clip;
-  animation:djRoomEnter 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
+  will-change:clip-path,filter;
 }
+.dj-overlay.entering{animation:djRoomEnter 0.65s cubic-bezier(0.4,0,0.2,1) forwards}
+.dj-overlay.exiting {animation:djRoomExit  0.45s cubic-bezier(0.4,0,1,1)   forwards}
 
 /* Holz-Maserung Hintergrund */
 .dj-studio-bg{

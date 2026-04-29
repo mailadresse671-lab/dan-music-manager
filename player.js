@@ -715,7 +715,25 @@ function rpOpenDJ(){
       else{djPlayB=false;$('rpDJVinylB').classList.remove('playing');$('rpDJBassB')?.classList.remove('active');$('rpDJTapeB')?.classList.remove('running');rpDJUpdateBtn('B')}
     });
   }
-  $('rpDJOverlay').style.display='flex';
+
+  // Portal-Ursprung: DJ-Button Position berechnen
+  const overlay=$('rpDJOverlay');
+  const btn=document.querySelector('.dj-launch-btn');
+  if(btn){
+    const r=btn.getBoundingClientRect();
+    overlay.style.setProperty('--ox',Math.round((r.left+r.width/2)/window.innerWidth*100)+'%');
+    overlay.style.setProperty('--oy',Math.round((r.top+r.height/2)/window.innerHeight*100)+'%');
+  }
+
+  // Haupt-Player abdunkeln (hinter dem Portal sichtbar)
+  $('rpPlayer')?.classList.add('dj-active');
+
+  // Overlay zeigen + Portal-Animation starten
+  overlay.classList.remove('exiting');
+  overlay.style.display='flex';
+  overlay.offsetHeight; // Reflow erzwingen damit Animation neu startet
+  overlay.classList.add('entering');
+
   rpDJRenderList();
   rpDJCrossfade(50);
   djSessionStart=Date.now();
@@ -725,9 +743,16 @@ function rpOpenDJ(){
 }
 
 function rpCloseDJ(){
-  $('rpDJOverlay').style.display='none';
+  const overlay=$('rpDJOverlay');
+  overlay.classList.remove('entering');
+  overlay.classList.add('exiting');
   clearInterval(djVuInterval);clearInterval(djTimeInterval);
   if(djWaveRaf){cancelAnimationFrame(djWaveRaf);djWaveRaf=null;}
+  overlay.addEventListener('animationend',()=>{
+    overlay.style.display='none';
+    overlay.classList.remove('exiting');
+    $('rpPlayer')?.classList.remove('dj-active');
+  },{once:true});
 }
 
 function rpDJRenderList(){
