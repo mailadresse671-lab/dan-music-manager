@@ -479,7 +479,7 @@ video:fullscreen,video:-webkit-full-screen{width:100vw;height:100vh;object-fit:c
 .dj-overlay{
   position:fixed;inset:0;z-index:300;
   background:#060402;
-  display:flex;flex-direction:column;overflow:hidden;
+  display:flex;flex-direction:column;overflow:clip;
   animation:djRoomEnter 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
 }
 
@@ -550,6 +550,7 @@ video:fullscreen,video:-webkit-full-screen{width:100vw;height:100vh;object-fit:c
   position:relative;
   display:flex;align-items:center;justify-content:center;
   overflow:visible;flex-shrink:0;
+  isolation:isolate;
 }
 
 /* Vinyl */
@@ -601,12 +602,14 @@ video:fullscreen,video:-webkit-full-screen{width:100vw;height:100vh;object-fit:c
   top:-8px;right:-26px;
   width:58px;height:96px;
   filter:drop-shadow(1px 2px 4px rgba(0,0,0,0.9));
+  will-change:transform;
 }
 /* Deck B: Pivot oben-links (SVG intern gespiegelt) */
 .dj-arm-b{
   top:-8px;left:-26px;
   width:58px;height:96px;
   filter:drop-shadow(-1px 2px 4px rgba(0,0,0,0.9));
+  will-change:transform;
 }
 
 /* Track Meta */
