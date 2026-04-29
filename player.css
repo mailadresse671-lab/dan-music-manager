@@ -180,8 +180,9 @@ video{width:100%;max-height:40vh;display:block;object-fit:contain}
 .video-fs-btn:active{background:rgba(212,160,23,0.4)}
 
 /* ── VINYL AREA ────────────────────────────────────────── */
-.vinyl-area{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:8px;overflow:visible !important}
-.vinyl-area svg{overflow:visible !important}
+.vinyl-area, .vinyl-area div, .vinyl-area svg, .deck, .deck div, .deck svg {
+  overflow: visible !important;
+}
 .vinyl-disc{
   width:min(62vw,300px);height:min(62vw,300px);border-radius:50%;
   background:radial-gradient(circle,#2a2a2a 0%,#111 20%,#1a1a1a 21%,#0d0d0d 35%,#1a1a1a 36%,#0d0d0d 50%,#1a1a1a 51%,#0d0d0d 65%,#1a1a1a 66%,#111 80%,#222 100%);
