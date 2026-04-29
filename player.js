@@ -691,89 +691,183 @@ function updateMediaSession(f){
 // ── DJ MODE ────────────────────────────────────────────────
 let djElA=null,djElB=null,djUrlA=null,djUrlB=null;
 let djPlayA=false,djPlayB=false,djCFVal=50;
+let djLoopA=false,djLoopB=false;
+let djHotCues={A:[null,null,null],B:[null,null,null]};
+let djVuInterval=null,djTimeInterval=null;
 let djScratchData={A:{active:false,lastX:0,lastT:0,rot:0,wasPlaying:false},B:{active:false,lastX:0,lastT:0,rot:0,wasPlaying:false}};
 
 function rpOpenDJ(){
   if(!files.length){rpToast('Erst Musik laden!');return}
   if(!djElA){
     djElA=new Audio();
-    djElA.addEventListener('ended',()=>{djPlayA=false;rpDJUpdateBtn('A')});
+    djElA.addEventListener('ended',()=>{
+      if(djLoopA&&djElA.duration){djElA.currentTime=0;djElA.play().catch(()=>{})}
+      else{djPlayA=false;$('rpDJVinylA').classList.remove('playing');rpDJUpdateBtn('A')}
+    });
   }
   if(!djElB){
     djElB=new Audio();
-    djElB.addEventListener('ended',()=>{djPlayB=false;rpDJUpdateBtn('B')});
+    djElB.addEventListener('ended',()=>{
+      if(djLoopB&&djElB.duration){djElB.currentTime=0;djElB.play().catch(()=>{})}
+      else{djPlayB=false;$('rpDJVinylB').classList.remove('playing');rpDJUpdateBtn('B')}
+    });
   }
   $('rpDJOverlay').style.display='flex';
   rpDJRenderList();
   rpDJCrossfade(50);
+  // VU meter animation
+  djVuInterval=setInterval(rpDJAnimateVU,80);
+  // Time display
+  djTimeInterval=setInterval(rpDJUpdateTime,500);
 }
-function rpCloseDJ(){$('rpDJOverlay').style.display='none'}
+
+function rpCloseDJ(){
+  $('rpDJOverlay').style.display='none';
+  clearInterval(djVuInterval);clearInterval(djTimeInterval);
+}
 
 function rpDJRenderList(){
   const el=$('rpDJList');if(!el)return;
-  const items=playlist.filter(pi=>!isVid(files[pi].name));
-  el.innerHTML=items.map(pi=>{
-    const name=esc(getDisplayName(files[pi]));
+  const items=playlist.filter(fi=>!isVid(files[fi].name));
+  el.innerHTML=items.map(fi=>{
+    const name=esc(getDisplayName(files[fi]));
     return`<div class="dj-list-item">
       <span class="dj-list-item-name">${name}</span>
-      <button class="dj-load-btn" onclick="rpDJLoad('A',${pi})">→ A</button>
-      <button class="dj-load-btn" onclick="rpDJLoad('B',${pi})">→ B</button>
+      <button class="dj-load-btn" onclick="rpDJLoad('A',${fi})">→ A</button>
+      <button class="dj-load-btn" onclick="rpDJLoad('B',${fi})">→ B</button>
     </div>`;
   }).join('');
 }
 
 function rpDJLoad(deck,pi){
+  if(pi<0){rpToast('Track aus der Liste wählen ↓');return}
   const f=files[pi];
   const el=deck==='A'?djElA:djElB;
   const prevUrl=deck==='A'?djUrlA:djUrlB;
   if(prevUrl)URL.revokeObjectURL(prevUrl);
   const url=URL.createObjectURL(f);
-  if(deck==='A'){djUrlA=url;djPlayA=false}else{djUrlB=url;djPlayB=false}
-  el.src=url;el.load();
-  el.currentTime=0;
+  if(deck==='A'){djUrlA=url;djPlayA=false;djHotCues.A=[null,null,null]}
+  else{djUrlB=url;djPlayB=false;djHotCues.B=[null,null,null]}
+  el.src=url;el.load();el.currentTime=0;
   $('rpDJName'+deck).textContent=getDisplayName(f);
   $('rpDJVinyl'+deck).classList.remove('playing');
   rpDJUpdateBtn(deck);
+  // Reset hot cues visual
+  document.querySelectorAll(`.dj-hc`).forEach(b=>b.classList.remove('set'));
   rpToast('Deck '+deck+': '+getDisplayName(f));
 }
 
 function rpDJToggle(deck){
   const el=deck==='A'?djElA:djElB;
   const url=deck==='A'?djUrlA:djUrlB;
-  if(!url){rpToast('Erst Track laden → '+deck);return}
-  if(deck==='A'){
-    if(djPlayA){el.pause();djPlayA=false;$('rpDJVinylA').classList.remove('playing')}
-    else{el.play().catch(()=>{});djPlayA=true;$('rpDJVinylA').classList.add('playing')}
+  if(!url){rpToast('Track aus der Liste wählen → '+deck);return}
+  const isPlaying=deck==='A'?djPlayA:djPlayB;
+  if(isPlaying){
+    el.pause();
+    if(deck==='A'){djPlayA=false;$('rpDJVinylA').classList.remove('playing')}
+    else{djPlayB=false;$('rpDJVinylB').classList.remove('playing')}
   }else{
-    if(djPlayB){el.pause();djPlayB=false;$('rpDJVinylB').classList.remove('playing')}
-    else{el.play().catch(()=>{});djPlayB=true;$('rpDJVinylB').classList.add('playing')}
+    el.play().catch(()=>{});
+    if(deck==='A'){djPlayA=true;$('rpDJVinylA').classList.add('playing')}
+    else{djPlayB=true;$('rpDJVinylB').classList.add('playing')}
   }
   rpDJUpdateBtn(deck);
 }
 
 function rpDJUpdateBtn(deck){
-  const playing=deck==='A'?djPlayA:djPlayB;
-  $('rpDJPlayBtn'+deck).textContent=playing?'⏸':'▶';
+  const isPlaying=deck==='A'?djPlayA:djPlayB;
+  const btn=$('rpDJPlayBtn'+deck);
+  btn.textContent=isPlaying?'⏸':'▶';
+  btn.classList.toggle('playing-state',isPlaying);
 }
 
 function rpDJCue(deck){
   const el=deck==='A'?djElA:djElB;
-  if(el){el.currentTime=0}
+  if(el)el.currentTime=0;
 }
 
 function rpDJCrossfade(val){
   djCFVal=parseFloat(val);
   const a=val/100*Math.PI/2;
-  const volA=Math.cos(a),volB=Math.sin(a);
-  if(djElA)djElA.volume=Math.max(0,Math.min(1,volA));
-  if(djElB)djElB.volume=Math.max(0,Math.min(1,volB));
+  if(djElA)djElA.volume=Math.max(0,Math.min(1,Math.cos(a)));
+  if(djElB)djElB.volume=Math.max(0,Math.min(1,Math.sin(a)));
 }
 
 function rpDJPitch(deck,val){
   const r=parseFloat(val);
   const el=deck==='A'?djElA:djElB;
   if(el)el.playbackRate=r;
-  $('rpDJPitchVal'+deck).textContent=r.toFixed(2)+'×';
+  const pct=Math.round((r-1)*100);
+  $('rpDJPitchVal'+deck).textContent=(pct>0?'+':'')+pct+'%';
+}
+
+function rpDJChanVol(deck,val){
+  const el=deck==='A'?djElA:djElB;
+  if(el)el.volume=Math.max(0,Math.min(1,parseFloat(val)));
+}
+
+function rpDJLoop(deck){
+  if(deck==='A'){
+    djLoopA=!djLoopA;
+    $('rpDJLoopBtnA').classList.toggle('loop-active',djLoopA);
+    rpToast('Loop A: '+(djLoopA?'AN':'AUS'));
+  }else{
+    djLoopB=!djLoopB;
+    $('rpDJLoopBtnB').classList.toggle('loop-active',djLoopB);
+    rpToast('Loop B: '+(djLoopB?'AN':'AUS'));
+  }
+}
+
+function rpDJHotCue(deck,idx){
+  const el=deck==='A'?djElA:djElB;
+  if(!el||!el.src)return;
+  const cues=djHotCues[deck];
+  if(cues[idx]===null){
+    // Set cue
+    cues[idx]=el.currentTime;
+    // Find the button and mark it
+    const allHc=document.querySelectorAll('.dj-hotcue-row');
+    const deckIdx=deck==='A'?0:1;
+    if(allHc[deckIdx]){
+      const btns=allHc[deckIdx].querySelectorAll('.dj-hc');
+      if(btns[idx])btns[idx].classList.add('set');
+    }
+    rpToast('H'+(idx+1)+' gesetzt: '+fmt(cues[idx]));
+  }else{
+    // Jump to cue
+    el.currentTime=cues[idx];
+  }
+}
+
+function rpDJUpdateTime(){
+  ['A','B'].forEach(d=>{
+    const el=d==='A'?djElA:djElB;
+    if(!el)return;
+    const t=$('rpDJTime'+d);
+    if(t)t.textContent=fmt(el.currentTime||0);
+    // Fake BPM based on pitch
+    const rate=el.playbackRate||1;
+    const bpmEl=$('rpDJBpm'+d);
+    if(bpmEl&&el.src){
+      const fakeBpm=Math.round(128*rate);
+      bpmEl.textContent=fakeBpm+' BPM';
+    }
+  });
+}
+
+function rpDJAnimateVU(){
+  ['A','B'].forEach(d=>{
+    const isPlaying=d==='A'?djPlayA:djPlayB;
+    const bar=$('rpDJVu'+d);
+    if(!bar)return;
+    const segs=bar.querySelectorAll('.dj-vs');
+    if(isPlaying){
+      const level=Math.floor(Math.random()*3)+Math.floor(Math.random()*5);
+      segs.forEach((s,i)=>s.classList.toggle('active',i<level));
+    }else{
+      segs.forEach(s=>s.classList.remove('active'));
+    }
+  });
 }
 
 // DJ Scratch (direkt auf den DJ-Vinyls)
@@ -782,9 +876,7 @@ function rpDJScratchStart(e,deck){
   const t=e.touches[0];
   const d=djScratchData[deck];
   d.lastX=t.clientX;d.lastT=Date.now();d.active=false;
-  const el=deck==='A'?djElA:djElB;
   d.wasPlaying=deck==='A'?djPlayA:djPlayB;
-  // Vinyl visuell einfrieren
   const v=$('rpDJVinyl'+deck);
   const m=getComputedStyle(v).transform;
   if(m&&m!=='none'){const p=m.match(/matrix\(([^,]+),([^,]+)/);if(p)d.rot=Math.atan2(parseFloat(p[2]),parseFloat(p[1]))*180/Math.PI}
