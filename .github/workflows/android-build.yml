@@ -1,0 +1,107 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - 'claude/**'
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+      - '.github/workflows/auto-deploy.yml'
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0 platform-tools'
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Backup custom AndroidManifest.xml
+        run: |
+          mkdir -p .ci-backup
+          if [ -f android/app/src/main/AndroidManifest.xml ]; then
+            cp android/app/src/main/AndroidManifest.xml .ci-backup/AndroidManifest.xml
+            echo "Custom AndroidManifest.xml gesichert."
+          fi
+
+      - name: Generate fresh Android project (cap add android)
+        run: |
+          rm -rf android
+          npx cap add android
+
+      - name: Apply custom AndroidManifest.xml (Storage-Permissions)
+        run: |
+          if [ -f .ci-backup/AndroidManifest.xml ]; then
+            cp .ci-backup/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
+            echo "Custom AndroidManifest.xml wiederhergestellt."
+          fi
+
+      - name: Generate Android icons from icon.png
+        run: |
+          npm install --no-save @capacitor/assets
+          mkdir -p assets
+          cp icon.png assets/icon.png
+          npx capacitor-assets generate --android --assetPath assets || echo "Icon generation übersprungen (nutze Defaults)"
+
+      - name: Sync www/ into native project
+        run: npx cap sync android
+
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
+      - name: Build Debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Rename APK with short SHA
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          cp android/app/build/outputs/apk/debug/app-debug.apk DaN-Vibe-Player-${SHORT_SHA}.apk
+          echo "APK_NAME=DaN-Vibe-Player-${SHORT_SHA}.apk" >> $GITHUB_ENV
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DaN-Vibe-Player-debug-apk
+          path: DaN-Vibe-Player-*.apk
+          retention-days: 90
+
+      - name: Create GitHub Release on tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: DaN-Vibe-Player-*.apk
+          generate_release_notes: true
+          name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
