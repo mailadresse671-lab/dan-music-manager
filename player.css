@@ -882,3 +882,33 @@ video:fullscreen,video:-webkit-full-screen{width:100vw;height:100vh;object-fit:c
   animation:djTapeBlink 1.4s ease-in-out infinite;
 }
 @keyframes djTapeBlink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* ── TABLET LANDSCAPE (≥768px Breite, Querformat) ─────────── */
+@media (min-width:768px) and (orientation:landscape){
+  /* Vinyl-Bereich: kleiner damit Controls daneben Platz haben */
+  .vinyl-disc{width:min(40vh,360px);height:min(40vh,360px)}
+  .vinyl-area{padding:24px}
+  .player-controls{padding:16px 32px}
+  /* DJ-Mode: Plattenteller größer ausnutzen */
+  .dj-vinyl{width:min(28vh,180px);height:min(28vh,180px)}
+  .dj-table{padding:14px 18px 8px;gap:12px}
+  .dj-turntable{padding:10px 14px;gap:8px}
+  .dj-mixer{width:min(14vw,110px)}
+  .dj-arm-a,.dj-arm-b{width:78px;height:128px}
+  /* Trackliste in 2 Spalten */
+  .dj-list{column-count:2;column-gap:14px}
+  .dj-list-item{break-inside:avoid}
+  /* Touch-Targets vergrößern */
+  .dj-tc,.dj-kill,.dj-hc,.dj-fx,.dj-pad,
+  .ctrl-btn,.eq-preset-btn,.speed-btn{min-height:38px}
+  .dj-pad{min-height:34px}
+  /* Header größer für Tablet-Hand */
+  .header{padding:14px 22px}
+  .header-title{font-size:22px}
+}
+
+/* ── TOUCH-OPTIMIERUNG: keine Hover-Highlights ───────────── */
+@media (pointer:coarse){
+  *{-webkit-tap-highlight-color:transparent}
+  button,input[type=range]{touch-action:manipulation}
+}

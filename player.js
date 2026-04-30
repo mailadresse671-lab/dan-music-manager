@@ -1,3 +1,16 @@
+// ── Capacitor Native Bridge ────────────────────────────────
+const isNative=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+const CapFs=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Filesystem;
+function getMediaSrc(f){
+  if(f&&f._uri&&window.Capacitor&&window.Capacitor.convertFileSrc){
+    return window.Capacitor.convertFileSrc(f._uri);
+  }
+  return URL.createObjectURL(f);
+}
+function revokeMediaSrc(url){
+  if(typeof url==='string'&&url.startsWith('blob:'))URL.revokeObjectURL(url);
+}
+
 const AUDIO_EXT=['mp3','wav','ogg','flac','aac','m4a','opus','wma','oga','m4b'];
 const VIDEO_EXT=['mp4','webm','mov','avi','mkv','m4v','wmv','3gp','flv','ogv'];
 
@@ -18,7 +31,15 @@ const NAMES_KEY='rp_names';
 let customNames={};
 try{customNames=JSON.parse(localStorage.getItem(NAMES_KEY)||'{}')}catch(e){}
 function fileKey(f){return f.name+'|'+f.size}
-function getDisplayName(f){return customNames[fileKey(f)]||f.name.replace(/\.[^.]+$/,'')}
+function getDisplayName(f){
+  if(customNames[fileKey(f)])return customNames[fileKey(f)];
+  return f.name
+    .replace(/\.[^.]+$/,'')        // Endung entfernen
+    .replace(/[_\-]+/g,' ')        // _ und - durch Leerzeichen
+    .replace(/\s+/g,' ')           // mehrfache Leerzeichen
+    .replace(/^\d+\s*[\.\-]?\s*/,'')// führende Track-Nummern wie "01 - "
+    .trim();
+}
 function saveCustomName(f,name){customNames[fileKey(f)]=name;try{localStorage.setItem(NAMES_KEY,JSON.stringify(customNames))}catch(e){}}
 
 function rpRenameTrack(pi,event){
@@ -257,8 +278,41 @@ async function scanDir(dirHandle,arr){
   }
 }
 
+// ── Android: Music-Ordner via Capacitor Filesystem ─────────
+async function scanAndroidDir(path,arr){
+  let res;
+  try{res=await CapFs.readdir({path:path,directory:'EXTERNAL_STORAGE'})}catch(e){return}
+  for(const entry of (res.files||[])){
+    const fullPath=path?path+'/'+entry.name:entry.name;
+    if(entry.type==='file'){
+      const x=ext(entry.name);
+      if(AUDIO_EXT.includes(x)||VIDEO_EXT.includes(x)){
+        arr.push({name:entry.name,size:entry.size||0,type:'',_uri:entry.uri||fullPath});
+        $('rpScanCount').textContent=arr.length+' Dateien gefunden';
+      }
+    }else if(entry.type==='directory'){
+      try{await scanAndroidDir(fullPath,arr)}catch(e){}
+    }
+  }
+}
+async function rpPickAndroidFolder(){
+  if(!CapFs){rpToast('Filesystem-Plugin fehlt');return}
+  try{await CapFs.requestPermissions()}catch(e){}
+  $('rpSetupBox').style.display='none';$('rpReloadBox').style.display='none';
+  $('rpScanBox').style.display='flex';$('rpScanCount').textContent='0 Dateien gefunden';
+  const arr=[];
+  for(const root of ['Music','Download','DCIM']){
+    try{await scanAndroidDir(root,arr)}catch(e){}
+  }
+  $('rpScanBox').style.display='none';
+  if(!arr.length){$('rpSetupBox').style.display='';rpToast('Keine Musikdateien gefunden');return}
+  files=arr;buildPlaylist(false);rpToast('✓ '+files.length+' Tracks geladen');
+  $('rpRescanBtn').style.display='flex';
+}
+
 // ── Haupt-Ordner auswählen ─────────────────────────────────
 async function rpPickRootFolder(){
+  if(isNative)return rpPickAndroidFolder();
   if(!window.showDirectoryPicker){$('rpFolderIn').click();return}
   try{
     const handle=await window.showDirectoryPicker({mode:'read',startIn:'music'});
@@ -370,8 +424,8 @@ function ensureAudio(){
 function playTrack(pi){
   if(pi<0||pi>=playlist.length)return;
   cur=pi;const f=files[playlist[pi]];
-  if(objUrl){URL.revokeObjectURL(objUrl);objUrl=null}
-  objUrl=URL.createObjectURL(f);
+  if(objUrl){revokeMediaSrc(objUrl);objUrl=null}
+  objUrl=getMediaSrc(f);
   ensureAudio();
 
   const vid=$('rpVideo'),va=$('rpVideoArea'),viny=$('rpVinylArea');
@@ -773,8 +827,8 @@ function rpDJLoad(deck,pi){
   const f=files[pi];
   const el=deck==='A'?djElA:djElB;
   const prevUrl=deck==='A'?djUrlA:djUrlB;
-  if(prevUrl)URL.revokeObjectURL(prevUrl);
-  const url=URL.createObjectURL(f);
+  if(prevUrl)revokeMediaSrc(prevUrl);
+  const url=getMediaSrc(f);
   if(deck==='A'){djUrlA=url;djPlayA=false;djHotCues.A=[null,null,null,null,null,null,null,null]}
   else{djUrlB=url;djPlayB=false;djHotCues.B=[null,null,null,null,null,null,null,null]}
   el.src=url;el.load();el.currentTime=0;
@@ -1020,8 +1074,8 @@ function rpDJScratchEnd(e,deck){
   }
 }
 
-// ── Service Worker ─────────────────────────────────────────
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+// ── Service Worker (nur Web, nicht in nativer App) ─────────
+if(!isNative&&'serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
 // ── Vollbild ───────────────────────────────────────────────
 (function(){
