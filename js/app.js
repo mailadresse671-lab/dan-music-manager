@@ -510,7 +510,8 @@ const OPTION_PRESETS = {
 // =============================
 // INIT
 // =============================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  if (typeof nativePrefSync === 'function') await nativePrefSync();
   migrateStorageKeys();  // migrate to multi-profile if needed
   renderProfilePicker(); // show profile picker first
 
@@ -3532,4 +3533,5 @@ window.addEventListener('DOMContentLoaded', () => {
   initBioCard();
   updateVoicePersonaBadge();
   buildIntroParticles();
+  if (typeof initNativeUI === 'function') initNativeUI();
 });
