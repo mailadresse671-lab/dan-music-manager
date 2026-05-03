@@ -8012,17 +8012,36 @@ function isPhase2Complete() {
   const s = songs[currentSongId];
   return !!(s?.p2_lyrics?.trim().length > 10);
 }
+function isPhase3Complete() {
+  if (!currentSongId) return false;
+  return !!(songs[currentSongId]?.p3_ai_result?.trim());
+}
+function isPhase4Complete() {
+  if (!currentSongId) return false;
+  return !!(songs[currentSongId]?.p4_ai_result?.trim());
+}
+function isPhase5Complete() {
+  if (!currentSongId) return false;
+  return !!(songs[currentSongId]?.p5_ai_result?.trim());
+}
+function isPhase6Complete() {
+  if (!currentSongId) return false;
+  return !!(songs[currentSongId]?.p6_ai_result?.trim());
+}
+function isPhase7Complete() {
+  if (!currentSongId) return false;
+  return !!(songs[currentSongId]?.p7_ai_result?.trim());
+}
 function updateNavLocks() {
   const p1ok = isPhase1Complete();
   const p2ok = isPhase2Complete();
+  const phDone = [false, p1ok, p2ok, isPhase3Complete(), isPhase4Complete(), isPhase5Complete(), isPhase6Complete(), isPhase7Complete()];
   document.querySelectorAll('.nav-item').forEach(el => {
     const ph = parseInt(el.dataset.phase);
+    if (!ph) return;
     el.classList.remove('locked','done');
-    if (ph === 1 && p1ok) el.classList.add('done');
-    if (ph === 2) {
-      if (!p1ok) el.classList.add('locked');
-      else if (p2ok) el.classList.add('done');
-    }
+    if (phDone[ph]) el.classList.add('done');
+    if (ph === 2 && !p1ok) el.classList.add('locked');
     if (ph === 3 && !p2ok) el.classList.add('locked');
   });
 }
