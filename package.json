@@ -1,0 +1,27 @@
+{
+  "name": "dan-music-manager",
+  "version": "1.0.0",
+  "description": "KI-gestützter Musikproduktions-Manager",
+  "main": "player.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mailadresse671-lab/dan-music-manager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mailadresse671-lab/dan-music-manager/issues"
+  },
+  "homepage": "https://github.com/mailadresse671-lab/dan-music-manager#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/cli": "^8.3.1",
+    "@capacitor/core": "^8.3.1",
+    "@capacitor/filesystem": "^8.1.2"
+  }
+}
