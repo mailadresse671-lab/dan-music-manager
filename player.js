@@ -1101,16 +1101,6 @@ if(!isNative&&'serviceWorker' in navigator)navigator.serviceWorker.register('./s
   });
 })();
 
-// ── Intro Splash ───────────────────────────────────────────
-(function(){
-  const intro=document.getElementById('rpIntro');
-  if(!intro)return;
-  setTimeout(()=>{
-    intro.classList.add('hiding');
-    setTimeout(()=>{intro.style.display='none'},700);
-  },2300);
-})();
-
 // ── Start ──────────────────────────────────────────────────
 applyTheme(currentTheme);
 const savedPreset=localStorage.getItem('rp_preset')||'master';
